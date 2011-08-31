@@ -109,6 +109,7 @@ import org.activiti.engine.impl.variable.VariableDeclaration;
  * @author Frederik Heremans
  * @author Falko Menge
  * @author Esteban Robles
+ * @author Daniel Meyer
  */
 public class BpmnParse extends Parse {
 
@@ -919,11 +920,14 @@ public class BpmnParse extends Parse {
     String expression = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "expression");
     String delegateExpression = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression");
     String resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariable");
+    String async = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async");
     if (resultVariableName == null) {
       resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
     String implementation = serviceTaskElement.attribute("implementation");
     String operationRef = this.resolveName(serviceTaskElement.attribute("operationRef"));
+    
+    activity.setAsync("true".equals(async));
 
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {

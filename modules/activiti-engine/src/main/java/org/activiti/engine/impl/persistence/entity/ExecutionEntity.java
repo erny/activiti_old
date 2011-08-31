@@ -14,12 +14,14 @@
 package org.activiti.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.activiti.engine.impl.JobQueryImpl;
 import org.activiti.engine.impl.TaskQueryImpl;
@@ -30,6 +32,7 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.activiti.engine.impl.history.handler.ActivityInstanceEndHandler;
 import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.activiti.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
@@ -46,6 +49,7 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
+import org.activiti.engine.impl.pvm.runtime.AtomicOperationCodes;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.variable.VariableDeclaration;
@@ -541,11 +545,37 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public void performOperation(AtomicOperation executionOperation) {
+    if(executionOperation.isAsync(this)) {
+      scheduleAtomicOperationAsync(executionOperation);
+    } else {
+      performOperationSync(executionOperation);
+    }    
+  }
+  
+  protected void performOperationSync(AtomicOperation executionOperation) {
     Context
       .getCommandContext()
       .performOperation(executionOperation, this);
   }
-  
+
+  protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
+    String atomicOperationCode = AtomicOperationCodes.getCode(executionOperation);
+    if(atomicOperationCode == null) {
+      throw new ActivitiException("Cannot schedue AtomicOperation async: no code set for AtomicOperation '"+executionOperation.getClass().getName()+"'.");
+    }
+
+    MessageEntity message = new MessageEntity();
+    message.setExecution(this);
+    message.setDuedate(new Date()); // it's due ASAP
+    message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
+    message.setJobHandlerConfiguration(atomicOperationCode);
+
+    Context
+      .getCommandContext()
+      .getJobManager()
+      .send(message);
+  }
+
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;
   }
