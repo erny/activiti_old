@@ -96,11 +96,10 @@ public class AsyncServiceTaskTest extends PluggableActivitiTestCase {
     assertEquals(0, managementService.createJobQuery().count());   
   }
   
-  // I think this is the behavior we would like to see:
-  // but the test is failing because the timer job is created in the same transaction as the 
-  // message is executed (a transaction which always fails, because the service task throws an exception)  
+
+  // This test passes but I am not sure it is the expected behavior from a user-perspective:
   @Deployment
-  public void FAILING_testFailingAsycServiceTimer() { 
+  public void testFailingAsycServiceTimer() { 
     // start process 
     runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
     // now there should be one job in the database, and it is a message
@@ -110,6 +109,29 @@ public class AsyncServiceTaskTest extends PluggableActivitiTestCase {
       fail("the job must be a message");
     }      
     
+    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    
+    // the service failed: the execution is still sitting in the service task:
+    Execution execution = runtimeService.createExecutionQuery().singleResult();
+    assertNotNull(execution);
+    assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
+    
+    // there still a single job because the timer was created in the same transaction as the 
+    // service was executed (which rolled back)
+    assertEquals(1, managementService.createJobQuery().count());    
+    
+    runtimeService.deleteProcessInstance(execution.getId(), "dead");        
+  }
+  
+  // TODO:Maybe we want to see this:
+  @Deployment
+  public void FAILING_testFailingAsycServiceTimer() { 
+    // start process 
+    runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
+    // now there are two jobs the message and a timer:
+    assertEquals(2, managementService.createJobQuery().count());          
+    
+    // let 'max-retires' on the message be reached
     waitForJobExecutorToProcessAllJobs(5000L, 25L);
     
     // the service failed: the execution is still sitting in the service task:
