@@ -12,7 +12,14 @@
  */
 package org.activiti.engine.test.bpmn.async;
 
+import java.util.Date;
+
+import org.activiti.engine.impl.persistence.entity.MessageEntity;
+import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
+import org.activiti.engine.impl.util.ClockUtil;
+import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.Job;
 import org.activiti.engine.test.Deployment;
 
 /**
@@ -89,22 +96,37 @@ public class AsyncServiceTaskTest extends PluggableActivitiTestCase {
     assertEquals(0, managementService.createJobQuery().count());   
   }
   
-  // TODO: do we want this behavior?  
+  // I think this is the behavior we would like to see:
+  // but the test is failing because the timer job is created in the same transaction as the 
+  // message is executed (a transaction which always fails, because the service task throws an exception)  
   @Deployment
-  public void FAILING_testAsycServiceTimer() { 
-    INVOCATION = false;
+  public void FAILING_testFailingAsycServiceTimer() { 
     // start process 
     runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
-    // now there should be two jobs in the database, one for the message and one for the timer.
-    assertEquals(2, managementService.createJobQuery().count());
-    // the service was not invoked:
-    assertFalse(INVOCATION);
+    // now there should be one job in the database, and it is a message
+    assertEquals(1, managementService.createJobQuery().count());
+    Job job = managementService.createJobQuery().singleResult();
+    if(!(job instanceof MessageEntity)) {
+      fail("the job must be a message");
+    }      
     
     waitForJobExecutorToProcessAllJobs(5000L, 25L);
     
-    // the service was invoked
-    assertTrue(INVOCATION);    
-    // both the timer and the message are cancelled
+    // the service failed: the execution is still sitting in the service task:
+    Execution execution = runtimeService.createExecutionQuery().singleResult();
+    assertNotNull(execution);
+    assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
+    
+    // there are tow jobs, the message and the timer (the message will no be retried anymore, max retires is reached.)
+    assertEquals(2, managementService.createJobQuery().count());    
+      
+    // now the timer triggers:
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()+10000));
+    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    
+    // and we are done:
+    assertNull(runtimeService.createExecutionQuery().singleResult());    
+    // and there are no more jobs left:
     assertEquals(0, managementService.createJobQuery().count());   
         
   }
