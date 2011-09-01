@@ -12,11 +12,9 @@
  */
 package org.activiti.engine.impl.jobexecutor;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
-import org.activiti.engine.impl.pvm.runtime.AtomicOperationCodes;
 
 /**
  * 
@@ -31,10 +29,9 @@ public class AsyncContinuationJobHandler implements JobHandler {
   }
 
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
-    AtomicOperation atomicOperation = AtomicOperationCodes.getAtomicOperation(configuration);
-    if(atomicOperation == null) {
-      throw new ActivitiException("Cannot perform async continutation. Atomic operation with code '"+configuration+"' not found.");
-    }
+    // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously 
+    AtomicOperation atomicOperation = AtomicOperation.TRANSITION_CREATE_SCOPE;
+    
     commandContext
       .performOperation(atomicOperation, execution);
   }

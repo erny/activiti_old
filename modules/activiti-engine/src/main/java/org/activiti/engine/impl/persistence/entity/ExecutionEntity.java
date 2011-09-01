@@ -49,7 +49,6 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.ScopeImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
-import org.activiti.engine.impl.pvm.runtime.AtomicOperationCodes;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.variable.VariableDeclaration;
@@ -559,16 +558,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
-    String atomicOperationCode = AtomicOperationCodes.getCode(executionOperation);
-    if(atomicOperationCode == null) {
-      throw new ActivitiException("Cannot schedue AtomicOperation async: no code set for AtomicOperation '"+executionOperation.getClass().getName()+"'.");
-    }
-
     MessageEntity message = new MessageEntity();
     message.setExecution(this);
-    message.setDuedate(new Date()); // it's due ASAP
     message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-    message.setJobHandlerConfiguration(atomicOperationCode);
+    // At the moment, only AtomicOperationTransitionCreateScope can be performed asynchronously,
+    // so there is no need to pass it to the handler
 
     Context
       .getCommandContext()
