@@ -22,7 +22,7 @@ import org.activiti.engine.delegate.JavaDelegate;
 public class AsyncService implements JavaDelegate {
   
   public void execute(DelegateExecution execution) throws Exception {
-    AsyncServiceTaskTest.INVOCATION = true;
+    AsyncTaskTest.INVOCATION = true;
   }
 
 }
