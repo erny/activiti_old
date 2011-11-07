@@ -56,7 +56,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs> {
       List<String> jobIds = new ArrayList<String>();
 
       if (job != null && !acquiredJobs.contains(job.getId())) {     
-        if (job.isExclusive()) {
+        if (job.isExclusive() && job.getProcessInstanceId() != null) {
           // acquire all exclusive jobs in the same process instance
           // (includes the current job)
           List<JobEntity> exclusiveJobs = commandContext.getJobManager()

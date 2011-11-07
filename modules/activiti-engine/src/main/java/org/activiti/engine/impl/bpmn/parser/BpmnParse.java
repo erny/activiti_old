@@ -2425,14 +2425,11 @@ public class BpmnParse extends Parse {
   }
   
   protected boolean isExclusive(Element element) {   
-    return "exclusive".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async")) 
-            || ("true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async")) && JobEntity.DEFAULT_EXCLUSIVE);
-            
+    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE)));              
   }
 
   protected boolean isAsync(Element element) {
-    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"))
-            || "exclusive".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"));
+    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"));
   }
 
 }

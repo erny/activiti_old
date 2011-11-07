@@ -29,7 +29,7 @@ public class ExclusiveTimerEventTest extends PluggableActivitiTestCase {
     // Set the clock fixed
     Date startTime = new Date();
 
-    // After process start, there should be timer created
+    // After process start, there should be 3 timers created
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveTimers");
     JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getId());
     assertEquals(3, jobQuery.count());

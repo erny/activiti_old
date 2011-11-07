@@ -16,19 +16,19 @@
 		<sequenceFlow sourceRef="fork" targetRef="timer3" />
 
         <intermediateCatchEvent id="timer">
-            <timerEventDefinition activiti:exclusive="true">
+            <timerEventDefinition>
                 <timeDuration>PT5M</timeDuration>
             </timerEventDefinition>
         </intermediateCatchEvent>
         
         <intermediateCatchEvent id="timer2">
-            <timerEventDefinition activiti:exclusive="true">
+            <timerEventDefinition>
                 <timeDuration>PT5M</timeDuration>
             </timerEventDefinition>
         </intermediateCatchEvent>
         
         <intermediateCatchEvent id="timer3">
-            <timerEventDefinition activiti:exclusive="true">
+            <timerEventDefinition>
                 <timeDuration>PT5M</timeDuration>
             </timerEventDefinition>
         </intermediateCatchEvent>
