@@ -113,6 +113,11 @@
 		<artifactId>java-uuid-generator</artifactId>
 		<scope>provided</scope>
 	</dependency>
+	<dependency>
+		<groupId>com.bea.commonj</groupId>
+		<artifactId>com.springsource.commonj</artifactId>
+		<scope>provided</scope>
+	</dependency>
   </dependencies>
 
   <properties>

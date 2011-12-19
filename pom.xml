@@ -423,6 +423,11 @@
 		    <artifactId>java-uuid-generator</artifactId>
 		    <version>3.1.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bea.commonj</groupId>
+			<artifactId>com.springsource.commonj</artifactId>
+			<version>1.1.0</version>
+		</dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -455,6 +460,11 @@
       <id>vaadin-addons</id>
       <url>http://maven.vaadin.com/vaadin-addons</url>
     </repository>
+	<repository>
+	  <id>com.springsource.repository.bundles.external</id>
+	  <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+	  <url>http://repository.springsource.com/maven/bundles/external</url>
+	</repository>
   </repositories>
 
   <pluginRepositories>
