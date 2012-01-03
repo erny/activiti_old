@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cmd.AcquireJobsCmd;
+import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.runtime.Job;
 
@@ -28,91 +28,70 @@ import org.activiti.engine.runtime.Job;
  * <p>This component is responsible for performing all background work 
  * ({@link Job Jobs}) scheduled by activiti.</p>
  * 
- * <p>You should generally only have one of these per Activiti instance in a JVM.
+ * <p>You should generally only have one of these per Activiti instance (process 
+ * engine) in a JVM.
  * In clustered situations, you can have multiple of these running against the
  * same queue + pending job list.</p>
  * 
  * @author Daniel Meyer
  */
 public abstract class JobExecutor {
-
+  
   private static Logger log = Logger.getLogger(JobExecutor.class.getName());
 
+  protected String name = "JobExecutor["+getClass().getName()+"]";
   protected CommandExecutor commandExecutor;
+  protected Command<AcquiredJobs> acquireJobsCmd;
+  protected AcquireJobsRunnable acquireJobsRunnable;
+  
   protected boolean isAutoActivate = false;
-
+  protected boolean isActive = false;
+  
   protected int maxJobsPerAcquisition = 3;
   protected int waitTimeInMillis = 5 * 1000;
   protected String lockOwner = UUID.randomUUID().toString();
   protected int lockTimeInMillis = 5 * 60 * 1000;
-  
-  protected boolean isActive = false;
-  
-  protected AcquireJobsRunnable acquireJobsRunnable;
-  protected AcquireJobsCmd acquireJobsCmd;
-  
-  public synchronized void start() {
+      
+  public void start() {
     if (isActive) {
-      log.info("Ignoring duplicate JobExecutor start invocation");
       return;
     }
     log.info("Starting up the JobExecutor["+getClass().getName()+"].");
     ensureInitialization();    
     startExecutingJobs();
-    scheduleAcquisitionTimer(acquireJobsRunnable, 0, waitTimeInMillis);    
     isActive = true;
   }
   
   public synchronized void shutdown() {
     if (!isActive) {
-      log.info("Ignoring request to shut down non-active JobExecutor");
       return;
     }
     log.info("Shutting down the JobExecutor["+getClass().getName()+"].");
     acquireJobsRunnable.interrupt();
-    cancelAcquisitionTimer();
     stopExecutingJobs();
+    ensureCleanup();   
     isActive = false;
+  }
+  
+  protected void ensureInitialization() { 
+    acquireJobsCmd = new AcquireJobsCmd(this);
+    acquireJobsRunnable = new AcquireJobsRunnable(this);  
+  }
+  
+  protected void ensureCleanup() {  
+    acquireJobsCmd = null;
+    acquireJobsRunnable = null;  
   }
   
   public void jobWasAdded() {
     if(isActive) {
-      // run immediately (ASAP)
-      rescheduleAcquisition(0);
+      acquireJobsRunnable.jobWasAdded();
     }
-  }
-  
-  public void rescheduleAcquisition(long waitUntilStart) {
-    if(! isActive) {
-      throw new ActivitiException("JobExecutor cannot accept work: not active.");
-    } 
-    cancelAcquisitionTimer();
-    scheduleAcquisitionTimer(acquireJobsRunnable, waitUntilStart, waitTimeInMillis);
-  }
-  
-  public void executeJobs(List<String> jobIds) {
-    if(! isActive) {
-      throw new ActivitiException("JobExecutor cannot accept work: not active.");
-    } 
-    execute(jobIds);
-  }
-  
-
-  protected void ensureInitialization() {
-   if(acquireJobsCmd == null) {
-     acquireJobsCmd = new AcquireJobsCmd(this);     
-   }
-   if(acquireJobsRunnable == null) {
-     acquireJobsRunnable = new AcquireJobsRunnable(this);
-   }
   }
   
   protected abstract void startExecutingJobs();
   protected abstract void stopExecutingJobs(); 
-
-  protected abstract void scheduleAcquisitionTimer(Runnable acquireJobsRunnable, long startDelayInMillis, long period);
-  protected abstract void cancelAcquisitionTimer();
-  protected abstract void execute(List<String> jobIds);
+  protected abstract void executeJobs(List<String> jobIds);
   
   // getters and setters //////////////////////////////////////////////////////
 
@@ -134,10 +113,6 @@ public abstract class JobExecutor {
 
   public void setLockTimeInMillis(int lockTimeInMillis) {
     this.lockTimeInMillis = lockTimeInMillis;
-  }
-
-  public boolean isActive() {
-    return isActive;
   }
 
   public String getLockOwner() {
@@ -167,22 +142,21 @@ public abstract class JobExecutor {
   public void setMaxJobsPerAcquisition(int maxJobsPerAcquisition) {
     this.maxJobsPerAcquisition = maxJobsPerAcquisition;
   }
+
+  public String getName() {
+    return name;
+  }
   
-  
-  public AcquireJobsCmd getAcquireJobsCmd() {
+  public Command<AcquiredJobs> getAcquireJobsCmd() {
     return acquireJobsCmd;
   }
-    
-  public void setAcquireJobsCmd(AcquireJobsCmd acquireJobsCmd) {
+  
+  public void setAcquireJobsCmd(Command<AcquiredJobs> acquireJobsCmd) {
     this.acquireJobsCmd = acquireJobsCmd;
   }
     
-  public AcquireJobsRunnable getAcquireJobsRunnable() {
-    return acquireJobsRunnable;
+  public boolean isActive() {
+    return isActive;
   }
-    
-  public void setAcquireJobsRunnable(AcquireJobsRunnable acquireJobsRunnable) {
-    this.acquireJobsRunnable = acquireJobsRunnable;
-  }
-    
+      
 }

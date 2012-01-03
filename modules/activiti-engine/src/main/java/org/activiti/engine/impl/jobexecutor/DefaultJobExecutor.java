@@ -13,15 +13,13 @@
 package org.activiti.engine.impl.jobexecutor;
 
 import java.util.List;
-import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.jobexecutor.commonj.WorkManagerJobExecutor;
 
 /**
  * <p>This is a simple implementation of the {@link JobExecutor} using self-managed
@@ -30,28 +28,23 @@ import org.activiti.engine.impl.jobexecutor.commonj.WorkManagerJobExecutor;
  * <p>This implementation uses a {@link ThreadPoolExecutor} backed by a queue to which
  * work is submitted.</p>
  * 
- * <p><em>NOTE: this class is present for supporting environments in which 
- * self-management of threads is permitted.</em></p>
- * 
- * <p><em>On IBM WebSphere 6.0+ and BEA WebLogic 9.0+, consider using the  
- * {@link WorkManagerJobExecutor} implementation which delegates to a CommonJ 
- * WorkManager / TimerManager.</em></p>
+ * <p><em>NOTE: use this class in environments in which self-management of threads 
+ * is permitted. Consider using a different thread-management strategy in 
+ * J(2)EE-Environments.</em></p>
  * 
  * @author Daniel Meyer
  */
 public class DefaultJobExecutor extends JobExecutor {
   
-  private static Logger log = Logger.getLogger(DefaultJobExecutor.class.getName());
-  
   protected int queueSize = 3;
   protected int corePoolSize = 3;
   private int maxPoolSize = 10;
 
-  protected Timer acquisitionTimer;
+  protected Thread jobAcquisitionThread;
   protected BlockingQueue<Runnable> threadPoolQueue;
   protected ThreadPoolExecutor threadPoolExecutor;
-
-  protected TimerTaskAdapter scheduledAcquisitionTask;
+  
+  protected RejectedExecutionHandler rejectedExecutionHandler;
   
   protected void startExecutingJobs() {
     if (threadPoolQueue==null) {
@@ -59,31 +52,19 @@ public class DefaultJobExecutor extends JobExecutor {
     }
     if (threadPoolExecutor==null) {
       threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue);
-      threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+      if(rejectedExecutionHandler == null) {
+        rejectedExecutionHandler = new ThreadPoolExecutor.CallerRunsPolicy();
+      }
+      threadPoolExecutor.setRejectedExecutionHandler(rejectedExecutionHandler);
     }
-    if(acquisitionTimer == null) {
-      acquisitionTimer = new Timer("Job Acquisition Timer",true);
-    }
+    if(jobAcquisitionThread == null) {
+      jobAcquisitionThread = new Thread(acquireJobsRunnable);
+      jobAcquisitionThread.setDaemon(true);
+      jobAcquisitionThread.start();
+    }   
   }
-  
-  protected void scheduleAcquisitionTimer(Runnable acquireJobsRunnable, long startDelayInMillis, long period) {
-    scheduledAcquisitionTask = new TimerTaskAdapter(acquireJobsRunnable);    
-    acquisitionTimer.schedule(scheduledAcquisitionTask, startDelayInMillis, period);
-  }  
-
-  protected void cancelAcquisitionTimer() {
-    if(scheduledAcquisitionTask == null) {
-      log.fine("no acquisition scheduled");
-    }else {
-      scheduledAcquisitionTask.cancel();
-      scheduledAcquisitionTask = null;
-    }
-  }
-  
-  protected void stopExecutingJobs() {
-    // cancel the acquisition timer
-    acquisitionTimer.cancel();
     
+  protected void stopExecutingJobs() {
     // Ask the thread pool to finish and exit
     threadPoolExecutor.shutdown();
 
@@ -96,10 +77,10 @@ public class DefaultJobExecutor extends JobExecutor {
     }
 
     threadPoolExecutor = null;
-    acquisitionTimer = null;
+    jobAcquisitionThread = null;
   }
   
-  public void execute(List<String> jobIds) {
+  public void executeJobs(List<String> jobIds) {
     // TODO: RejectedExecutionException handling!
     threadPoolExecutor.execute(new ExecuteJobsRunnable(commandExecutor, jobIds));
   }
@@ -146,4 +127,12 @@ public class DefaultJobExecutor extends JobExecutor {
     this.threadPoolExecutor = threadPoolExecutor;
   }
   
+  protected RejectedExecutionHandler getRejectedExecutionHandler() {    
+    return rejectedExecutionHandler;
+  }
+  
+  public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
+    this.rejectedExecutionHandler = rejectedExecutionHandler;
+  }
+    
 }
