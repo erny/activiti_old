@@ -67,7 +67,7 @@ public abstract class JobExecutor {
       return;
     }
     log.info("Shutting down the JobExecutor["+getClass().getName()+"].");
-    acquireJobsRunnable.interrupt();
+    acquireJobsRunnable.stop();
     stopExecutingJobs();
     ensureCleanup();   
     isActive = false;

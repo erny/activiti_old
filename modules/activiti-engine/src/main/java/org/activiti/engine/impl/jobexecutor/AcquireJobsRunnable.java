@@ -14,6 +14,7 @@ package org.activiti.engine.impl.jobexecutor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ public class AcquireJobsRunnable implements Runnable {
   protected volatile boolean isInterrupted = false;
   protected volatile boolean isJobAdded = false;
   protected final Object MONITOR = new Object();
+  protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
   public AcquireJobsRunnable(JobExecutor jobExecutor) {
     this.jobExecutor = jobExecutor;
@@ -92,28 +94,33 @@ public class AcquireJobsRunnable implements Runnable {
         try {
           log.fine("job acquisition thread sleeping for " + millisToWait + " millis");
           synchronized (MONITOR) {
-            MONITOR.wait(millisToWait);
+            isWaiting.set(true);
+            MONITOR.wait(millisToWait);            
           }
           log.fine("job acquisition thread woke up");
         } catch (InterruptedException e) {
           log.fine("job acquisition wait interrupted");
+        } finally {
+          isWaiting.set(false);
         }
       }
     }
     log.info(jobExecutor.getName() + " stopped job acquisition");
   }
 
-  public void interrupt() {
+  public void stop() {
     isInterrupted = true; 
     synchronized (MONITOR) {
       MONITOR.notifyAll();
     }
   }
 
-  public void jobWasAdded() {
+  public void jobWasAdded() {    
     isJobAdded = true;
-    synchronized (MONITOR) {
-      MONITOR.notifyAll();
+    if(isWaiting.compareAndSet(true, false)) {
+      synchronized (MONITOR) {
+        MONITOR.notifyAll();
+      }
     }    
   }
 
