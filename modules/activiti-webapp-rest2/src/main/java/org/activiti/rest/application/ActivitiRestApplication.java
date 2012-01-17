@@ -55,6 +55,7 @@ import org.restlet.security.ChallengeAuthenticator;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.Verifier;
 
+import org.activiti.rest.api.task.SubTasksResource;
 /**
  * @author Tijs Rademakers
  */
@@ -117,6 +118,7 @@ public class ActivitiRestApplication extends Application {
     router.attach("/task/{taskId}/form", TaskFormResource.class);
     router.attach("/task/{taskId}/{operation}", TaskOperationResource.class);
     
+    router.attach("/subTasks", SubTasksResource.class);
     router.attach("/form/{taskId}/properties", TaskPropertiesResource.class);
     
     router.attach("/deployments", DeploymentsResource.class);
