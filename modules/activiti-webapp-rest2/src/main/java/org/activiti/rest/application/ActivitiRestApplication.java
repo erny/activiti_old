@@ -28,6 +28,7 @@ import org.activiti.rest.api.management.JobsResource;
 import org.activiti.rest.api.management.TableDataResource;
 import org.activiti.rest.api.management.TableResource;
 import org.activiti.rest.api.management.TablesResource;
+import org.activiti.rest.api.process.ProcessDefinitionBPMNResource;
 import org.activiti.rest.api.process.ProcessDefinitionFormResource;
 import org.activiti.rest.api.process.ProcessDefinitionsResource;
 import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
@@ -105,6 +106,7 @@ public class ActivitiRestApplication extends Application {
     router.attach("/process-instance", ProcessInstanceResource.class);
     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
+    router.attach("/process-definition/{processDefinitionId}/bpmn", ProcessDefinitionBPMNResource.class);
     
     router.attach("/tasks", TasksResource.class);
     router.attach("/tasks-summary", TasksSummaryResource.class);
