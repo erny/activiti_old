@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
 import org.codehaus.jackson.JsonNode;
@@ -35,29 +36,35 @@ public class TaskOperationResource extends SecuredResource {
   public ObjectNode executeTaskOperation(Representation entity) {
     if(authenticate() == false) return null;
     
+    String effectiveUser = (String) getRequest().getAttributes().get("effectiveUser");
+    if(authenticate(SecuredResource.ADMIN) == true && effectiveUser != null){
+    	Authentication.setAuthenticatedUserId(effectiveUser);
+    	super.loggedInUser = effectiveUser;
+    }
+    
     String taskId = (String) getRequest().getAttributes().get("taskId");
     String operation = (String) getRequest().getAttributes().get("operation");
     try {
       String startParams = entity.getText();
       JsonNode startJSON = new ObjectMapper().readTree(startParams);
       Iterator<String> itName = startJSON.getFieldNames();
-      Map<String, Object> variables = new HashMap<String, Object>();
+      Map<String, String> properties = new HashMap<String, String>();
       while(itName.hasNext()) {
         String name = itName.next();
         JsonNode valueNode = startJSON.path(name);
-        if("true".equals(valueNode.getTextValue()) || "false".equals(valueNode.getTextValue())) {
-          variables.put(name, Boolean.valueOf(valueNode.getTextValue()));
-        } else {
-          variables.put(name, valueNode.getTextValue());
-        }
+        properties.put(name, valueNode.getTextValue());
       }
       
       if ("claim".equals(operation)) {
         ActivitiUtil.getTaskService().claim(taskId, loggedInUser);
       } else if ("complete".equals(operation)) {
-        variables.remove("taskId");
-        ActivitiUtil.getTaskService().complete(taskId, variables);
-      } else {
+        properties.remove("taskId");
+        ActivitiUtil.getFormService().submitTaskFormData(taskId, properties);
+      }else if ("reassign".equals(operation)){
+      	String userId = properties.get("userId");
+      	ActivitiUtil.getTaskService().setAssignee(taskId, userId);
+      }
+      else {
         throw new ActivitiException("'" + operation + "' is not a valid operation");
       }
       
