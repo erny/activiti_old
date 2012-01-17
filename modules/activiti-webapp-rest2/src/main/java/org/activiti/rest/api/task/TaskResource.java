@@ -13,7 +13,9 @@
 
 package org.activiti.rest.api.task;
 
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
@@ -35,7 +37,16 @@ public class TaskResource extends SecuredResource {
     if(taskFormData != null) {
       response.setFormResourceKey(taskFormData.getFormKey());     
     }
-    
+    // Return also processDefinitionName
+    if(taskFormData != null) {
+    	RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
+    	String processDefinitionId = task.getProcessDefinitionId();
+    	ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
+    	if (processDefinition != null){
+    		String processDefinitionName = processDefinition.getName();
+    		response.setProcessDefinitionName(processDefinitionName);
+    	}
+    }
     return response;
   }
 
