@@ -25,12 +25,15 @@ public class ProcessInstancesResponse {
   String businessKey;
   String processDefinitionId;
   String startTime;
+  String startUserId;
+  String superProcessInstanceId;
   
   public ProcessInstancesResponse(HistoricProcessInstance processInstance) {
     this.setId(processInstance.getId());
     this.setBusinessKey(processInstance.getBusinessKey());
     this.setStartTime(RequestUtil.dateToString(processInstance.getStartTime()));
     this.setProcessDefinitionId(processInstance.getProcessDefinitionId());
+    this.setStartUserId(processInstance.getStartUserId());
   }
 
   public String getId() {
@@ -63,5 +66,21 @@ public class ProcessInstancesResponse {
 
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+  
+  public String getStartUserId() {
+    return startUserId;
+  }
+
+  public void setStartUserId(String startUserId) {
+    this.startUserId = startUserId;
+  }
+
+  public String getSuperProcessInstanceId() {
+    return this.superProcessInstanceId;  
+  }
+
+  public void setSuperProcessInstanceId(String superProcessInstanceId) {
+    this.superProcessInstanceId = superProcessInstanceId;  
   }
 }
