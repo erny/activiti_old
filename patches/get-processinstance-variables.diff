@@ -1,65 +1,46 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java	(working copy)
-@@ -18,12 +18,16 @@
- import java.util.Map;
- 
- import org.activiti.engine.ActivitiException;
- import org.activiti.engine.runtime.ProcessInstance;
- import org.activiti.rest.api.ActivitiUtil;
- import org.activiti.rest.api.SecuredResource;
- import org.codehaus.jackson.JsonNode;
- import org.codehaus.jackson.map.ObjectMapper;
-+import org.codehaus.jackson.node.ArrayNode;
-+import org.codehaus.jackson.node.ObjectNode;
- import org.restlet.representation.Representation;
-+import org.restlet.resource.Get;
- import org.restlet.resource.Post;
- 
- /**
-@@ -73,4 +77,29 @@
-       throw new ActivitiException("Failed to retrieve the process definition parameters", e);
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
+index 24570f0..144df49 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
+@@ -169,4 +169,29 @@ public class ProcessInstanceResource extends SecuredResource {
+       }
      }
    }
 +
-+	@Get
-+	public ObjectNode getVariables() {
-+		if (authenticate() == false)
-+			return null;
-+		String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
-+		
-+		Map<String, Object> variables = ActivitiUtil.getRuntimeService().getVariables(processInstanceId);
++  @Get
++  public ObjectNode getVariables() {
++    if (authenticate() == false)
++      return null;
++    String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
++    
++    Map<String, Object> variables = ActivitiUtil.getRuntimeService().getVariables(processInstanceId);
 +
-+		ObjectNode responseJSON = new ObjectMapper().createObjectNode();
++    ObjectNode responseJSON = new ObjectMapper().createObjectNode();
 +
-+		ArrayNode propertiesJSON = new ObjectMapper().createArrayNode();
++    ArrayNode propertiesJSON = new ObjectMapper().createArrayNode();
 +
-+		for (Iterator<String> it = variables.keySet().iterator(); it.hasNext();){
-+			String key = it.next();
-+			String value = String.valueOf(variables.get(key));
-+			
-+			ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
-+			propertyJSON.put(key,value);
-+			propertiesJSON.add(propertyJSON);
-+		}
-+		responseJSON.put("data", propertiesJSON);
++    for (Iterator<String> it = variables.keySet().iterator(); it.hasNext();){
++      String key = it.next();
++      String value = String.valueOf(variables.get(key));
++      
++      ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
++      propertyJSON.put(key,value);
++      propertiesJSON.add(propertyJSON);
++    }
++    responseJSON.put("data", propertiesJSON);
 +
-+		return responseJSON;
-+	}
++    return responseJSON;
++  }
  }
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(working copy)
-@@ -102,7 +102,10 @@
-     
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+index 2f02ac1..861359a 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+@@ -114,6 +114,7 @@ public class ActivitiRestApplication extends Application {
      router.attach("/process-definitions", ProcessDefinitionsResource.class);
      router.attach("/process-instances", ProcessInstancesResource.class);
-+    
-     router.attach("/process-instance", ProcessInstanceResource.class);
+     router.attach("/process-instance", StartProcessInstanceResource.class);
 +    router.attach("/process-instance/{processInstanceId}/variables", ProcessInstanceResource.class);
-+    
+     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
      router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
      router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
-     
