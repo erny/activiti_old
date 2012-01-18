@@ -1,0 +1,41 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java	(revisión: 3029)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java	(copia de trabajo)
+@@ -25,12 +25,15 @@
+   String businessKey;
+   String processDefinitionId;
+   String startTime;
++  String startUserId;
++  String superProcessInstanceId;
+   
+   public ProcessInstancesResponse(HistoricProcessInstance processInstance) {
+     this.setId(processInstance.getId());
+     this.setBusinessKey(processInstance.getBusinessKey());
+     this.setStartTime(RequestUtil.dateToString(processInstance.getStartTime()));
+     this.setProcessDefinitionId(processInstance.getProcessDefinitionId());
++    this.setStartUserId(processInstance.getStartUserId());
+   }
+ 
+   public String getId() {
+@@ -64,4 +67,20 @@
+   public void setProcessDefinitionId(String processDefinitionId) {
+     this.processDefinitionId = processDefinitionId;
+   }
++  
++  public String getStartUserId() {
++    return startUserId;
++  }
++
++  public void setStartUserId(String startUserId) {
++    this.startUserId = startUserId;
++  }
++
++  public String getSuperProcessInstanceId() {
++    return this.superProcessInstanceId;  
++  }
++
++  public void setSuperProcessInstanceId(String superProcessInstanceId) {
++    this.superProcessInstanceId = superProcessInstanceId;  
++  }
+ }

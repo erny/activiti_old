@@ -1,0 +1,39 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java	(revisión: 3028)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java	(copia de trabajo)
+@@ -16,6 +16,7 @@
+ import java.util.List;
+ 
+ import org.activiti.engine.identity.Group;
++import org.activiti.engine.impl.identity.Authentication;
+ import org.activiti.rest.application.ActivitiRestApplication;
+ import org.restlet.data.Status;
+ import org.restlet.resource.ServerResource;
+@@ -36,6 +37,7 @@
+   
+   protected boolean authenticate(String group) {
+     loggedInUser = ((ActivitiRestApplication) getApplication()).authenticate(getRequest(), getResponse());
++    Authentication.setAuthenticatedUserId(loggedInUser);
+     if(loggedInUser == null) {
+       // Not authenticated
+       setStatus(Status.CLIENT_ERROR_FORBIDDEN, "Authentication is required");
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(revisión: 3028)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(copia de trabajo)
+@@ -55,11 +55,14 @@
+       if ("claim".equals(operation)) {
+         ActivitiUtil.getTaskService().claim(taskId, loggedInUser);
+       } else if ("complete".equals(operation)) {
+         variables.remove("taskId");
+         ActivitiUtil.getTaskService().complete(taskId, variables);
++      } else if ("reassign".equals(operation)){
++        String userId = properties.get("userId");
++        ActivitiUtil.getTaskService().setAssignee(taskId, userId);
+       } else {
+         throw new ActivitiException("'" + operation + "' is not a valid operation");
+       }
+    } catch(Exception e) {
+      throw new ActivitiException("Did not receive the operation parameters", e);
+    }

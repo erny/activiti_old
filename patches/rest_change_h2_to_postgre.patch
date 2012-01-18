@@ -1,0 +1,19 @@
+Index: modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml   (revisión: 3029)
++++ modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml   (copia de trabajo)
+@@ -7,10 +7,10 @@
+   <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+     <property name="databaseSchemaUpdate" value="true"/>
+     
+-    <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/activiti" />
+-    <property name="jdbcDriver" value="org.h2.Driver" />
+-    <property name="jdbcUsername" value="sa" />
+-    <property name="jdbcPassword" value="" />
++    <property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/activiti" />
++    <property name="jdbcDriver" value="org.postgresql.Driver" />
++    <property name="jdbcUsername" value="activiti" />
++    <property name="jdbcPassword" value="activiti" />
+     
+     <property name="jobExecutorActivate" value="true" />
+   </bean>

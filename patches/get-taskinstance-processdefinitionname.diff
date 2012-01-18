@@ -1,0 +1,89 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (working copy)
+@@ -13,17 +13,30 @@
+ 
+ package org.activiti.rest.api.task;
+ 
+ import java.util.HashMap;
++import java.util.List;
+ import java.util.Map;
+ 
+ import org.activiti.engine.ActivitiException;
++import org.activiti.engine.RepositoryService;
+ import org.activiti.engine.impl.TaskQueryProperty;
+ import org.activiti.engine.query.QueryProperty;
++import org.activiti.engine.repository.ProcessDefinition;
+ import org.activiti.engine.task.TaskQuery;
+ import org.activiti.rest.api.ActivitiUtil;
+ import org.activiti.rest.api.DataResponse;
+ import org.activiti.rest.api.SecuredResource;
+ import org.restlet.resource.Get;
+ 
+ /**
+  * @author Tijs Rademakers
+@@ -40,12 +53,12 @@
+     properties.put("assignee", TaskQueryProperty.ASSIGNEE);
+     properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
+     properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
++    
+   }
+   
+   @Get
+   public DataResponse getTasks() {
+     if(authenticate() == false) return null;
+-    
+     String personalTaskUserId = (String) getQuery().getValues("assignee");
+     String candidateTaskUserId = (String) getQuery().getValues("candidate");
+     String candidateGroupId = (String) getQuery().getValues("candidate-group");
+@@ -59,9 +72,57 @@
+     } else {
+       throw new ActivitiException("Tasks must be filtered with 'assignee', 'candidate' or 'candidate-group'");
+     }
+-    
++    // Return also processDefinitionName for each task
+     DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
++    List<TaskResponse> tasks = (List<TaskResponse>) dataResponse.getData();
++    RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
++    Map <String , ProcessDefinition> processDefinitions = new HashMap<String, ProcessDefinition>();
++    for (TaskResponse taskResponse : tasks) {
++       String processDefinitionId = taskResponse.getProcessDefinitionId();
++       ProcessDefinition processDefinition = processDefinitions.get(processDefinitionId);
++       if (processDefinition == null){
++           processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
++           processDefinitions.put(processDefinitionId, processDefinition);
++       }
++       String processDefinitionName = processDefinition.getName();
++       taskResponse.setProcessDefinitionName(processDefinitionName);
++    }
+     return dataResponse;
+   }
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java    (revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java    (working copy)
+@@ -34,6 +34,7 @@
+   String parentTaskId;
+   int priority;
+   String processDefinitionId;
++  String processDefinitionName;
+   String processInstanceId;
+   String taskDefinitionKey;
+   String formResourceKey;
+@@ -155,7 +156,15 @@
+     return processInstanceId;
+   }
+ 
++  public String getProcessDefinitionName() {
++      return processDefinitionName;
++  }
++
++  public void setProcessDefinitionName(String processDefinitionName) {
++      this.processDefinitionName = processDefinitionName;
++  }
++
+   public void setProcessInstanceId(String processInstanceId) {
+     this.processInstanceId = processInstanceId;
+   }
+ 

@@ -1,0 +1,19 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskPropertiesResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskPropertiesResource.java	(revisión: 3028)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskPropertiesResource.java	(copia de trabajo)
+@@ -40,9 +40,13 @@
+     
+     for (FormProperty property : properties) {
+       ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
++      String value = property.getValue();
++      if (value == null) {
++          value = "";
++      }
+       propertyJSON.put("id", property.getId());
+       propertyJSON.put("name", property.getName());
+-      propertyJSON.put("value", property.getValue());
++      propertyJSON.put("value", value);
+       propertyJSON.put("type", property.getType().getName());
+       propertyJSON.put("required", property.isRequired());
+       propertyJSON.put("readable", property.isReadable());

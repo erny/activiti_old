@@ -1,0 +1,150 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(working copy)
+@@ -95,6 +95,7 @@
+     
+     router.attach("/login", LoginResource.class);
+     
++    router.attach("/user", UserResource.class);
+     router.attach("/user/{userId}", UserResource.class);
+     router.attach("/user/{userId}/groups", UserGroupsResource.class);
+     router.attach("/group/{groupId}", GroupResource.class);
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/StateResponse.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/StateResponse.java	(revision 0)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/StateResponse.java	(revision 0)
+@@ -0,0 +1,14 @@
++package org.activiti.rest.api.identity;
++
++public class StateResponse {
++	private boolean success;
++
++	public boolean isSuccess() {
++		return success;
++	}
++
++	public StateResponse setSuccess(boolean success) {
++		this.success = success;
++		return this;
++	}
++}
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserResource.java	(revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserResource.java	(working copy)
+@@ -14,21 +14,27 @@
+ package org.activiti.rest.api.identity;
+ 
+ import org.activiti.engine.ActivitiException;
++import org.activiti.engine.IdentityService;
+ import org.activiti.engine.identity.User;
+ import org.activiti.rest.api.ActivitiUtil;
+ import org.activiti.rest.api.SecuredResource;
+ import org.restlet.resource.Get;
++import org.restlet.resource.Put;
+ 
+ /**
+  * @author Tijs Rademakers
+  */
+ public class UserResource extends SecuredResource {
++	
++	public UserResource(){
++		super();
++	}
+   
+   @Get
+   public UserResponse getUser() {
+     if(authenticate() == false) return null;
+     
+    String userId = (String) getRequest().getAttributes().get("userId");
+     if(userId == null) {
+       throw new ActivitiException("No userId provided");
+     }
+@@ -36,5 +42,29 @@
+     UserResponse response = new UserResponse(user);
+     return response;
+   }
+-
++  
++  @Put()
++  public StateResponse createUser(UserInfo userInfo){
++    if(authenticate() == false) return null;
++    
++    IdentityService identityService = ActivitiUtil.getIdentityService();
++    
++    String userId = userInfo.getUserId();
++    
++    if( userId == null) {
++      throw new ActivitiException("No user id supplied");
++    }
++    
++    if (identityService.createUserQuery().userId(userId).count() == 0) {
++      User user = identityService.newUser(userId);
++      user.setFirstName(userInfo.getFirstName());
++      user.setLastName(userInfo.getLastName());
++      user.setPassword(userInfo.getPassword());
++      user.setEmail(userInfo.getEmail());
++      identityService.saveUser(user);
++    }else{
++    	throw new ActivitiException("user id must be unique");
++    }
++    return new StateResponse().setSuccess(true);
++  }
+ }
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserInfo.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserInfo.java	(revision 0)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/identity/UserInfo.java	(revision 0)
+@@ -0,0 +1,51 @@
++package org.activiti.rest.api.identity;
++
++public class UserInfo {
++	
++	private String userId;
++	private String password;
++	private String firstName;
++	private String lastName;
++	private String email;
++
++	public String getUserId() {
++		return userId;
++	}
++
++	public void setUserId(String userId) {
++		this.userId = userId;
++	}
++
++	public String getPassword() {
++		return password;
++	}
++
++	public void setPassword(String password) {
++		this.password = password;
++	}
++
++	public String getFirstName() {
++		return firstName;
++	}
++
++	public void setFirstName(String firstName) {
++		this.firstName = firstName;
++	}
++
++	public String getLastName() {
++		return lastName;
++	}
++
++	public void setLastName(String lastName) {
++		this.lastName = lastName;
++	}
++
++	public String getEmail() {
++		return email;
++	}
++
++	public void setEmail(String email) {
++		this.email = email;
++	}
++
++}

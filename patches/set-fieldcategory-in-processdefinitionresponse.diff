@@ -1,0 +1,46 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java	(revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java	(working copy)
+@@ -36,6 +36,7 @@
+     properties.put("version", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_VERSION);
+     properties.put("deploymentId", ProcessDefinitionQueryProperty.DEPLOYMENT_ID);
+     properties.put("name", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_NAME);
++    properties.put("category", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_CATEGORY);
+   }
+   
+   @Get
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java	(revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java	(working copy)
+@@ -31,6 +31,7 @@
+   String diagramResourceName;
+   String startFormResourceKey;
+   boolean isGraphicNotationDefined;
++  String category;
+ 
+   public ProcessDefinitionResponse(ProcessDefinitionEntity processDefinition) {
+     this.setId(processDefinition.getId());
+@@ -40,6 +41,7 @@
+     this.setDeploymentId(processDefinition.getDeploymentId());
+     this.setResourceName(processDefinition.getResourceName());
+     this.setDiagramResourceName(processDefinition.getDiagramResourceName());
++    this.setCategory(processDefinition.getCategory());
+   }
+   
+   public String getId() {
+@@ -113,4 +115,13 @@
+   public void setStartFormResourceKey(String startFormResourceKey) {
+     this.startFormResourceKey = startFormResourceKey;
+   }
++
++  public String getCategory() {
++    return category;
++  }
++
++  public void setCategory(String category) {
++    this.category = category;
++  }
++  
+ }

@@ -1,0 +1,64 @@
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java	(revision 0)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java	(revision 0)
+@@ -0,0 +1,47 @@
++package org.activiti.rest.api.process;
++
++import java.io.InputStream;
++
++import org.activiti.engine.ActivitiException;
++import org.activiti.engine.RepositoryService;
++import org.activiti.engine.repository.ProcessDefinition;
++import org.activiti.rest.api.ActivitiUtil;
++import org.activiti.rest.api.SecuredResource;
++import org.restlet.data.MediaType;
++import org.restlet.representation.InputRepresentation;
++import org.restlet.resource.Get;
++
++public class ProcessDefinitionDiagramResource extends SecuredResource {
++
++	@Get
++	public InputRepresentation getDiagram() {
++		if (authenticate() == false)
++			return null;
++
++		String processDefinitionId = (String) getRequest().getAttributes().get("processDefinitionId");
++
++		if (processDefinitionId == null) {
++			throw new ActivitiException("No process definition id provided");
++		}
++
++		RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
++		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
++		    .processDefinitionId(processDefinitionId).singleResult();
++
++		if (processDefinition == null) {
++			throw new ActivitiException("Process definition " + processDefinitionId + " could not be found");
++		}
++
++		if (processDefinition.getDiagramResourceName() == null) {
++			throw new ActivitiException("Diagram resource could not be found");
++		}
++		final InputStream definitionImageStream = repositoryService.getResourceAsStream(
++		    processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
++
++		if (definitionImageStream == null) {
++			throw new ActivitiException("Diagram resource could not be found");
++		}
++		return new InputRepresentation(definitionImageStream, MediaType.IMAGE_PNG);
++	}
++
++}
+Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+===================================================================
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revision 3030)
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(working copy)
+@@ -105,6 +105,7 @@
+     router.attach("/process-instance", ProcessInstanceResource.class);
+     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
+     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
++    router.attach("/process-definition/{processDefinitionId}/diagram", org.activiti.rest.api.process.ProcessDefinitionDiagramResource.class);
+     
+     router.attach("/tasks", TasksResource.class);
+     router.attach("/tasks-summary", TasksSummaryResource.class);
