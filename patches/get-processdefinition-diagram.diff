@@ -1,7 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java	(revision 0)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java	(revision 0)
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
+new file mode 100644
+index 0000000..7d97b2a
+--- /dev/null
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
 @@ -0,0 +1,47 @@
 +package org.activiti.rest.api.process;
 +
@@ -50,15 +51,15 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
 +	}
 +
 +}
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(working copy)
-@@ -105,6 +105,7 @@
-     router.attach("/process-instance", ProcessInstanceResource.class);
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+index 2f02ac1..623f0d2 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+@@ -116,6 +116,7 @@ public class ActivitiRestApplication extends Application {
+     router.attach("/process-instance", StartProcessInstanceResource.class);
+     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
      router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
-     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
 +    router.attach("/process-definition/{processDefinitionId}/diagram", org.activiti.rest.api.process.ProcessDefinitionDiagramResource.class);
+     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
+     router.attach("/process-definition/{processDefinitionId}/properties", ProcessDefinitionPropertiesResource.class);
      
-     router.attach("/tasks", TasksResource.class);
-     router.attach("/tasks-summary", TasksSummaryResource.class);
