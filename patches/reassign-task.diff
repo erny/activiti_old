@@ -1,8 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java	(revisión: 3028)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java	(copia de trabajo)
-@@ -16,6 +16,7 @@
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
+index 86f184d..69f9ee0 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
+@@ -16,6 +16,7 @@ package org.activiti.rest.api;
  import java.util.List;
  
  import org.activiti.engine.identity.Group;
@@ -10,7 +10,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/Secured
  import org.activiti.rest.application.ActivitiRestApplication;
  import org.restlet.data.Status;
  import org.restlet.resource.ServerResource;
-@@ -36,6 +37,7 @@
+@@ -36,6 +37,7 @@ public class SecuredResource extends ServerResource {
    
    protected boolean authenticate(String group) {
      loggedInUser = ((ActivitiRestApplication) getApplication()).authenticate(getRequest(), getResponse());
@@ -18,13 +18,11 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/Secured
      if(loggedInUser == null) {
        // Not authenticated
        setStatus(Status.CLIENT_ERROR_FORBIDDEN, "Authentication is required");
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(revisión: 3028)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(copia de trabajo)
-@@ -55,11 +55,14 @@
-       if ("claim".equals(operation)) {
-         ActivitiUtil.getTaskService().claim(taskId, loggedInUser);
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+index 5476c27..89952ff 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+@@ -57,6 +57,9 @@ public class TaskOperationResource extends SecuredResource {
        } else if ("complete".equals(operation)) {
          variables.remove("taskId");
          ActivitiUtil.getTaskService().complete(taskId, variables);
@@ -34,6 +32,3 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/Ta
        } else {
          throw new ActivitiException("'" + operation + "' is not a valid operation");
        }
-    } catch(Exception e) {
-      throw new ActivitiException("Did not receive the operation parameters", e);
-    }
