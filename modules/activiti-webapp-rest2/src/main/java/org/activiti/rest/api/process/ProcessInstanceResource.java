@@ -18,12 +18,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 
 /**
@@ -73,4 +77,29 @@ public class ProcessInstanceResource extends SecuredResource {
       throw new ActivitiException("Failed to retrieve the process definition parameters", e);
     }
   }
+
+	@Get
+	public ObjectNode getVariables() {
+		if (authenticate() == false)
+			return null;
+		String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
+		
+		Map<String, Object> variables = ActivitiUtil.getRuntimeService().getVariables(processInstanceId);
+
+		ObjectNode responseJSON = new ObjectMapper().createObjectNode();
+
+		ArrayNode propertiesJSON = new ObjectMapper().createArrayNode();
+
+		for (Iterator<String> it = variables.keySet().iterator(); it.hasNext();){
+			String key = it.next();
+			String value = String.valueOf(variables.get(key));
+			
+			ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
+			propertyJSON.put(key,value);
+			propertiesJSON.add(propertyJSON);
+		}
+		responseJSON.put("data", propertiesJSON);
+
+		return responseJSON;
+	}
 }
