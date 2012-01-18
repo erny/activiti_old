@@ -1,8 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java	(revisión: 3029)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java	(copia de trabajo)
-@@ -25,12 +25,15 @@
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java
+index 2b9bd6a..66d0a57 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstancesResponse.java
+@@ -29,12 +29,15 @@ public class ProcessInstancesResponse implements Serializable {
    String businessKey;
    String processDefinitionId;
    String startTime;
@@ -18,7 +18,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
    }
  
    public String getId() {
-@@ -64,4 +67,20 @@
+@@ -68,4 +71,20 @@ public class ProcessInstancesResponse implements Serializable {
    public void setProcessDefinitionId(String processDefinitionId) {
      this.processDefinitionId = processDefinitionId;
    }
