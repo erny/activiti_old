@@ -29,7 +29,7 @@ import org.activiti.rest.api.management.TableDataResource;
 import org.activiti.rest.api.management.TableResource;
 import org.activiti.rest.api.management.TablesResource;
 import org.activiti.rest.api.process.ProcessDefinitionBPMNResource;
-import org.activiti.rest.api.process.ProcessDefinitionDiagramResource
+import org.activiti.rest.api.process.ProcessDefinitionDiagramResource;
 import org.activiti.rest.api.process.ProcessDefinitionFormResource;
 import org.activiti.rest.api.process.ProcessDefinitionTasksResource;
 import org.activiti.rest.api.process.ProcessDefinitionsResource;
