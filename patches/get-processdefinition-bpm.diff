@@ -1,27 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revisión: 3028)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(copia de trabajo)
-@@ -28,6 +28,7 @@
- import org.activiti.rest.api.management.TableDataResource;
- import org.activiti.rest.api.management.TableResource;
- import org.activiti.rest.api.management.TablesResource;
-+import org.activiti.rest.api.process.ProcessDefinitionBPMNResource;
- import org.activiti.rest.api.process.ProcessDefinitionFormResource;
- import org.activiti.rest.api.process.ProcessDefinitionsResource;
- import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
-@@ -105,6 +106,7 @@
-     router.attach("/process-instance", ProcessInstanceResource.class);
-     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
-     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
-+    router.attach("/process-definition/{processDefinitionId}/bpmn", ProcessDefinitionBPMNResource.class);
-     
-     router.attach("/tasks", TasksResource.class);
-     router.attach("/tasks-summary", TasksSummaryResource.class);
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java	(revisión: 0)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java	(revisión: 0)
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
+new file mode 100644
+index 0000000..5fe4646
+--- /dev/null
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
 @@ -0,0 +1,59 @@
 +/* Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -82,3 +63,23 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
 +    return new InputRepresentation(stream, MediaType.APPLICATION_XML);  
 +  }
 +}
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+index 2f02ac1..d72cf0b 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+@@ -30,6 +30,7 @@ import org.activiti.rest.api.management.JobsResource;
+ import org.activiti.rest.api.management.TableDataResource;
+ import org.activiti.rest.api.management.TableResource;
+ import org.activiti.rest.api.management.TablesResource;
++import org.activiti.rest.api.process.ProcessDefinitionBPMNResource;
+ import org.activiti.rest.api.process.ProcessDefinitionFormResource;
+ import org.activiti.rest.api.process.ProcessDefinitionPropertiesResource;
+ import org.activiti.rest.api.process.ProcessDefinitionsResource;
+@@ -116,6 +117,7 @@ public class ActivitiRestApplication extends Application {
+     router.attach("/process-instance", StartProcessInstanceResource.class);
+     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
+     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
++    router.attach("/process-definition/{processDefinitionId}/bpmn", ProcessDefinitionBPMNResource.class);
+     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
+     router.attach("/process-definition/{processDefinitionId}/properties", ProcessDefinitionPropertiesResource.class);
+     
