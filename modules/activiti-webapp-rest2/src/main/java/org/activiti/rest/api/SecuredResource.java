@@ -16,6 +16,7 @@ package org.activiti.rest.api;
 import java.util.List;
 
 import org.activiti.engine.identity.Group;
+import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.rest.application.ActivitiRestApplication;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
@@ -36,6 +37,7 @@ public class SecuredResource extends ServerResource {
   
   protected boolean authenticate(String group) {
     loggedInUser = ((ActivitiRestApplication) getApplication()).authenticate(getRequest(), getResponse());
+    Authentication.setAuthenticatedUserId(loggedInUser);
     if(loggedInUser == null) {
       // Not authenticated
       setStatus(Status.CLIENT_ERROR_FORBIDDEN, "Authentication is required");
