@@ -40,9 +40,13 @@ public class TaskPropertiesResource extends SecuredResource {
     
     for (FormProperty property : properties) {
       ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
+      String value = property.getValue();
+      if (value == null) {
+          value = "";
+      }
       propertyJSON.put("id", property.getId());
       propertyJSON.put("name", property.getName());
-      propertyJSON.put("value", property.getValue());
+      propertyJSON.put("value", value);
       propertyJSON.put("type", property.getType().getName());
       propertyJSON.put("required", property.isRequired());
       propertyJSON.put("readable", property.isReadable());
