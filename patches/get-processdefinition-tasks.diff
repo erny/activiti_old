@@ -1,31 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(revisión: 3028)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java	(copia de trabajo)
-@@ -29,6 +29,7 @@
- import org.activiti.rest.api.management.TableResource;
- import org.activiti.rest.api.management.TablesResource;
- import org.activiti.rest.api.process.ProcessDefinitionFormResource;
-+import org.activiti.rest.api.process.ProcessDefinitionTasksResource;
- import org.activiti.rest.api.process.ProcessDefinitionsResource;
- import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
- import org.activiti.rest.api.process.ProcessInstanceResource;
-@@ -102,9 +103,11 @@
-     
-     router.attach("/process-definitions", ProcessDefinitionsResource.class);
-     router.attach("/process-instances", ProcessInstancesResource.class);
-     
-     router.attach("/process-instance", ProcessInstanceResource.class);
-     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
-     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
-+    router.attach("/process-definition/{processDefinitionId}/tasks", ProcessDefinitionTasksResource.class);
-     
-     router.attach("/tasks", TasksResource.class);
-     router.attach("/tasks-summary", TasksSummaryResource.class);
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java	(revisión: 0)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java	(revisión: 0)
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java
+new file mode 100644
+index 0000000..f5e8640
+--- /dev/null
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionTasksResource.java
 @@ -0,0 +1,71 @@
 +/* Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -98,3 +75,15 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
 +    return responseJSON;
 +  }
 +}
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+index 2f02ac1..a46e9bd 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+@@ -32,6 +32,7 @@ import org.activiti.rest.api.management.TableResource;
+ import org.activiti.rest.api.management.TablesResource;
+ import org.activiti.rest.api.process.ProcessDefinitionFormResource;
+ import org.activiti.rest.api.process.ProcessDefinitionPropertiesResource;
++import org.activiti.rest.api.process.ProcessDefinitionTasksResource;
+ import org.activiti.rest.api.process.ProcessDefinitionsResource;
+ import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
+ import org.activiti.rest.api.process.ProcessInstanceResource;
