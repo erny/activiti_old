@@ -1,7 +1,7 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
 index 3a7d8cf..1433e1c 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
 @@ -37,6 +37,7 @@ public class TaskResponse {
    String parentTaskId;
    int priority;
@@ -25,10 +25,10 @@ index 3a7d8cf..1433e1c 100644
    public void setProcessInstanceId(String processInstanceId) {
      this.processInstanceId = processInstanceId;
    }
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
 index debb0a1..3b47049 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
 @@ -14,11 +14,14 @@
  package org.activiti.rest.api.task;
  

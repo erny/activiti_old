@@ -1,7 +1,7 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
 index 91d1085..c47b4ca 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
 @@ -16,7 +16,9 @@ package org.activiti.rest.api.task;
  import java.util.List;
  

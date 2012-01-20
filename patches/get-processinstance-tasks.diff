@@ -1,8 +1,8 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceTaskResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceTaskResource.java
+diff --git /dev/null b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceTaskResource.java
 new file mode 100644
 index 0000000..f0c0a3c
 --- /dev/null
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceTaskResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceTaskResource.java
 @@ -0,0 +1,60 @@
 +/* Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -34,40 +34,40 @@ index 0000000..f0c0a3c
 +
 +public class ProcessInstanceTaskResource extends SecuredResource {
 +
-+	Map<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
++  Map<String, QueryProperty> properties = new HashMap<String, QueryProperty>();
 +
-+	public ProcessInstanceTaskResource() {
-+		properties.put("id", TaskQueryProperty.TASK_ID);
-+		properties.put("name", TaskQueryProperty.NAME);
-+		properties.put("description", TaskQueryProperty.DESCRIPTION);
-+		properties.put("priority", TaskQueryProperty.PRIORITY);
-+		properties.put("assignee", TaskQueryProperty.ASSIGNEE);
-+		properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
-+		properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
-+	}
++  public ProcessInstanceTaskResource() {
++    properties.put("id", TaskQueryProperty.TASK_ID);
++    properties.put("name", TaskQueryProperty.NAME);
++    properties.put("description", TaskQueryProperty.DESCRIPTION);
++    properties.put("priority", TaskQueryProperty.PRIORITY);
++    properties.put("assignee", TaskQueryProperty.ASSIGNEE);
++    properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
++    properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
++  }
 +
-+	@Get
-+	public DataResponse getTasks() {
-+		if (authenticate() == false)
-+			return null;
++  @Get
++  public DataResponse getTasks() {
++    if (authenticate() == false)
++      return null;
 +
-+		String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
++    String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
 +
-+		if (processInstanceId == null) {
-+			throw new ActivitiException("No process instance id provided");
-+		}
++    if (processInstanceId == null) {
++      throw new ActivitiException("No process instance id provided");
++    }
 +
-+		TaskQuery taskQuery = ActivitiUtil.getTaskService().createTaskQuery().processInstanceId(processInstanceId);
++    TaskQuery taskQuery = ActivitiUtil.getTaskService().createTaskQuery().processInstanceId(processInstanceId);
 +
-+		// Return also processDefinitionName for each task
-+		DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
-+		return dataResponse;
-+	}
++    // Return also processDefinitionName for each task
++    DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
++    return dataResponse;
++  }
 +}
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 index 2f02ac1..224b2df 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 @@ -60,7 +60,7 @@ import org.restlet.routing.Router;
  import org.restlet.security.ChallengeAuthenticator;
  import org.restlet.security.SecretVerifier;

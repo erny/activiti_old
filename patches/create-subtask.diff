@@ -1,8 +1,8 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/SubTasksResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/SubTasksResource.java
+diff --git /dev/null b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/SubTasksResource.java
 new file mode 100644
 index 0000000..0cb4247
 --- /dev/null
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/SubTasksResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/SubTasksResource.java
 @@ -0,0 +1,126 @@
 +package org.activiti.rest.api.task;
 +
@@ -130,10 +130,10 @@ index 0000000..0cb4247
 +	}
 +
 +}
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 index 2f02ac1..6679e34 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 @@ -61,6 +61,7 @@ import org.restlet.security.ChallengeAuthenticator;
  import org.restlet.security.SecretVerifier;
  import org.restlet.security.Verifier;

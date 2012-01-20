@@ -1,7 +1,7 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
 index a440407..2c97dd1 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
 @@ -33,6 +33,7 @@ public class ProcessDefinitionResponse implements Serializable {
    String diagramResourceName;
    String startFormResourceKey;
@@ -32,10 +32,10 @@ index a440407..2c97dd1 100644
 +  }
 +  
  }
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
 index e45ab92..3aabfaf 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
 @@ -36,6 +36,7 @@ public class ProcessDefinitionsResource extends SecuredResource {
      properties.put("version", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_VERSION);
      properties.put("deploymentId", ProcessDefinitionQueryProperty.DEPLOYMENT_ID);

@@ -1,8 +1,8 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
+diff --git /dev/null b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
 new file mode 100644
 index 0000000..5fe4646
 --- /dev/null
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionBPMNResource.java
 @@ -0,0 +1,59 @@
 +/* Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -63,10 +63,10 @@ index 0000000..5fe4646
 +    return new InputRepresentation(stream, MediaType.APPLICATION_XML);  
 +  }
 +}
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 index 2f02ac1..d72cf0b 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 @@ -30,6 +30,7 @@ import org.activiti.rest.api.management.JobsResource;
  import org.activiti.rest.api.management.TableDataResource;
  import org.activiti.rest.api.management.TableResource;

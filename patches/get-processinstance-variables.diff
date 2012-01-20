@@ -1,7 +1,7 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
 index 24570f0..144df49 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessInstanceResource.java
 @@ -169,4 +169,29 @@ public class ProcessInstanceResource extends SecuredResource {
        }
      }
@@ -32,10 +32,10 @@ index 24570f0..144df49 100644
 +    return responseJSON;
 +  }
  }
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 index 2f02ac1..861359a 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 @@ -114,6 +114,7 @@ public class ActivitiRestApplication extends Application {
      router.attach("/process-definitions", ProcessDefinitionsResource.class);
      router.attach("/process-instances", ProcessInstancesResource.class);

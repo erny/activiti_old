@@ -1,8 +1,8 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
+diff --git /dev/null b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
 new file mode 100644
 index 0000000..7d97b2a
 --- /dev/null
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionDiagramResource.java
 @@ -0,0 +1,47 @@
 +package org.activiti.rest.api.process;
 +
@@ -19,42 +19,42 @@ index 0000000..7d97b2a
 +
 +public class ProcessDefinitionDiagramResource extends SecuredResource {
 +
-+	@Get
-+	public InputRepresentation getDiagram() {
-+		if (authenticate() == false)
-+			return null;
++  @Get
++  public InputRepresentation getDiagram() {
++    if (authenticate() == false)
++      return null;
 +
-+		String processDefinitionId = (String) getRequest().getAttributes().get("processDefinitionId");
++    String processDefinitionId = (String) getRequest().getAttributes().get("processDefinitionId");
 +
-+		if (processDefinitionId == null) {
-+			throw new ActivitiException("No process definition id provided");
-+		}
++    if (processDefinitionId == null) {
++      throw new ActivitiException("No process definition id provided");
++    }
 +
-+		RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
-+		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-+		    .processDefinitionId(processDefinitionId).singleResult();
++    RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
++    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
++        .processDefinitionId(processDefinitionId).singleResult();
 +
-+		if (processDefinition == null) {
-+			throw new ActivitiException("Process definition " + processDefinitionId + " could not be found");
-+		}
++    if (processDefinition == null) {
++      throw new ActivitiException("Process definition " + processDefinitionId + " could not be found");
++    }
 +
-+		if (processDefinition.getDiagramResourceName() == null) {
-+			throw new ActivitiException("Diagram resource could not be found");
-+		}
-+		final InputStream definitionImageStream = repositoryService.getResourceAsStream(
-+		    processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
++    if (processDefinition.getDiagramResourceName() == null) {
++      throw new ActivitiException("Diagram resource could not be found");
++    }
++    final InputStream definitionImageStream = repositoryService.getResourceAsStream(
++        processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
 +
-+		if (definitionImageStream == null) {
-+			throw new ActivitiException("Diagram resource could not be found");
-+		}
-+		return new InputRepresentation(definitionImageStream, MediaType.IMAGE_PNG);
-+	}
++    if (definitionImageStream == null) {
++      throw new ActivitiException("Diagram resource could not be found");
++    }
++    return new InputRepresentation(definitionImageStream, MediaType.IMAGE_PNG);
++  }
 +
 +}
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 index 2f02ac1..623f0d2 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java
 @@ -116,6 +116,7 @@ public class ActivitiRestApplication extends Application {
      router.attach("/process-instance", StartProcessInstanceResource.class);
      router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);

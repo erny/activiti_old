@@ -1,7 +1,7 @@
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
 index 86f184d..69f9ee0 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/SecuredResource.java
 @@ -16,6 +16,7 @@ package org.activiti.rest.api;
  import java.util.List;
  
@@ -18,10 +18,10 @@ index 86f184d..69f9ee0 100644
      if(loggedInUser == null) {
        // Not authenticated
        setStatus(Status.CLIENT_ERROR_FORBIDDEN, "Authentication is required");
-diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
 index 5476c27..89952ff 100644
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
 @@ -57,6 +57,9 @@ public class TaskOperationResource extends SecuredResource {
        } else if ("complete".equals(operation)) {
          variables.remove("taskId");
