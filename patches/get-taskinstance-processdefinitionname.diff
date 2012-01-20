@@ -2,7 +2,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/Ta
 ===================================================================
 --- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (revision 3030)
 +++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (working copy)
-@@ -13,17 +13,30 @@
+@@ -13,17 +13,20 @@
  
  package org.activiti.rest.api.task;
  
@@ -23,21 +23,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/Ta
  
  /**
   * @author Tijs Rademakers
-@@ -40,12 +53,12 @@
-     properties.put("assignee", TaskQueryProperty.ASSIGNEE);
-     properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
-     properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
-+    
-   }
-   
-   @Get
-   public DataResponse getTasks() {
-     if(authenticate() == false) return null;
--    
-     String personalTaskUserId = (String) getQuery().getValues("assignee");
-     String candidateTaskUserId = (String) getQuery().getValues("candidate");
-     String candidateGroupId = (String) getQuery().getValues("candidate-group");
-@@ -59,9 +72,57 @@
+@@ -59,7 +62,20 @@
      } else {
        throw new ActivitiException("Tasks must be filtered with 'assignee', 'candidate' or 'candidate-group'");
      }
