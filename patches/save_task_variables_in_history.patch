@@ -1,8 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(revisión: 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java	(copia de trabajo)
-@@ -41,22 +41,18 @@
+diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+index 5476c27..0a226d1 100644
+--- a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
++++ b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskOperationResource.java
+@@ -41,22 +41,18 @@ public class TaskOperationResource extends SecuredResource {
        String startParams = entity.getText();
        JsonNode startJSON = new ObjectMapper().readTree(startParams);
        Iterator<String> itName = startJSON.getFieldNames();
