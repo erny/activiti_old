@@ -1,0 +1,47 @@
+diff --git a/distro/src/setup/build.db.properties b/distro/src/setup/build.db.properties
+index 2b8496d..d1f3edb 100644
+--- a/distro/src/setup/build.db.properties
++++ b/distro/src/setup/build.db.properties
+@@ -1,5 +1,5 @@
+ db=h2
+-jdbc.driver=org.h2.Driver
+-jdbc.url=jdbc:h2:tcp://localhost/activiti
+-jdbc.username=sa
+-jdbc.password=
++jdbc.driver=org.postgresql.Driver
++jdbc.url=jdbc:postgresql://localhost:5432/activiti
++jdbc.username=activiti
++jdbc.password=activiti
+diff --git a/modules/activiti-webapp-explorer2/src/main/resources/db.properties b/modules/activiti-webapp-explorer2/src/main/resources/db.properties
+index adb09b3..d1f3edb 100644
+--- a/modules/activiti-webapp-explorer2/src/main/resources/db.properties
++++ b/modules/activiti-webapp-explorer2/src/main/resources/db.properties
+@@ -1,5 +1,5 @@
+ db=h2
+-jdbc.driver=org.h2.Driver
+-jdbc.url=jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000
+-jdbc.username=sa
+-jdbc.password=
++jdbc.driver=org.postgresql.Driver
++jdbc.url=jdbc:postgresql://localhost:5432/activiti
++jdbc.username=activiti
++jdbc.password=activiti
+diff --git a/modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml b/modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml
+index 2f862ea..4698a62 100644
+--- a/modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml
++++ b/modules/activiti-webapp-rest2/src/main/resources/activiti.cfg.xml
+@@ -7,10 +7,10 @@
+   <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+     <property name="databaseSchemaUpdate" value="true"/>
+     
+-    <property name="jdbcUrl" value="jdbc:h2:tcp://localhost/activiti" />
+-    <property name="jdbcDriver" value="org.h2.Driver" />
+-    <property name="jdbcUsername" value="sa" />
+-    <property name="jdbcPassword" value="" />
++    <property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/activiti" />
++    <property name="jdbcDriver" value="org.postgresql.Driver" />
++    <property name="jdbcUsername" value="activiti" />
++    <property name="jdbcPassword" value="activiti" />
+     
+     <property name="jobExecutorActivate" value="true" />
+   </bean>
