@@ -1,9 +1,35 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java    (working copy)
-@@ -13,17 +13,20 @@
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
+index 3a7d8cf..1433e1c 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
+@@ -37,6 +37,7 @@ public class TaskResponse {
+   String parentTaskId;
+   int priority;
+   String processDefinitionId;
++  String processDefinitionName;
+   String processInstanceId;
+   String taskDefinitionKey;
+   String formResourceKey;
+@@ -161,6 +162,14 @@ public class TaskResponse {
+     return processInstanceId;
+   }
  
++  public String getProcessDefinitionName() {
++      return processDefinitionName;
++  }
++
++  public void setProcessDefinitionName(String processDefinitionName) {
++      this.processDefinitionName = processDefinitionName;
++  }
++
+   public void setProcessInstanceId(String processInstanceId) {
+     this.processInstanceId = processInstanceId;
+   }
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
+index debb0a1..3b47049 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TasksResource.java
+@@ -14,11 +14,14 @@
  package org.activiti.rest.api.task;
  
  import java.util.HashMap;
@@ -18,17 +44,11 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/Ta
  import org.activiti.engine.task.TaskQuery;
  import org.activiti.rest.api.ActivitiUtil;
  import org.activiti.rest.api.DataResponse;
- import org.activiti.rest.api.SecuredResource;
- import org.restlet.resource.Get;
- 
- /**
-  * @author Tijs Rademakers
-@@ -59,7 +62,20 @@
-     } else {
-       throw new ActivitiException("Tasks must be filtered with 'assignee', 'candidate' or 'candidate-group'");
+@@ -92,7 +95,21 @@ public class TasksResource extends SecuredResource {
+       taskQuery.dueBefore(RequestUtil.parseToDate(strMaxDueDate));
      }
--    
-+    // Return also processDefinitionName for each task
+     
++    // add processDefinition name to every task
      DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
 +    List<TaskResponse> tasks = (List<TaskResponse>) dataResponse.getData();
 +    RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
@@ -45,31 +65,4 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/Ta
 +    }
      return dataResponse;
    }
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java    (revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResponse.java    (working copy)
-@@ -34,6 +34,7 @@
-   String parentTaskId;
-   int priority;
-   String processDefinitionId;
-+  String processDefinitionName;
-   String processInstanceId;
-   String taskDefinitionKey;
-   String formResourceKey;
-@@ -155,7 +156,15 @@
-     return processInstanceId;
-   }
- 
-+  public String getProcessDefinitionName() {
-+      return processDefinitionName;
-+  }
-+
-+  public void setProcessDefinitionName(String processDefinitionName) {
-+      this.processDefinitionName = processDefinitionName;
-+  }
-+
-   public void setProcessInstanceId(String processInstanceId) {
-     this.processInstanceId = processInstanceId;
-   }
- 
+ }
