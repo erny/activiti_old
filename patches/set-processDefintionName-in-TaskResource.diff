@@ -1,32 +1,32 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java	(working copy)
-@@ -13,7 +13,9 @@
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
+index 91d1085..c47b4ca 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/task/TaskResource.java
+@@ -16,7 +16,9 @@ package org.activiti.rest.api.task;
+ import java.util.List;
  
- package org.activiti.rest.api.task;
- 
+ import org.activiti.engine.ActivitiException;
 +import org.activiti.engine.RepositoryService;
  import org.activiti.engine.form.TaskFormData;
 +import org.activiti.engine.repository.ProcessDefinition;
+ import org.activiti.engine.task.Attachment;
+ import org.activiti.engine.task.IdentityLink;
  import org.activiti.engine.task.Task;
- import org.activiti.rest.api.ActivitiUtil;
- import org.activiti.rest.api.SecuredResource;
-@@ -35,7 +37,16 @@
-     if(taskFormData != null) {
+@@ -52,6 +54,17 @@ public class TaskResource extends SecuredResource {
        response.setFormResourceKey(taskFormData.getFormKey());     
      }
--    
+     
 +    // Return also processDefinitionName
 +    if(taskFormData != null) {
-+    	RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
-+    	String processDefinitionId = task.getProcessDefinitionId();
-+    	ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
-+    	if (processDefinition != null){
-+    		String processDefinitionName = processDefinition.getName();
-+    		response.setProcessDefinitionName(processDefinitionName);
-+    	}
++      RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
++      String processDefinitionId = task.getProcessDefinitionId();
++      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
++      if (processDefinition != null){
++        String processDefinitionName = processDefinition.getName();
++        response.setProcessDefinitionName(processDefinitionName);
++      }
 +    }
-     return response;
-   }
- 
++    
+     List<Task> subTaskList = ActivitiUtil.getTaskService().getSubTasks(task.getId());
+     if(subTaskList != null) {
+       for (Task subTask : subTaskList) {
