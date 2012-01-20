@@ -1,20 +1,8 @@
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java	(working copy)
-@@ -36,6 +36,7 @@
-     properties.put("version", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_VERSION);
-     properties.put("deploymentId", ProcessDefinitionQueryProperty.DEPLOYMENT_ID);
-     properties.put("name", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_NAME);
-+    properties.put("category", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_CATEGORY);
-   }
-   
-   @Get
-Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
-===================================================================
---- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java	(revision 3030)
-+++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java	(working copy)
-@@ -31,6 +31,7 @@
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
+index a440407..2c97dd1 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionResponse.java
+@@ -33,6 +33,7 @@ public class ProcessDefinitionResponse implements Serializable {
    String diagramResourceName;
    String startFormResourceKey;
    boolean isGraphicNotationDefined;
@@ -22,7 +10,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
  
    public ProcessDefinitionResponse(ProcessDefinitionEntity processDefinition) {
      this.setId(processDefinition.getId());
-@@ -40,6 +41,7 @@
+@@ -42,6 +43,7 @@ public class ProcessDefinitionResponse implements Serializable {
      this.setDeploymentId(processDefinition.getDeploymentId());
      this.setResourceName(processDefinition.getResourceName());
      this.setDiagramResourceName(processDefinition.getDiagramResourceName());
@@ -30,7 +18,7 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
    }
    
    public String getId() {
-@@ -113,4 +115,13 @@
+@@ -115,4 +117,13 @@ public class ProcessDefinitionResponse implements Serializable {
    public void setStartFormResourceKey(String startFormResourceKey) {
      this.startFormResourceKey = startFormResourceKey;
    }
@@ -44,3 +32,15 @@ Index: modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process
 +  }
 +  
  }
+diff --git modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
+index e45ab92..3aabfaf 100644
+--- modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
++++ modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
+@@ -36,6 +36,7 @@ public class ProcessDefinitionsResource extends SecuredResource {
+     properties.put("version", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_VERSION);
+     properties.put("deploymentId", ProcessDefinitionQueryProperty.DEPLOYMENT_ID);
+     properties.put("name", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_NAME);
++    properties.put("category", ProcessDefinitionQueryProperty.PROCESS_DEFINITION_CATEGORY);
+   }
+   
+   @Get
