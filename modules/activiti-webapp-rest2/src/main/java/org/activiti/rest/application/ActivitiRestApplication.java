@@ -38,6 +38,7 @@ import org.activiti.rest.api.process.ProcessDefinitionTasksResource;
 import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
 import org.activiti.rest.api.process.ProcessInstanceResource;
 import org.activiti.rest.api.process.ProcessInstancesResource;
+import org.activiti.rest.api.process.ProcessInstanceTaskResource;
 import org.activiti.rest.api.process.StartProcessInstanceResource;
 import org.activiti.rest.api.repository.DeploymentDeleteResource;
 import org.activiti.rest.api.repository.DeploymentUploadResource;
@@ -120,6 +121,7 @@ public class ActivitiRestApplication extends Application {
     router.attach("/process-instance", StartProcessInstanceResource.class);
     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
+    router.attach("/processInstance/{processInstanceId}/tasks", ProcessInstanceTaskResource.class);
     router.attach("/process-definition/{processDefinitionId}/bpmn", ProcessDefinitionBPMNResource.class);
     router.attach("/process-definition/{processDefinitionId}/diagram", org.activiti.rest.api.process.ProcessDefinitionDiagramResource.class);
     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
