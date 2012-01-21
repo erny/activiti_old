@@ -11,10 +11,9 @@
  * limitations under the License.
  */
 
-package org.activiti.engine.impl.bpmn.event;
+package org.activiti.engine.delegate;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.impl.bpmn.parser.Error;
 
 
@@ -35,10 +34,19 @@ public class BpmnError extends ActivitiException {
   
   private static final long serialVersionUID = 1L;
 
-  private final String errorCode;
+  private String errorCode;
 
+  public BpmnError(String errorCode) {
+    super("");
+    setErrorCode(errorCode);
+  }
+          
   public BpmnError(String errorCode, String message) {
-    super(message);
+    super(message + " (errorCode='" + errorCode + "')");
+    setErrorCode(errorCode);
+  }
+
+  protected void setErrorCode(String errorCode) {
     if (errorCode == null) {
       throw new ActivitiException("Error Code must not be null.");
     }
@@ -50,6 +58,10 @@ public class BpmnError extends ActivitiException {
 
   public String getErrorCode() {
     return errorCode;
+  }
+
+  public String toString() {
+    return super.toString() + " (errorCode='" + errorCode + "')";
   }
 
 }

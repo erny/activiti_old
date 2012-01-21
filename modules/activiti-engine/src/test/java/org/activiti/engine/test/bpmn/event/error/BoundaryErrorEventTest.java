@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
@@ -63,9 +63,17 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
   
   @Deployment
   public void testCatchErrorInConcurrentEmbeddedSubprocesses() {
-    
+    assertErrorCaughtInConcurrentEmbeddedSubprocesses("boundaryEventTestConcurrentSubprocesses");
+  }
+
+  @Deployment
+  public void testCatchErrorInConcurrentEmbeddedSubprocessesThrownByScriptTask() {
+    assertErrorCaughtInConcurrentEmbeddedSubprocesses("catchErrorInConcurrentEmbeddedSubprocessesThrownByScriptTask");
+  }
+
+  private void assertErrorCaughtInConcurrentEmbeddedSubprocesses(String processDefinitionKey) {
     // Completing task A will lead to task D
-    String procId = runtimeService.startProcessInstanceByKey("boundaryEventTestConcurrentSubprocesses").getId();
+    String procId = runtimeService.startProcessInstanceByKey(processDefinitionKey).getId();
     List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
     assertEquals(2, tasks.size());
     assertEquals("task A", tasks.get(0).getName());
@@ -77,7 +85,7 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
     assertProcessEnded(procId);
     
     // Completing task B will lead to task C
-    procId = runtimeService.startProcessInstanceByKey("boundaryEventTestConcurrentSubprocesses").getId();
+    procId = runtimeService.startProcessInstanceByKey(processDefinitionKey).getId();
     tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
     assertEquals(2, tasks.size());
     assertEquals("task A", tasks.get(0).getName());
@@ -175,7 +183,7 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
       // Completing the task will reach the end error event,
       // which is never caught in the process
       taskService.complete(task.getId());
-    } catch (ActivitiException e) {
+    } catch (BpmnError e) {
       assertTextPresent("No catching boundary event found for error with errorCode 'myError', neither in same process nor in parent process", e.getMessage());
     }
   }
@@ -193,7 +201,7 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
       // Completing the task will reach the end error event,
       // which is never caught in the process
       taskService.complete(task.getId());
-    } catch (ActivitiException e) {
+    } catch (BpmnError e) {
       assertTextPresent("No catching boundary event found for error with errorCode 'myError', neither in same process nor in parent process", e.getMessage());
     }
   }
@@ -295,7 +303,7 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
   public void testUncaughtErrorThrownByJavaDelegateOnServiceTask() {
     try {
       runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnCallActivity-child");
-    } catch (ActivitiException e) {
+    } catch (BpmnError e) {
       assertTextPresent("No catching boundary event found for error with errorCode '23', neither in same process nor in parent process", e.getMessage());
     }
   }
@@ -307,11 +315,27 @@ public class BoundaryErrorEventTest extends PluggableActivitiTestCase {
   public void testUncaughtErrorThrownByJavaDelegateOnCallActivity() {
     try {
       runtimeService.startProcessInstanceByKey("uncaughtErrorThrownByJavaDelegateOnCallActivity-parent");
-    } catch (ActivitiException e) {
+    } catch (BpmnError e) {
       assertTextPresent("No catching boundary event found for error with errorCode '23', neither in same process nor in parent process", e.getMessage());
     }
   }
   
+  @Deployment
+  public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("executionsBeforeError", 2);
+    String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskSequential", variables).getId();
+    assertThatErrorHasBeenCaught(procId);
+  }
+
+  @Deployment
+  public void testCatchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("executionsBeforeError", 2);
+    String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnMultiInstanceServiceTaskParallel", variables).getId();
+    assertThatErrorHasBeenCaught(procId);
+  }
+
   private void assertThatErrorHasBeenCaught(String procId) {
     // The service task will throw an error event,
     // which is caught on the service task boundary

@@ -13,6 +13,7 @@
 package org.activiti.engine.impl.bpmn.behavior;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -20,6 +21,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 
 /**
  * @author Joram Barrez
+ * @author Falko Menge
  */
 public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavior {
   
@@ -69,6 +71,9 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     } else {
       try {
         executeOriginalBehavior(execution, loopCounter);
+      } catch (BpmnError error) {
+        // re-throw business fault so that it can be caught by an Error Intermediate Event or Error Event Sub-Process in the process
+        throw error;
       } catch (Exception e) {
         throw new ActivitiException("Could not execute inner activity behavior of multi instance behavior", e);
       }
