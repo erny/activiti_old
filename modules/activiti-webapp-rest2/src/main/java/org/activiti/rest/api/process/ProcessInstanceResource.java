@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,8 @@
 package org.activiti.rest.api.process;
 
 import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.history.HistoricActivityInstance;
@@ -34,21 +36,21 @@ import org.restlet.resource.Get;
  * @author Tijs Rademakers
  */
 public class ProcessInstanceResource extends SecuredResource {
-  
+
   @Get
   public ObjectNode getProcessInstances() {
     if(authenticate() == false) return null;
-    
+
     String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
     HistoricProcessInstance instance = ActivitiUtil.getHistoryService()
         .createHistoricProcessInstanceQuery()
         .processInstanceId(processInstanceId)
         .singleResult();
-    
+
     if(instance == null) {
       throw new ActivitiException("Process instance not found for id " + processInstanceId);
     }
-    
+
     ObjectNode responseJSON = new ObjectMapper().createObjectNode();
     responseJSON.put("processInstanceId", instance.getId());
     responseJSON.put("businessKey", instance.getBusinessKey() != null ? instance.getBusinessKey() : "null");
@@ -64,27 +66,27 @@ public class ProcessInstanceResource extends SecuredResource {
       responseJSON.put("endActivityId", instance.getEndActivityId());
       responseJSON.put("duration", instance.getDurationInMillis());
     }
-    
+
     addTaskList(processInstanceId, responseJSON);
     addActivityList(processInstanceId, responseJSON);
     addVariableList(processInstanceId, responseJSON);
-    
+
     return responseJSON;
   }
-  
+
   @Delete
   public ObjectNode deleteProcessInstance() {
     if(authenticate() == false) return null;
-    
+
     String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
-    
+
     ActivitiUtil.getRuntimeService().deleteProcessInstance(processInstanceId, "REST API");
-    
+
     ObjectNode successNode = new ObjectMapper().createObjectNode();
     successNode.put("success", true);
     return successNode;
   }
-  
+
   private void addTaskList(String processInstanceId, ObjectNode responseJSON) {
     List<HistoricTaskInstance> taskList = ActivitiUtil.getHistoryService()
         .createHistoricTaskInstanceQuery()
@@ -92,7 +94,7 @@ public class ProcessInstanceResource extends SecuredResource {
         .orderByHistoricActivityInstanceStartTime()
         .asc()
         .list();
-    
+
     if(taskList != null && taskList.size() > 0) {
       ArrayNode tasksJSON = new ObjectMapper().createArrayNode();
       responseJSON.put("tasks", tasksJSON);
@@ -114,7 +116,7 @@ public class ProcessInstanceResource extends SecuredResource {
       }
     }
   }
-  
+
   private void addActivityList(String processInstanceId, ObjectNode responseJSON) {
     List<HistoricActivityInstance> activityList = ActivitiUtil.getHistoryService()
         .createHistoricActivityInstanceQuery()
@@ -122,7 +124,7 @@ public class ProcessInstanceResource extends SecuredResource {
         .orderByHistoricActivityInstanceStartTime()
         .asc()
         .list();
-    
+
     if(activityList != null && activityList.size() > 0) {
       ArrayNode activitiesJSON = new ObjectMapper().createArrayNode();
       responseJSON.put("activities", activitiesJSON);
@@ -143,7 +145,7 @@ public class ProcessInstanceResource extends SecuredResource {
       }
     }
   }
-  
+
   private void addVariableList(String processInstanceId, ObjectNode responseJSON) {
     List<HistoricDetail> variableList = ActivitiUtil.getHistoryService()
         .createHistoricDetailQuery()
@@ -152,7 +154,7 @@ public class ProcessInstanceResource extends SecuredResource {
         .orderByTime()
         .desc()
         .list();
-    
+
     if(variableList != null && variableList.size() > 0) {
       ArrayNode variablesJSON = new ObjectMapper().createArrayNode();
       responseJSON.put("variables", variablesJSON);
@@ -164,7 +166,7 @@ public class ProcessInstanceResource extends SecuredResource {
         variableJSON.put("variableType", variableUpdate.getVariableTypeName());
         variableJSON.put("revision", variableUpdate.getRevision());
         variableJSON.put("time", RequestUtil.dateToString(variableUpdate.getTime()));
-        
+
         variablesJSON.add(variableJSON);
       }
     }
