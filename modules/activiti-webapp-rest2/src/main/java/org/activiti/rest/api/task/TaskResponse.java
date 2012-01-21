@@ -37,6 +37,7 @@ public class TaskResponse {
   String parentTaskId;
   int priority;
   String processDefinitionId;
+  String processDefinitionName;
   String processInstanceId;
   String taskDefinitionKey;
   String formResourceKey;
@@ -159,6 +160,14 @@ public class TaskResponse {
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessDefinitionName() {
+      return processDefinitionName;
+  }
+
+  public void setProcessDefinitionName(String processDefinitionName) {
+      this.processDefinitionName = processDefinitionName;
   }
 
   public void setProcessInstanceId(String processInstanceId) {

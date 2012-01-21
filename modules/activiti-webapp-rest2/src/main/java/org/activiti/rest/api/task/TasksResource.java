@@ -15,12 +15,15 @@ package org.activiti.rest.api.task;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskQueryProperty;
 import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.api.ActivitiUtil;
@@ -102,6 +105,20 @@ public class TasksResource extends SecuredResource {
     }
     
     DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
+    // add processDefinition name to every task
+    List<TaskResponse> tasks = (List<TaskResponse>) dataResponse.getData();
+    RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
+    Map <String , ProcessDefinition> processDefinitions = new HashMap<String, ProcessDefinition>();
+    for (TaskResponse taskResponse : tasks) {
+       String processDefinitionId = taskResponse.getProcessDefinitionId();
+       ProcessDefinition processDefinition = processDefinitions.get(processDefinitionId);
+       if (processDefinition == null){
+           processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
+           processDefinitions.put(processDefinitionId, processDefinition);
+       }
+       String processDefinitionName = processDefinition.getName();
+       taskResponse.setProcessDefinitionName(processDefinitionName);
+    }
     return dataResponse;
   }
 
