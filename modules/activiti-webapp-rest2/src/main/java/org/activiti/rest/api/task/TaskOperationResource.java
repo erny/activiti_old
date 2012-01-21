@@ -48,22 +48,18 @@ public class TaskOperationResource extends SecuredResource {
       String startParams = entity.getText();
       JsonNode startJSON = new ObjectMapper().readTree(startParams);
       Iterator<String> itName = startJSON.getFieldNames();
-      Map<String, Object> variables = new HashMap<String, Object>();
+      Map<String, String> properties = new HashMap<String, String>();
       while(itName.hasNext()) {
         String name = itName.next();
         JsonNode valueNode = startJSON.path(name);
-        if("true".equals(valueNode.getTextValue()) || "false".equals(valueNode.getTextValue())) {
-          variables.put(name, Boolean.valueOf(valueNode.getTextValue()));
-        } else {
-          variables.put(name, valueNode.getTextValue());
-        }
+        properties.put(name, valueNode.getTextValue());
       }
       
       if ("claim".equals(operation)) {
         ActivitiUtil.getTaskService().claim(taskId, loggedInUser);
       } else if ("complete".equals(operation)) {
-        variables.remove("taskId");
-        ActivitiUtil.getTaskService().complete(taskId, variables);
+        properties.remove("taskId");
+        ActivitiUtil.getFormService().submitTaskFormData(taskId, properties);
       } else if ("reassign".equals(operation)){
         String userId = properties.get("userId");
         ActivitiUtil.getTaskService().setAssignee(taskId, userId);
