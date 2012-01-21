@@ -22,7 +22,7 @@ index 2b9bd6a..66d0a57 100644
    public void setProcessDefinitionId(String processDefinitionId) {
      this.processDefinitionId = processDefinitionId;
    }
-+  
++
 +  public String getStartUserId() {
 +    return startUserId;
 +  }
@@ -32,10 +32,10 @@ index 2b9bd6a..66d0a57 100644
 +  }
 +
 +  public String getSuperProcessInstanceId() {
-+    return this.superProcessInstanceId;  
++    return this.superProcessInstanceId;
 +  }
 +
 +  public void setSuperProcessInstanceId(String superProcessInstanceId) {
-+    this.superProcessInstanceId = superProcessInstanceId;  
++    this.superProcessInstanceId = superProcessInstanceId;
 +  }
  }

@@ -59,13 +59,13 @@ index 0000000..f5e8640
 +      jsonNode.put("key", taskDef.getKey());
 +      Expression assigneeExpression = taskDef.getAssigneeExpression();
 +      if (assigneeExpression != null){
-+        jsonNode.put("assigneeExpression", assigneeExpression.toString());    		
++        jsonNode.put("assigneeExpression", assigneeExpression.toString());
 +      } else {
 +        jsonNode.put("assigneeExpression", "");
 +      }
 +      Expression nameExpression = taskDef.getNameExpression();
 +      if (nameExpression != null){
-+        jsonNode.put("nameExpression", nameExpression.toString());    		
++        jsonNode.put("nameExpression", nameExpression.toString());
 +      } else {
 +        jsonNode.put("nameExpression", "");
 +      }

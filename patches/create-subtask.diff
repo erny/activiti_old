@@ -27,21 +27,21 @@ index 0000000..0cb4247
 +import org.restlet.resource.Put;
 +
 +public class SubTasksResource extends SecuredResource{
-+	@Put
-+	public ObjectNode createSubTask(Representation entity) {
-+		 Authentication.getAuthenticatedUserId();
-+		if (authenticate() == false)
-+			return null;
-+		try {
-+			String startParams = entity.getText();
-+			JsonNode startJSON = new ObjectMapper().readTree(startParams);
++  @Put
++  public ObjectNode createSubTask(Representation entity) {
++     Authentication.getAuthenticatedUserId();
++    if (authenticate() == false)
++      return null;
++    try {
++      String startParams = entity.getText();
++      JsonNode startJSON = new ObjectMapper().readTree(startParams);
 +
-+    	String parentTaskId = startJSON.path("parentTaskId").getTextValue();
-+			String name = startJSON.path("name").getTextValue();
-+			String description = startJSON.path("description").getTextValue();
-+      
-+    	TaskService taskService = ActivitiUtil.getTaskService();
-+    	Task parentTask = taskService.createTaskQuery().taskId(parentTaskId).singleResult();
++      String parentTaskId = startJSON.path("parentTaskId").getTextValue();
++      String name = startJSON.path("name").getTextValue();
++      String description = startJSON.path("description").getTextValue();
++
++      TaskService taskService = ActivitiUtil.getTaskService();
++      Task parentTask = taskService.createTaskQuery().taskId(parentTaskId).singleResult();
 +      // save task
 +      Task newTask = taskService.newTask();
 +      newTask.setParentTaskId(parentTask.getId());
@@ -58,13 +58,13 @@ index 0000000..0cb4247
 +      newTask.setName(name);
 +      newTask.setDescription(description);
 +      taskService.saveTask(newTask);
-+		} catch (Exception e) {
-+			throw new ActivitiException("Failed to create subtask", e);
++    } catch (Exception e) {
++      throw new ActivitiException("Failed to create subtask", e);
 +    }
-+		ObjectNode successNode = new ObjectMapper().createObjectNode();
-+		successNode.put("success", true);
-+		return successNode;
-+	}
++    ObjectNode successNode = new ObjectMapper().createObjectNode();
++    successNode.put("success", true);
++    return successNode;
++  }
 +
 +}
 +package org.activiti.rest.api.task;
@@ -90,21 +90,21 @@ index 0000000..0cb4247
 +import org.restlet.resource.Put;
 +
 +public class SubTasksResource extends SecuredResource{
-+	@Put
-+	public ObjectNode createSubTask(Representation entity) {
-+		 Authentication.getAuthenticatedUserId();
-+		if (authenticate() == false)
-+			return null;
-+		try {
-+			String startParams = entity.getText();
-+			JsonNode startJSON = new ObjectMapper().readTree(startParams);
++  @Put
++  public ObjectNode createSubTask(Representation entity) {
++     Authentication.getAuthenticatedUserId();
++    if (authenticate() == false)
++      return null;
++    try {
++      String startParams = entity.getText();
++      JsonNode startJSON = new ObjectMapper().readTree(startParams);
 +
-+    	String parentTaskId = startJSON.path("parentTaskId").getTextValue();
-+			String name = startJSON.path("name").getTextValue();
-+			String description = startJSON.path("description").getTextValue();
-+      
-+    	TaskService taskService = ActivitiUtil.getTaskService();
-+    	Task parentTask = taskService.createTaskQuery().taskId(parentTaskId).singleResult();
++      String parentTaskId = startJSON.path("parentTaskId").getTextValue();
++      String name = startJSON.path("name").getTextValue();
++      String description = startJSON.path("description").getTextValue();
++
++      TaskService taskService = ActivitiUtil.getTaskService();
++      Task parentTask = taskService.createTaskQuery().taskId(parentTaskId).singleResult();
 +      // save task
 +      Task newTask = taskService.newTask();
 +      newTask.setParentTaskId(parentTask.getId());
@@ -121,13 +121,13 @@ index 0000000..0cb4247
 +      newTask.setName(name);
 +      newTask.setDescription(description);
 +      taskService.saveTask(newTask);
-+		} catch (Exception e) {
-+			throw new ActivitiException("Failed to create subtask", e);
++    } catch (Exception e) {
++      throw new ActivitiException("Failed to create subtask", e);
 +    }
-+		ObjectNode successNode = new ObjectMapper().createObjectNode();
-+		successNode.put("success", true);
-+		return successNode;
-+	}
++    ObjectNode successNode = new ObjectMapper().createObjectNode();
++    successNode.put("success", true);
++    return successNode;
++  }
 +
 +}
 diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/application/ActivitiRestApplication.java

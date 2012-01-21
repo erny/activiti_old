@@ -26,7 +26,7 @@ index 91d1085..c47b4ca 100644
 +        response.setProcessDefinitionName(processDefinitionName);
 +      }
 +    }
-+    
++
      List<Task> subTaskList = ActivitiUtil.getTaskService().getSubTasks(task.getId());
      if(subTaskList != null) {
        for (Task subTask : subTaskList) {

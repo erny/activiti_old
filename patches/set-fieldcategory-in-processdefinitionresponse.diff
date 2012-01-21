@@ -30,7 +30,7 @@ index a440407..2c97dd1 100644
 +  public void setCategory(String category) {
 +    this.category = category;
 +  }
-+  
++
  }
 diff --git a/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java b/modules/activiti-webapp-rest2/src/main/java/org/activiti/rest/api/process/ProcessDefinitionsResource.java
 index e45ab92..3aabfaf 100644
