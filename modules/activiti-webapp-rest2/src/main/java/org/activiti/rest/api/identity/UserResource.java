@@ -14,16 +14,22 @@
 package org.activiti.rest.api.identity;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.User;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
 import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 
 /**
  * @author Tijs Rademakers
  */
 public class UserResource extends SecuredResource {
   
+  public UserResource(){
+    super();
+  }
+
   @Get
   public UserResponse getUser() {
     if(authenticate() == false) return null;
@@ -37,4 +43,28 @@ public class UserResource extends SecuredResource {
     return response;
   }
 
+  @Put()
+  public StateResponse createUser(UserInfo userInfo){
+    if(authenticate() == false) return null;
+
+    IdentityService identityService = ActivitiUtil.getIdentityService();
+
+    String userId = userInfo.getUserId();
+
+    if( userId == null) {
+      throw new ActivitiException("No user id supplied");
+    }
+
+    if (identityService.createUserQuery().userId(userId).count() == 0) {
+      User user = identityService.newUser(userId);
+      user.setFirstName(userInfo.getFirstName());
+      user.setLastName(userInfo.getLastName());
+      user.setPassword(userInfo.getPassword());
+      user.setEmail(userInfo.getEmail());
+      identityService.saveUser(user);
+    }else{
+      throw new ActivitiException("user id must be unique");
+    }
+    return new StateResponse().setSuccess(true);
+  }
 }
