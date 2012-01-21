@@ -13,18 +13,27 @@
 
 package org.activiti.rest.api.task;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskQueryProperty;
 import org.activiti.engine.query.QueryProperty;
+import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.api.RequestUtil;
 import org.activiti.rest.api.SecuredResource;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+import org.restlet.data.Form;
+import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 
 /**
  * @author Tijs Rademakers
@@ -94,5 +103,40 @@ public class TasksResource extends SecuredResource {
     
     DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
     return dataResponse;
+  }
+
+  @Put
+  public ObjectNode createTask(Representation entity) {
+    if (authenticate() == false)
+      return null;
+    try {
+      String startParams = entity.getText();
+      JsonNode startJSON = new ObjectMapper().readTree(startParams);
+
+      String name = startJSON.path("name").getTextValue();
+      String description = startJSON.path("description").getTextValue();
+      String dueDateStr = startJSON.path("dueDate").getTextValue();
+      Form tmpForm = new Form();
+      tmpForm.set("dueDate", dueDateStr);
+      Date dueDate = RequestUtil.getDate(tmpForm, "dueDate");
+      int priority = startJSON.path("priority").getIntValue();
+      String owner = startJSON.path("owner").getTextValue();
+
+      TaskService taskService = ActivitiUtil.getTaskService();
+
+      // Create task
+      Task task = taskService.newTask();
+      task.setName(name);
+      task.setDescription(description);
+      task.setDueDate(dueDate);
+      task.setPriority(priority);
+      task.setOwner(owner);
+      taskService.saveTask(task);
+    } catch (Exception e) {
+      throw new ActivitiException("Failed to retrieve the process definition parameters", e);
+    }
+    ObjectNode successNode = new ObjectMapper().createObjectNode();
+    successNode.put("success", true);
+    return successNode;
   }
 }
