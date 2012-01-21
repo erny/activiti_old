@@ -57,6 +57,9 @@ public class TaskOperationResource extends SecuredResource {
       } else if ("complete".equals(operation)) {
         variables.remove("taskId");
         ActivitiUtil.getTaskService().complete(taskId, variables);
+      } else if ("reassign".equals(operation)){
+        String userId = properties.get("userId");
+        ActivitiUtil.getTaskService().setAssignee(taskId, userId);
       } else {
         throw new ActivitiException("'" + operation + "' is not a valid operation");
       }
