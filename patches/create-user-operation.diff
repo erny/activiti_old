@@ -113,7 +113,7 @@ index 4787583..7dc004b 100644
 +    if(authenticate() == false) return null;
 +
 +    IdentityService identityService = ActivitiUtil.getIdentityService();
-+    
++
 +    String userId = userInfo.getUserId();
 +
 +    if( userId == null) {
