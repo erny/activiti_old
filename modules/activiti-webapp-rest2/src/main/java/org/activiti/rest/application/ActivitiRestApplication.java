@@ -120,6 +120,7 @@ public class ActivitiRestApplication extends Application {
     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
     router.attach("/process-definition/{processDefinitionId}/bpmn", ProcessDefinitionBPMNResource.class);
+    router.attach("/process-definition/{processDefinitionId}/diagram", org.activiti.rest.api.process.ProcessDefinitionDiagramResource.class);
     router.attach("/process-definition/{processDefinitionId}/form", ProcessDefinitionFormResource.class);
     router.attach("/process-definition/{processDefinitionId}/properties", ProcessDefinitionPropertiesResource.class);
     
