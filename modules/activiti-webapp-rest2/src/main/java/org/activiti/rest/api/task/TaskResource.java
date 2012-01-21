@@ -16,7 +16,9 @@ package org.activiti.rest.api.task;
 import java.util.List;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
@@ -52,6 +54,17 @@ public class TaskResource extends SecuredResource {
       response.setFormResourceKey(taskFormData.getFormKey());     
     }
     
+    // Return also processDefinitionName
+    if(taskFormData != null) {
+      RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
+      String processDefinitionId = task.getProcessDefinitionId();
+      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).list().get(0);
+      if (processDefinition != null){
+        String processDefinitionName = processDefinition.getName();
+        response.setProcessDefinitionName(processDefinitionName);
+      }
+    }
+
     List<Task> subTaskList = ActivitiUtil.getTaskService().getSubTasks(task.getId());
     if(subTaskList != null) {
       for (Task subTask : subTaskList) {
