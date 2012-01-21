@@ -169,4 +169,29 @@ public class ProcessInstanceResource extends SecuredResource {
       }
     }
   }
+
+  @Get
+  public ObjectNode getVariables() {
+    if (authenticate() == false)
+      return null;
+    String processInstanceId = (String) getRequest().getAttributes().get("processInstanceId");
+
+    Map<String, Object> variables = ActivitiUtil.getRuntimeService().getVariables(processInstanceId);
+
+    ObjectNode responseJSON = new ObjectMapper().createObjectNode();
+
+    ArrayNode propertiesJSON = new ObjectMapper().createArrayNode();
+
+    for (Iterator<String> it = variables.keySet().iterator(); it.hasNext();){
+      String key = it.next();
+      String value = String.valueOf(variables.get(key));
+
+      ObjectNode propertyJSON = new ObjectMapper().createObjectNode();
+      propertyJSON.put(key,value);
+      propertiesJSON.add(propertyJSON);
+    }
+    responseJSON.put("data", propertiesJSON);
+
+    return responseJSON;
+  }
 }
