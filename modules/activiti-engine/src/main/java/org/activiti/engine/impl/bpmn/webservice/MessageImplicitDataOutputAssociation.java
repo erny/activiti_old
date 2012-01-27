@@ -14,8 +14,8 @@ package org.activiti.engine.impl.bpmn.webservice;
 
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
-import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.activiti.engine.impl.bpmn.data.FieldBaseStructureInstance;
+import org.activiti.engine.impl.bpmn.data.SimpleDataAssociation;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
@@ -24,7 +24,7 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
  * 
  * @author Esteban Robles Luna
  */
-public class MessageImplicitDataOutputAssociation extends AbstractDataAssociation {
+public class MessageImplicitDataOutputAssociation extends SimpleDataAssociation {
 
   public MessageImplicitDataOutputAssociation(String targetRef, Expression sourceExpression) {
     super(sourceExpression, targetRef);
@@ -36,8 +36,9 @@ public class MessageImplicitDataOutputAssociation extends AbstractDataAssociatio
 
   @Override
   public void evaluate(ActivityExecution execution) {
+  	super.evaluate(execution);
     MessageInstance message = (MessageInstance) execution.getVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
-    if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
+    if (message != null && message.getStructureInstance() instanceof FieldBaseStructureInstance) {
       FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
       execution.setVariable(this.getTarget(), structure.getFieldValue(this.getSource()));
     }

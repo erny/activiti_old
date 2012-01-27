@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+	expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://activiti.org/bpmn20">
+	<process id="CalculateDiscountProcess" name="Calculate discount">
+		<ioSpecification>
+			<dataInput id="orderValue" itemSubjectRef="java.lang.Double"/>
+			<dataOutput id="orderDiscount" itemSubjectRef="java.lang.Double"/>
+			<inputSet>
+				<dataInputRefs>orderValue</dataInputRefs>
+			</inputSet>
+			<outputSet>
+				<dataOutputRefs>orderDiscount</dataOutputRefs>
+			</outputSet>
+		</ioSpecification>
+		
+		<dataObject id="order" itemSubjectRef="java.lang.Double"/>
+		<dataObject id="discount" itemSubjectRef="java.lang.Double"/>
+
+		<startEvent id="theStart" name="Start">
+			<dataOutputAssociation>
+				<sourceRef>orderValue</sourceRef>
+				<targetRef>order</targetRef>
+			</dataOutputAssociation>
+		</startEvent>
+		<sequenceFlow id="startflow" name="" sourceRef="theStart" targetRef="discountDecision"/>
+		<exclusiveGateway id="discountDecision" name="Discount Decision"/>
+		
+		<sequenceFlow id="OrderLessThan500" name="" sourceRef="discountDecision" targetRef="noDiscount">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${order <= 500}]]></conditionExpression>
+		</sequenceFlow>
+		<scriptTask id="noDiscount" name="No Discount" scriptFormat="javascript">
+			<script><![CDATA[orderDiscount = 0]]></script>
+		</scriptTask>
+		<sequenceFlow id="ndflow" name="" sourceRef="noDiscount" targetRef="discountDecisionResult"/>
+		
+		<sequenceFlow id="OrderMoreThan500" name="${order &gt; 500 &amp;&amp; order &lt; 1000}" 
+			sourceRef="discountDecision" targetRef="discount5">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${order > 500 && order < 1000}]]></conditionExpression>
+		</sequenceFlow>
+		<scriptTask id="discount5" name="Discount 5%" scriptFormat="javascript">
+			<script><![CDATA[orderDiscount = 5]]></script>
+		</scriptTask>
+		<sequenceFlow id="d5flow" name="" sourceRef="discount5" targetRef="discountDecisionResult"/>
+		
+		<sequenceFlow id="OrderMoreThan1000" name="${order &gt; 1000}"
+			sourceRef="discountDecision" targetRef="discount10">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${order > 1000}]]></conditionExpression>
+		</sequenceFlow>
+		<scriptTask id="discount10" name="Discount 10%" scriptFormat="javascript">
+			<script><![CDATA[orderDiscount = 10]]></script>
+		</scriptTask>
+		<sequenceFlow id="d10flow" name="" sourceRef="discount10" targetRef="discountDecisionResult"/>
+
+		<exclusiveGateway id="discountDecisionResult" name="Discount Decision Result"/>
+		<sequenceFlow id="ddrflow" name="" sourceRef="discountDecisionResult" targetRef="theEnd"/>
+		<endEvent id="theEnd" name="End"/>
+	</process>
+	<bpmndi:BPMNDiagram id="BPMNDiagram_CalculateDiscount">
+		<bpmndi:BPMNPlane bpmnElement="CalculateDiscountProcess"
+			id="BPMNPlane_CalculateDiscount">
+			<bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+				<omgdc:Bounds height="35" width="35" x="30" y="200"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="discountDecision"
+				id="BPMNShape_discountDecision">
+				<omgdc:Bounds height="40" width="40" x="110" y="197"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="noDiscount" id="BPMNShape_noDiscount">
+				<omgdc:Bounds height="55" width="105" x="195" y="190"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="discount5" id="BPMNShape_discount5">
+				<omgdc:Bounds height="55" width="105" x="200" y="290"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="discount10" id="BPMNShape_discount10">
+				<omgdc:Bounds height="55" width="105" x="200" y="80"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="discountDecisionResult"
+				id="BPMNShape_discountDecisionResult">
+				<omgdc:Bounds height="40" width="40" x="355" y="197"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+				<omgdc:Bounds height="35" width="35" x="470" y="200"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge bpmnElement="startflow" id="BPMNEdge_startflow">
+				<omgdi:waypoint x="65" y="217"></omgdi:waypoint>
+				<omgdi:waypoint x="110" y="217"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="OrderLessThan500" id="BPMNEdge_OrderLessThan500">
+				<omgdi:waypoint x="150" y="217"></omgdi:waypoint>
+				<omgdi:waypoint x="195" y="217"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="OrderMoreThan500"
+				id="BPMNEdge_OrderMoreThan500">
+				<omgdi:waypoint x="130" y="237"></omgdi:waypoint>
+				<omgdi:waypoint x="130" y="317"></omgdi:waypoint>
+				<omgdi:waypoint x="200" y="317"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="OrderMoreThan1000"
+				id="BPMNEdge_OrderMoreThan1000">
+				<omgdi:waypoint x="130" y="197"></omgdi:waypoint>
+				<omgdi:waypoint x="130" y="107"></omgdi:waypoint>
+				<omgdi:waypoint x="200" y="107"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="ndflow" id="BPMNEdge_ndflow">
+				<omgdi:waypoint x="300" y="217"></omgdi:waypoint>
+				<omgdi:waypoint x="355" y="217"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="d10flow" id="BPMNEdge_d10flow">
+				<omgdi:waypoint x="305" y="107"></omgdi:waypoint>
+				<omgdi:waypoint x="375" y="107"></omgdi:waypoint>
+				<omgdi:waypoint x="375" y="197"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="d5flow" id="BPMNEdge_d5flow">
+				<omgdi:waypoint x="305" y="317"></omgdi:waypoint>
+				<omgdi:waypoint x="375" y="317"></omgdi:waypoint>
+				<omgdi:waypoint x="375" y="237"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="ddrflow" id="BPMNEdge_ddrflow">
+				<omgdi:waypoint x="395" y="217"></omgdi:waypoint>
+				<omgdi:waypoint x="470" y="217"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>

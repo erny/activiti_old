@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
+
+import org.activiti.engine.ActivitiClassLoadingException;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -59,7 +62,7 @@ import org.activiti.engine.impl.bpmn.data.DataRef;
 import org.activiti.engine.impl.bpmn.data.IOSpecification;
 import org.activiti.engine.impl.bpmn.data.ItemDefinition;
 import org.activiti.engine.impl.bpmn.data.ItemKind;
-import org.activiti.engine.impl.bpmn.data.SimpleDataInputAssociation;
+import org.activiti.engine.impl.bpmn.data.SimpleDataAssociation;
 import org.activiti.engine.impl.bpmn.data.StructureDefinition;
 import org.activiti.engine.impl.bpmn.data.TransformationDataOutputAssociation;
 import org.activiti.engine.impl.bpmn.helper.ClassDelegate;
@@ -111,6 +114,7 @@ import org.activiti.engine.impl.variable.VariableDeclaration;
  * @author Falko Menge
  * @author Esteban Robles
  * @author Daniel Meyer
+ * @author Andrey Lumyanski
  */
 public class BpmnParse extends Parse {
 
@@ -175,11 +179,30 @@ public class BpmnParse extends Parse {
     this.initializeXSDItemDefinitions();
   }
 
+  /**
+   * Initializes xsd simple types item definitions.
+   */
   protected void initializeXSDItemDefinitions() {
-    this.itemDefinitions.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string",
-            new ClassStructureDefinition(String.class)));
+  	Object[] types = new Object[] {
+  			"string", String.class,
+  			"byte", Byte.class,
+  			"short", Short.class,
+  			"int", Integer.class,
+  			"long", Long.class,
+  			"boolean", Boolean.class,
+  			"float", Float.class,
+  			"double", Double.class
+  	};
+  	StringBuilder sb = new StringBuilder();
+  	String typeName;
+  	for (int i = 0; i < types.length / 2; i += 2) {
+  		sb.delete(0, sb.length());
+  		sb.append(XMLConstants.W3C_XML_SCHEMA_NS_URI).append(':').append(types[i]);
+  		typeName = sb.toString();
+      this.itemDefinitions.put(typeName, new ItemDefinition(typeName, new ClassStructureDefinition((Class<?>) types[i + 1])));
+  	}
   }
-
+  
   public BpmnParse deployment(DeploymentEntity deployment) {
     this.deployment = deployment;
     return this;
@@ -510,6 +533,22 @@ public class BpmnParse extends Parse {
 
     IOSpecification ioSpecification = parseIOSpecification(scopeElement.element("ioSpecification"));
     parentScope.setIoSpecification(ioSpecification);
+    parseDataObjects(scopeElement, parentScope);
+  }
+
+  /**
+   * Parses {@code dataObject} elements
+   * @param scopeElement scope element (process or sub-process)
+   * @param parentScope 
+   *          The scope that contains the nested scope.
+   */
+  private void parseDataObjects(Element scopeElement, ScopeImpl parentScope) {
+	  List<Element> dataObjects = scopeElement.elements("dataObject");
+	  VariableDeclaration variableDeclaration;
+	  for (Element dataObject : dataObjects) {
+		  variableDeclaration = new VariableDeclaration(dataObject.attribute("id"), dataObject.attribute("itemSubjectRef"));
+		  addVariableDeclaration(parentScope, variableDeclaration);
+	  }
   }
 
   protected IOSpecification parseIOSpecification(Element ioSpecificationElement) {
@@ -560,7 +599,7 @@ public class BpmnParse extends Parse {
     if (assignments.isEmpty()) {
       return new MessageImplicitDataInputAssociation(sourceRef, targetRef);
     } else {
-      SimpleDataInputAssociation dataAssociation = new SimpleDataInputAssociation(sourceRef, targetRef);
+      SimpleDataAssociation dataAssociation = new SimpleDataAssociation(sourceRef, targetRef);
 
       for (Element assigmentElement : dataAssociationElement.elements("assignment")) {
         Expression from = this.expressionManager.createExpression(assigmentElement.element("from").getText());
@@ -625,11 +664,16 @@ public class BpmnParse extends Parse {
       } else {
         scope.setProperty(PROPERTYNAME_INITIAL, startEventActivity);
       }
-
+      
       // Currently only none start events supported
 
       // TODO: a subprocess is only allowed to have a none start event
-      startEventActivity.setActivityBehavior(new NoneStartEventActivityBehavior());
+      NoneStartEventActivityBehavior noneStartEventActivityBehavior = new NoneStartEventActivityBehavior();
+      startEventActivity.setActivityBehavior(noneStartEventActivityBehavior);
+      for (Element dataAssociationElement : startEventElement.elements("dataOutputAssociation")) {
+        AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
+        noneStartEventActivityBehavior.addDataOutputAssociation(dataAssociation);
+      }
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseStartEvent(startEventElement, scope, startEventActivity);
@@ -1612,7 +1656,12 @@ public class BpmnParse extends Parse {
           activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error != null ? error.getErrorCode() : errorRef));
         }
       } else { // default: none end event
-        activity.setActivityBehavior(new NoneEndEventActivityBehavior());
+      	NoneEndEventActivityBehavior noneEndEventActivityBehavior = new NoneEndEventActivityBehavior();
+        activity.setActivityBehavior(noneEndEventActivityBehavior);
+        for (Element dataAssociationElement : endEventElement.elements("dataInputAssociation")) {
+          AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
+          noneEndEventActivityBehavior.addDataInputAssociation(dataAssociation);
+        }
       }
 
       for (BpmnParseListener parseListener : parseListeners) {
@@ -1912,10 +1961,10 @@ public class BpmnParse extends Parse {
         String target = listenerElement.attribute("target");
         if (sourceExpression != null) {
           Expression expression = expressionManager.createExpression(sourceExpression.trim());
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(expression, target));
+          callActivityBehaviour.addDataInputAssociation(new SimpleDataAssociation(expression, target));
         } else {
           String source = listenerElement.attribute("source");
-          callActivityBehaviour.addDataInputAssociation(new SimpleDataInputAssociation(source, target));
+          callActivityBehaviour.addDataInputAssociation(new SimpleDataAssociation(source, target));
         }
       }
       // output data elements
@@ -1932,20 +1981,18 @@ public class BpmnParse extends Parse {
       }
     }
 
-    // // parse data input and output
-    // for (Element dataAssociationElement :
-    // callActivityElement.elements("dataInputAssociation")) {
-    // AbstractDataAssociation dataAssociation =
-    // this.parseDataInputAssociation(dataAssociationElement);
-    // callActivityBehaviour.addDataInputAssociation(dataAssociation);
-    // }
-    //
-    // for (Element dataAssociationElement :
-    // callActivityElement.elements("dataOutputAssociation")) {
-    // AbstractDataAssociation dataAssociation =
-    // this.parseDataOutputAssociation(dataAssociationElement);
-    // callActivityBehaviour.addDataOutputAssociation(dataAssociation);
-    // }
+    // parse data input and output
+		for (Element dataAssociationElement : callActivityElement.elements("dataInputAssociation")) {
+			AbstractDataAssociation dataAssociation = 
+					this.parseDataInputAssociation(dataAssociationElement);
+			callActivityBehaviour.addDataInputAssociation(dataAssociation);
+		}
+
+		for (Element dataAssociationElement : callActivityElement.elements("dataOutputAssociation")) {
+			AbstractDataAssociation dataAssociation = 
+					this.parseDataOutputAssociation(dataAssociationElement);
+			callActivityBehaviour.addDataOutputAssociation(dataAssociation);
+		}
 
     activity.setScope(true);
     activity.setActivityBehavior(callActivityBehaviour);

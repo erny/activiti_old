@@ -12,16 +12,30 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
-import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
+import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
  * @author Joram Barrez
+ * @author Andrey Lumyanski
  */
 public class NoneEndEventActivityBehavior extends FlowNodeActivityBehavior {
-  
-  public void execute(ActivityExecution execution) throws Exception {
-    execution.end();
-  }
+
+	protected final List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
+
+	public void addDataInputAssociation(AbstractDataAssociation dataAssociation) {
+		this.dataInputAssociations.add(dataAssociation);
+	}
+
+	public void execute(ActivityExecution execution) throws Exception {
+		// evaluate data output associations:
+		for (AbstractDataAssociation dataAssociation : this.dataInputAssociations) {
+			dataAssociation.evaluate(execution);
+		}
+		execution.end();
+	}
 
 }

@@ -12,20 +12,35 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
+import java.util.List;
 
-
+import org.activiti.engine.impl.bpmn.data.AbstractDataAssociation;
+import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * implementation of the 'none start event': a start event that has no 
- * specific trigger but the programmatic one (processService.startProcessInstanceXXX()).
+ * implementation of the 'none start event': a start event that has no specific
+ * trigger but the programmatic one (processService.startProcessInstanceXXX()).
  * 
  * 
  * @author Joram Barrez
+ * @author Andrey Lumyanski
  */
 public class NoneStartEventActivityBehavior extends FlowNodeActivityBehavior {
 
-  // Nothing to see here.
-  // The default behaviour of the BpmnActivity is exactly what
-  // a none start event should be doing.
-  
+	protected final List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+
+  public void addDataOutputAssociation(AbstractDataAssociation dataAssociation) {
+    this.dataOutputAssociations.add(dataAssociation);
+  }
+
+  @Override
+  public void execute(ActivityExecution execution) throws Exception {
+    // evaluate data output associations:
+  	for (AbstractDataAssociation dataAssociation : this.dataOutputAssociations) {
+      dataAssociation.evaluate(execution);
+    }
+
+    super.execute(execution);
+  }
 }

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+	xmlns:tns="http://www.activiti.org/test" 
+	typeLanguage="http://www.w3.org/2001/XMLSchema"
+	expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+	<itemDefinition id="double" structureRef="java.lang.Double"/>
+	<process id="OrderHandler2" name="OrderHandler2">
+		<documentation>Handles Order</documentation>
+		<ioSpecification>
+			<dataInput id="order" itemSubjectRef="tns:double"/>
+			<dataOutput id="total" itemSubjectRef="tns:double"/>
+			<inputSet>
+				<dataInputRefs>order</dataInputRefs>
+			</inputSet>
+			<outputSet>
+				<dataOutputRefs>total</dataOutputRefs>
+			</outputSet>
+		</ioSpecification>
+
+		<dataObject id="discount" itemSubjectRef="tns:double"/>
+
+		<startEvent id="theStart" name="Start"/>
+		<sequenceFlow id="startflow" sourceRef="theStart" targetRef="callActivityCalculateDiscount"/>
+		<callActivity id="callActivityCalculateDiscount" name="Calculate Discount" calledElement="CalculateDiscountProcess">
+			<ioSpecification>
+				<dataInput id="orderValue" itemSubjectRef="tns:double"/>
+				<dataOutput id="orderDiscount" itemSubjectRef="tns:double"/>
+				<inputSet>
+					<dataInputRefs>orderValue</dataInputRefs>
+				</inputSet>
+				<outputSet>
+					<dataOutputRefs>orderDiscount</dataOutputRefs>
+				</outputSet>
+			</ioSpecification>
+			<dataInputAssociation>
+				<sourceRef>order</sourceRef>
+				<targetRef>orderValue</targetRef>
+			</dataInputAssociation>
+			<dataOutputAssociation>
+				<sourceRef>orderDiscount</sourceRef>
+				<targetRef>discount</targetRef>
+			</dataOutputAssociation>
+		</callActivity>
+	    <sequenceFlow id="cdflow" sourceRef="callActivityCalculateDiscount" targetRef="scripttaskCalculateTotal"/>
+	    <scriptTask id="scripttaskCalculateTotal" name="Calculate Total" scriptFormat="javascript">
+			<extensionElements>
+				<activiti:executionListener class="org.activiti.examples.bpmn.io.OrderHandlerTest" event="end" />
+			</extensionElements>
+			<script><![CDATA[total = order* (100 - discount)/100]]></script>
+	    </scriptTask>
+		<endEvent id="theEnd" name="End"/>
+	    <sequenceFlow id="ctflow" sourceRef="scripttaskCalculateTotal" targetRef="theEnd"/>
+	</process>
+	<bpmndi:BPMNDiagram id="BPMNDiagram_OrderHandler2">
+		<bpmndi:BPMNPlane bpmnElement="OrderHandler2"
+			id="BPMNPlane_OrderHandler2">
+			<bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+				<omgdc:Bounds height="35" width="35" x="170" y="250"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="callActivityCalculateDiscount"
+				id="BPMNShape_callActivityCalculateDiscount">
+				<omgdc:Bounds height="55" width="105" x="280" y="240"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+				<omgdc:Bounds height="35" width="35" x="670" y="250"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="scripttaskCalculateTotal"
+				id="BPMNShape_scripttaskCalculateTotal">
+				<omgdc:Bounds height="55" width="105" x="480" y="240"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge bpmnElement="startflow" id="BPMNEdge_startflow">
+				<omgdi:waypoint x="205" y="267"></omgdi:waypoint>
+				<omgdi:waypoint x="280" y="267"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="cdflow" id="BPMNEdge_cdflow">
+				<omgdi:waypoint x="385" y="267"></omgdi:waypoint>
+				<omgdi:waypoint x="480" y="267"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="ctflow" id="BPMNEdge_ctflow">
+				<omgdi:waypoint x="585" y="267"></omgdi:waypoint>
+				<omgdi:waypoint x="670" y="267"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>
