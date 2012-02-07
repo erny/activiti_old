@@ -30,6 +30,10 @@
       <version>1.2.132</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
     <!-- dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
