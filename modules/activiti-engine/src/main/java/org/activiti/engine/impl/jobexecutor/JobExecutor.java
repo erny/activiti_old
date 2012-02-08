@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import org.activiti.engine.impl.cmd.AcquireJobsCmd;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.runtime.Job;
 
 /**
@@ -52,6 +53,10 @@ public abstract class JobExecutor {
   protected int waitTimeInMillis = 5 * 1000;
   protected String lockOwner = UUID.randomUUID().toString();
   protected int lockTimeInMillis = 5 * 60 * 1000;
+  
+  private int amountOfRetries = JobEntity.DEFAULT_RETRIES;
+  private int retriesDelayInMills = 0;   
+
       
   public void start() {
     if (isActive) {
@@ -158,6 +163,26 @@ public abstract class JobExecutor {
     
   public boolean isActive() {
     return isActive;
+  }
+
+  
+  public int getAmountOfRetries() {
+    return amountOfRetries;
+  }
+
+  
+  public void setAmountOfRetries(int amountOfRetries) {
+    this.amountOfRetries = amountOfRetries;
+  }
+
+  
+  public int getRetriesDelayInMills() {
+    return retriesDelayInMills;
+  }
+
+  
+  public void setRetriesDelayInMills(int retriesDelayInMills) {
+    this.retriesDelayInMills = retriesDelayInMills;
   }
   
   public RejectedJobsHandler getRejectedJobsHandler() {

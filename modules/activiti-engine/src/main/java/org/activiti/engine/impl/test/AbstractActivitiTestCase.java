@@ -176,6 +176,10 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+    waitForJobExecutor(maxMillisToWait, intervalMillis, true);
+  }
+
+  public void waitForJobExecutor(long maxMillisToWait, long intervalMillis, boolean processAllJobs) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
 
@@ -193,7 +197,7 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
       } finally {
         timer.cancel();
       }
-      if (areJobsAvailable) {
+      if (areJobsAvailable && processAllJobs) {
         throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
       }
 

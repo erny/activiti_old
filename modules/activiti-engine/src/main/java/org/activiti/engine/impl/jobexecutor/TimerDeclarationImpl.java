@@ -99,12 +99,18 @@ public class TimerDeclarationImpl implements Serializable {
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
         .getBusinessCalendar(type.caledarName);
+    
+    
 
     String dueDateString = executionEntity == null ? description.getExpressionText() : (String) description.getValue(executionEntity);
     Date duedate = businessCalendar.resolveDuedate(dueDateString);
 
+    int retries = Context.getProcessEngineConfiguration().getJobExecutor().getAmountOfRetries();
+
     TimerEntity timer = new TimerEntity(this);
     timer.setDuedate(duedate);
+    timer.setRetries(retries);
+
     if (executionEntity != null) {
       timer.setExecution(executionEntity);
     }

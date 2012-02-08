@@ -15,6 +15,8 @@ package org.activiti.engine.impl.cmd;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.activiti.engine.impl.cfg.TransactionContext;
 import org.activiti.engine.impl.cfg.TransactionState;
@@ -24,6 +26,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.impl.jobexecutor.MessageAddedNotification;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
+import org.activiti.engine.impl.util.ClockUtil;
 
 /**
  * @author Tom Baeyens
@@ -40,23 +43,32 @@ public class DecrementJobRetriesCmd implements Command<Object> {
   }
 
   public Object execute(CommandContext commandContext) {
+    
+    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
+    
     JobEntity job = Context
       .getCommandContext()
       .getJobManager()
       .findJobById(jobId);
-    job.setRetries(job.getRetries() - 1);
-    job.setLockOwner(null);
-    job.setLockExpirationTime(null);
     
+    job.setRetries(job.getRetries() - 1);
+    
+    
+
     if(exception != null) {
       job.setExceptionMessage(exception.getMessage());
       job.setExceptionStacktrace(getExceptionStacktrace());
     }
     
-    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-    MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
-    TransactionContext transactionContext = commandContext.getTransactionContext();
-    transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+    if (jobExecutor.getRetriesDelayInMills() > 0 ) {
+      calculateNextAttemptTime(job, jobExecutor.getRetriesDelayInMills());
+    } else {
+      job.setLockExpirationTime(null);
+      job.setLockOwner(null);
+      MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
+      TransactionContext transactionContext = commandContext.getTransactionContext();
+      transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+    } 
     
     return null;
   }
@@ -66,4 +78,14 @@ public class DecrementJobRetriesCmd implements Command<Object> {
     exception.printStackTrace(new PrintWriter(stringWriter));
     return stringWriter.toString();
   }
+
+  protected void calculateNextAttemptTime(JobEntity job, int delayRetriesInMillis) {
+
+    GregorianCalendar gregorianCalendar = new GregorianCalendar();
+    gregorianCalendar.setTime(ClockUtil.getCurrentTime());
+    gregorianCalendar.add(Calendar.MILLISECOND, delayRetriesInMillis);
+    job.setLockExpirationTime(gregorianCalendar.getTime());
+
+  }
+
 }

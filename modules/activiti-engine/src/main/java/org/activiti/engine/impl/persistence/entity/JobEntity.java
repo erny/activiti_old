@@ -249,4 +249,5 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject {
     }
     return exceptionByteArray;
   }
+
 }
