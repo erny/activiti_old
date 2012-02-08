@@ -670,13 +670,13 @@
   
   <distributionManagement>
     <snapshotRepository>
-      <id>alfresco.snapshot.repo</id>
-      <url>http://maven.alfresco.com/nexus/content/repositories/activiti-snapshots/</url>
+      <id>consdata</id>
+      <url>http://devtools:8081/nexus/content/repositories/eximeeflow-snapshots</url>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
     <repository>
-      <id>alfresco.release.repo</id>
-      <url>http://maven.alfresco.com/nexus/content/repositories/activiti/</url>
+      <id>consdata</id>
+      <url>http://devtools:8081/nexus/content/repositories/eximeeflow-releases</url>
     </repository>
   </distributionManagement>
 
