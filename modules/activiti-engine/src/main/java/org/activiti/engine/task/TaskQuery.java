@@ -68,6 +68,10 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   
   /** Only select tasks for which there exist an {@link IdentityLink} with the given user */
   TaskQuery taskInvolvedUser(String involvedUser);
+  
+  /** Only select tasks for which there exist an {@link IdentityLink} with the given group */
+  TaskQuery taskInvolvedGroupIn(List<String> involvedGroups);
+
 
   /** Only select tasks for which users in the given group are candidates. */
   TaskQuery taskCandidateGroup(String candidateGroup);

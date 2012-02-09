@@ -28,6 +28,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.engine.test.Deployment;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * @author Joram Barrez
@@ -288,6 +290,28 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     } catch(ActivitiException e) {}
   }
   
+  public void testQueryByInvolvedGroups() {
+	  
+	  	TaskQuery query = taskService.createTaskQuery().taskName("managementAndAccountancyTask");
+	  	Task managementAndAccountancyTask = query.singleResult();
+	  	taskService.claim(managementAndAccountancyTask.getId(), "kermit");
+	  	
+	    query = taskService.createTaskQuery().taskInvolvedGroupIn(Arrays.asList("management","sales"));
+	    assertEquals(3, query.count());
+	    assertEquals(3, query.list().size());
+	    try {
+	      query.singleResult();
+	      fail("expected exception");
+	    } catch (ActivitiException e) {
+	      // OK
+	    }
+	    query = taskService.createTaskQuery().taskInvolvedGroupIn(Arrays.asList("sales"));
+	    assertEquals(0, query.count());
+	    assertEquals(0, query.list().size());
+	   
+	  }
+
+  
   public void testQueryByCandidateGroup() {
     TaskQuery query = taskService.createTaskQuery().taskCandidateGroup("management");
     assertEquals(3, query.count());
@@ -303,6 +327,8 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     assertEquals(0, query.count());
     assertEquals(0, query.list().size());
   }
+  
+
   
   public void testQueryByNullCandidateGroup() {
     try {
@@ -780,7 +806,8 @@ public class TaskQueryTest extends PluggableActivitiTestCase {
     taskService.addCandidateGroup(task.getId(), "management");
     taskService.addCandidateGroup(task.getId(), "accountancy");
     ids.add(task.getId());
-
+    
+    
     return ids;
   }
 

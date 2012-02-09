@@ -122,7 +122,7 @@
   
   <sql id="selectTaskByQueryCriteriaSql">  
     from ACT_RU_TASK T
-    <if test="candidateUser != null || candidateGroups != null || involvedUser != null">
+    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || involvedGroups!=null">
       inner join ACT_RU_IDENTITYLINK I on I.TASK_ID_ = T.ID_
     </if>
     <foreach collection="variables" index="index" item="var">
@@ -240,8 +240,22 @@
           </if>
         )
       </if>
-      <if test="involvedUser != null">
-        and I.USER_ID_ = #{involvedUser}
+      <if test="involvedUser != null || involvedGroups != null" >
+         and (
+          <if test="involvedUser != null">
+            I.USER_ID_ = #{involvedUser}          
+          </if> 
+          <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+            or
+          </if>
+          <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
+            I.GROUP_ID_ IN
+            <foreach item="group" index="index" collection="involvedGroups" 
+                     open="(" separator="," close=")">
+              #{group}
+            </foreach>
+          </if>
+        )
       </if>
       <foreach item="var" collection="variables" index="index">
         <if test="!var.taskVariable">

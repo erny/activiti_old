@@ -43,6 +43,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Integer maxPriority;
   protected String assignee;
   protected String involvedUser;
+  protected List<String> involvedGroups;
   protected String owner;
   protected boolean unassigned = false;
   protected String candidateUser;
@@ -178,6 +179,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.involvedUser = involvedUser;
     return this;
   }
+  
+  public TaskQuery taskInvolvedGroupIn(List<String> involvedGroups) {
+	  
+	    if (involvedGroups == null) {
+	        throw new ActivitiException("Involved group list is null");
+	      }
+	      this.involvedGroups = involvedGroups;
+	      return this;
+	}
   
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
     if (candidateGroup == null) {
@@ -448,4 +458,5 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public String getProcessInstanceBusinessKey() {
     return processInstanceBusinessKey;
   }
+
 }
