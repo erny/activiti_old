@@ -17,6 +17,7 @@ import java.util.List;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 
@@ -24,6 +25,7 @@ import org.activiti.engine.runtime.ExecutionQuery;
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
+ * @author Daniel Meyer
  */
 public class ExecutionQueryImpl extends ExecutionVariableQueryImpl<ExecutionQuery, Execution> 
   implements ExecutionQuery {
@@ -38,6 +40,8 @@ public class ExecutionQueryImpl extends ExecutionVariableQueryImpl<ExecutionQuer
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
+  protected SuspensionState suspensionState;
+  private String businessKey;
   
   public ExecutionQueryImpl() {
   }
@@ -75,6 +79,14 @@ public class ExecutionQueryImpl extends ExecutionVariableQueryImpl<ExecutionQuer
       throw new ActivitiException("Process instance id is null");
     }
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+  
+  public ExecutionQuery processInstanceBusinessKey(String businessKey) {
+    if (businessKey == null) {
+      throw new ActivitiException("Business key is null");
+    }
+    this.businessKey = businessKey;
     return this;
   }
   
@@ -149,7 +161,7 @@ public class ExecutionQueryImpl extends ExecutionVariableQueryImpl<ExecutionQuer
     return null;
   }
   public String getBusinessKey() {
-    return null;
+    return businessKey;
   }
   public String getExecutionId() {
     return executionId;
@@ -159,5 +171,11 @@ public class ExecutionQueryImpl extends ExecutionVariableQueryImpl<ExecutionQuer
   }
   public String getSubProcessInstanceId() {
     return subProcessInstanceId;
+  }  
+  public SuspensionState getSuspensionState() {
+    return suspensionState;
+  }  
+  public void setSuspensionState(SuspensionState suspensionState) {
+    this.suspensionState = suspensionState;
   }
 }

@@ -21,10 +21,13 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.JobQueryImpl;
 import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.cfg.TransactionListener;
 import org.activiti.engine.impl.cfg.TransactionState;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.jobexecutor.ExclusiveJobAddedNotification;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.jobexecutor.MessageAddedNotification;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.impl.util.ClockUtil;
@@ -33,6 +36,7 @@ import org.activiti.engine.runtime.Job;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class JobManager extends AbstractManager {
 
@@ -42,14 +46,10 @@ public class JobManager extends AbstractManager {
     commandContext
       .getDbSqlSession()
       .insert(message);
-    
-    
-    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-    commandContext
-      .getTransactionContext()
-      .addTransactionListener(TransactionState.COMMITTED, new MessageAddedNotification(jobExecutor));
+       
+    hintJobExecutor(message);    
   }
-  
+ 
   public void schedule(TimerEntity timer) {
     Date duedate = timer.getDuedate();
     if (duedate==null) {
@@ -69,13 +69,31 @@ public class JobManager extends AbstractManager {
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
     if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime()+waitTimeInMillis)) {
-      // then notify the job executor.
-      commandContext
-        .getTransactionContext()
-        .addTransactionListener(TransactionState.COMMITTED, new MessageAddedNotification(jobExecutor));
+      hintJobExecutor(timer);
     }
   }
-
+  
+  protected void hintJobExecutor(JobEntity job) {  
+    JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
+    JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
+    TransactionListener transactionListener = null;
+    if(job.isExclusive() 
+            && jobExecutorContext != null 
+            && jobExecutorContext.isExecutingExclusiveJob()) {
+      // lock job & add to the queue of the current processor
+      Date currentTime = ClockUtil.getCurrentTime();
+      job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
+      job.setLockOwner(jobExecutor.getLockOwner());
+      transactionListener = new ExclusiveJobAddedNotification(job.getId());      
+    } else {
+      // notify job executor:      
+      transactionListener = new MessageAddedNotification(jobExecutor);
+    }
+    Context.getCommandContext()
+    .getTransactionContext()
+    .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+  }
+ 
   public void cancelTimers(ExecutionEntity execution) {
     List<TimerEntity> timers = Context
       .getCommandContext()

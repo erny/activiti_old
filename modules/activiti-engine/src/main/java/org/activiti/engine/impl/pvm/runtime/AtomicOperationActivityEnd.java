@@ -15,7 +15,6 @@ package org.activiti.engine.impl.pvm.runtime;
 
 import java.util.List;
 
-import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -59,8 +58,18 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
       ActivityBehavior parentActivityBehavior = (parentActivity!=null ? parentActivity.getActivityBehavior() : null);
       if (parentActivityBehavior instanceof CompositeActivityBehavior) {
         CompositeActivityBehavior compositeActivityBehavior = (CompositeActivityBehavior) parentActivity.getActivityBehavior();
-        execution.setActivity(parentActivity);
-        compositeActivityBehavior.lastExecutionEnded(execution);
+        
+        if(activity.isScope() && activity.getOutgoingTransitions().isEmpty()) { 
+          // there is no transition destroying the scope
+          InterpretableExecution parentScopeExecution = (InterpretableExecution) execution.getParent();
+          execution.destroy();
+          execution.remove();
+          parentScopeExecution.setActivity(parentActivity);
+          compositeActivityBehavior.lastExecutionEnded(parentScopeExecution);          
+        } else {        
+          execution.setActivity(parentActivity);
+          compositeActivityBehavior.lastExecutionEnded(execution);
+        }
       } else {
         // default destroy scope behavior
         InterpretableExecution parentScopeExecution = (InterpretableExecution) execution.getParent();

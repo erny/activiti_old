@@ -42,6 +42,8 @@ create table ACT_RU_EXECUTION (
     IS_ACTIVE_ tinyint,
     IS_CONCURRENT_ tinyint,
     IS_SCOPE_ tinyint,
+    IS_EVENT_SCOPE_ tinyint,
+    SUSPENSION_STATE_ tinyint,
     primary key (ID_)
 );
 
@@ -66,6 +68,7 @@ create table ACT_RU_JOB (
 
 create table ACT_RE_PROCDEF (
     ID_ nvarchar(64),
+    REV_ int,
     CATEGORY_ nvarchar(255),
     NAME_ nvarchar(255),
     KEY_ nvarchar(255),
@@ -74,6 +77,7 @@ create table ACT_RE_PROCDEF (
     RESOURCE_NAME_ nvarchar(4000),
     DGRM_RESOURCE_NAME_ nvarchar(4000),
     HAS_START_FORM_KEY_ tinyint,
+    SUSPENSION_STATE_ tinyint,
     primary key (ID_)
 );
 
@@ -119,6 +123,19 @@ create table ACT_RU_VARIABLE (
     LONG_ numeric(19,0),
     TEXT_ nvarchar(4000),
     TEXT2_ nvarchar(4000),
+    primary key (ID_)
+);
+
+create table ACT_RU_EVENT_SUBSCR (
+    ID_ nvarchar(64) not null,
+    REV_ int,
+    EVENT_TYPE_ nvarchar(255) not null,
+    EVENT_NAME_ nvarchar(255),
+    EXECUTION_ID_ nvarchar(64),
+    PROC_INST_ID_ nvarchar(64),
+    ACTIVITY_ID_ nvarchar(64),
+    CONFIGURATION_ nvarchar(255),
+    CREATED_ datetime not null,
     primary key (ID_)
 );
 
@@ -182,3 +199,8 @@ alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXCEPTION 
     foreign key (EXCEPTION_STACK_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
+    
+alter table ACT_RU_EVENT_SUBSCR
+    add constraint ACT_FK_EVENT_EXEC
+    foreign key (EXECUTION_ID_)
+    references ACT_RU_EXECUTION(ID_);

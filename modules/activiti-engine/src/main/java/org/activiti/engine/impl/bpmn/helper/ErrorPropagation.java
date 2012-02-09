@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
-import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmScope;
@@ -48,6 +47,7 @@ public class ErrorPropagation {
       // search for error handler with same error code as thrown Error
       for (PvmActivity activity : scope.getActivities()) {
         if (((ActivityImpl) activity).getActivityBehavior() instanceof BoundaryEventActivityBehavior
+                && "boundaryError".equals(activity.getProperty("type"))
                 && error.getErrorCode().equals(activity.getProperty("errorCode"))) {
           errorEventHandler = activity;
           break;
@@ -57,6 +57,7 @@ public class ErrorPropagation {
       if (errorEventHandler == null) {
         for (PvmActivity activity : scope.getActivities()) {
           if (((ActivityImpl) activity).getActivityBehavior() instanceof BoundaryEventActivityBehavior
+                  && "boundaryError".equals(activity.getProperty("type"))
                   && (activity.getProperty("errorCode") == null || "".equals(activity.getProperty("errorCode")))) {
             errorEventHandler = activity;
             break;
@@ -74,12 +75,12 @@ public class ErrorPropagation {
       }
     }
     
-    ErrorEndEventActivityBehavior errorEndEvent = new ErrorEndEventActivityBehavior(error.getErrorCode());
-    if (errorEventHandler != null) {
-      errorEndEvent.setBorderEventActivityId(errorEventHandler.getId());
-    }
     // execute error handler
-    errorEndEvent.execute(execution);
+    String eventHandlerId = null;
+    if (errorEventHandler != null) {
+      eventHandlerId = errorEventHandler.getId();
+    }
+    propagateError(error.getErrorCode(), eventHandlerId, execution);
   }
 
   public static void propagateError(String errorCode, String eventHandlerId, ActivityExecution execution) {

@@ -13,20 +13,18 @@
 
 package org.activiti.engine.impl.bpmn.behavior;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.bpmn.helper.ScopeUtil;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
-import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 
 
 /**
- * Implementation of the BPMN 2.0 subprocess (formely know as 'embedded' subprocess):
+ * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess):
  * a subprocess defined within another process definition.
  * 
  * @author Joram Barrez
@@ -46,8 +44,8 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
   }
   
   public void lastExecutionEnded(ActivityExecution execution) {
-    List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    execution.takeAll(outgoingTransitions, new ArrayList<ActivityExecution>());
+    ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
+    bpmnActivityBehavior.performDefaultOutgoingBehavior(execution);
   }
 
 }
