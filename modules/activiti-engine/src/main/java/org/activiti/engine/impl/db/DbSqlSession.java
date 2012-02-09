@@ -589,7 +589,7 @@ public class DbSqlSession implements Session {
   }
 
   public void dbSchemaDrop() {
-    executeMandatorySchemaResource("drop", "engine");
+    
     if (dbSqlSessionFactory.isDbHistoryUsed()) {
       executeMandatorySchemaResource("drop", "history");
     }
@@ -599,6 +599,7 @@ public class DbSqlSession implements Session {
     if (dbSqlSessionFactory.isDbCycleUsed()) {
       executeMandatorySchemaResource("drop", "cycle");
     }
+    executeMandatorySchemaResource("drop", "engine");
   }
 
   public void dbSchemaPrune() {
