@@ -13,11 +13,13 @@
 
 package org.activiti.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.persistence.AbstractManager;
-
 
 /**
  * @author Tom Baeyens
@@ -29,8 +31,10 @@ public class VariableInstanceManager extends AbstractManager {
 
     String byteArrayValueId = variableInstance.getByteArrayValueId();
     if (byteArrayValueId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
-      // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
+      // the next apparently useless line is probably to ensure consistency in
+      // the DbSqlSession
+      // cache, but should be checked and docced here (or removed if it turns
+      // out to be unnecessary)
       // @see also HistoricVariableUpdateEntity
       variableInstance.getByteArrayValue();
       getDbSqlSession().delete(ByteArrayEntity.class, byteArrayValueId);
@@ -41,7 +45,7 @@ public class VariableInstanceManager extends AbstractManager {
   public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
     return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
     return getDbSqlSession().selectList("selectVariablesByExecutionId", executionId);
@@ -49,10 +53,40 @@ public class VariableInstanceManager extends AbstractManager {
 
   public void deleteVariableInstanceByTask(TaskEntity task) {
     Map<String, VariableInstanceEntity> variableInstances = task.getVariableInstances();
-    if (variableInstances!=null) {
-      for (VariableInstanceEntity variableInstance: variableInstances.values()) {
+    if (variableInstances != null) {
+      for (VariableInstanceEntity variableInstance : variableInstances.values()) {
         deleteVariableInstance(variableInstance);
       }
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, List<VariableInstanceEntity>> findVariableInstancesByTaskIds(Collection<String> taskIds, Collection<String> variableNames) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("taskIds", taskIds);
+    params.put("variableNames", variableNames);
+    List<VariableInstanceEntity> variableInstanceEntities = getDbSqlSession().selectList("selectVariablesByTaskIds", params);
+    return createVariablesMapByTaskId(variableInstanceEntities);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Map<String, List<VariableInstanceEntity>> findVariableInstancesLocalByTaskIds(Collection<String> taskIds, Collection<String> variableNames) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("taskIds", taskIds);
+    params.put("variableNames", variableNames);
+    List<VariableInstanceEntity> variableInstanceEntities = getDbSqlSession().selectList("selectVariablesLocalByTaskIds", params);
+    return createVariablesMapByTaskId(variableInstanceEntities);
+  }
+
+  private Map<String, List<VariableInstanceEntity>> createVariablesMapByTaskId(List<VariableInstanceEntity> variableInstanceEntities) {
+    Map<String, List<VariableInstanceEntity>> variablesByTaskMap = new HashMap<String, List<VariableInstanceEntity>>();
+    for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
+      String taskId = variableInstanceEntity.getTaskId();
+      if (variablesByTaskMap.get(taskId) == null) {
+        variablesByTaskMap.put(taskId, new ArrayList<VariableInstanceEntity>());
+      }
+      variablesByTaskMap.get(taskId).add(variableInstanceEntity);
+    }
+    return variablesByTaskMap;
   }
 }

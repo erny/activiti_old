@@ -315,4 +315,16 @@ public interface TaskService {
 
   /** The list of subtasks for this parent task */
   List<Task> getSubTasks(String parentTaskId);
+  
+  /**
+   * Get variable values for all given variableNames for all given taskIds.
+   * Returns map taskId->variables
+   */
+  Map<String, Map<String, Object>> getVariables(Collection<String> taskIds, Collection<String> variableNames);
+
+  /**
+   * Get task local variable values for all given variableNames for all given
+   * taskIds. Returns map taskId->variables
+   */
+  Map<String, Map<String, Object>> getVariablesLocal(Collection<String> taskIds, Collection<String> variableNames);
 }

@@ -176,4 +176,34 @@
       #{deploymentId, jdbcType=VARCHAR}
     )  
   </insert>
+  
+  <select id="selectVariablesByTaskIds" parameterType="map" resultMap="variableInstanceResultMap" >
+    select T.ID_ as TASK_ID_,V.ID_, V.REV_, V.TYPE_,V.NAME_, V.EXECUTION_ID_, V.PROC_INST_ID_, V.BYTEARRAY_ID_, V.DOUBLE_, V.LONG_,V.TEXT_, V.TEXT2_ 
+    from ACT_RU_VARIABLE V, ACT_RU_TASK T 
+    where V.EXECUTION_ID_ = T.EXECUTION_ID_
+    and T.id_ in
+    <foreach item="taskId" collection="taskIds" open="(" separator="," close=")">
+      #{taskId, jdbcType=VARCHAR}
+    </foreach>
+    <if test="variableNames!=null">
+      and V.NAME_ in
+      <foreach item="variableName" collection="variableNames" open="(" separator="," close=")">
+        #{variableName, jdbcType=VARCHAR}
+      </foreach>
+    </if>
+  </select>
+  
+  <select id="selectVariablesLocalByTaskIds" parameterType="map" resultMap="variableInstanceResultMap">
+    select * from ACT_RU_VARIABLE
+    where TASK_ID_ in
+    <foreach item="taskId" collection="taskIds" open="(" separator="," close=")">
+      #{taskId, jdbcType=VARCHAR}
+    </foreach>
+    <if test="variableNames!=null">
+      and NAME_ in
+      <foreach item="variableName" collection="variableNames" open="(" separator="," close=")">
+        #{variableName, jdbcType=VARCHAR}
+      </foreach>
+    </if>
+  </select>
 </mapper>

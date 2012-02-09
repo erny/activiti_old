@@ -40,6 +40,7 @@ import org.activiti.engine.impl.cmd.GetTaskCommentsCmd;
 import org.activiti.engine.impl.cmd.GetTaskEventsCmd;
 import org.activiti.engine.impl.cmd.GetTaskVariableCmd;
 import org.activiti.engine.impl.cmd.GetTaskVariablesCmd;
+import org.activiti.engine.impl.cmd.GetTasksVariablesCmd;
 import org.activiti.engine.impl.cmd.ResolveTaskCmd;
 import org.activiti.engine.impl.cmd.SaveAttachmentCmd;
 import org.activiti.engine.impl.cmd.SaveTaskCmd;
@@ -268,5 +269,15 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public List<Task> getSubTasks(String parentTaskId) {
     return commandExecutor.execute(new GetSubTasksCmd(parentTaskId));
+  }
+  
+  public Map<String, Map<String, Object>> getVariables(Collection<String> taskIds, Collection<String> variableNames) {
+    return commandExecutor.execute(new GetTasksVariablesCmd(taskIds, variableNames, false));
+  }
+
+  public Map<String, Map<String, Object>> getVariablesLocal(
+      Collection<String> taskIds,
+      Collection<String> variableNames) {
+    return commandExecutor.execute(new GetTasksVariablesCmd(taskIds, variableNames, true));
   }
 }
