@@ -10,7 +10,7 @@
 
   <property name="activiti.home" value=".." /> 
   <property name="activiti.version" value="5.9-SNAPSHOT" />   
-  <property name="tomcat.url" value="http://activiti.org/downloads/" />
+  <property name="tomcat.url" value="http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/" />
   
   <property name="cycle.workspace" location="${activiti.home}/workspace/activiti-cycle-examples"/>
   <property name="activiti.modeler.base.url" value="http://localhost:8080/activiti-modeler/" />
