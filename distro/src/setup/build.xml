@@ -45,6 +45,7 @@
   	
     <mkdir dir="${activiti.home}/workspace/activiti-engine-examples/libs-runtime" />
     <copy todir="${activiti.home}/workspace/activiti-engine-examples/libs-runtime">
+      <fileset dir="files/dependencies/libs" includesfile="${activiti.home}/setup/files/dependencies/libs.spring.runtime.txt" />
       <fileset dir="files/dependencies/libs" includesfile="${activiti.home}/setup/files/dependencies/libs.engine.runtime.txt" />
     </copy>
     <mkdir dir="${activiti.home}/workspace/activiti-engine-examples/libs-test" />
@@ -145,12 +146,14 @@
   <target name="internal.db.create" 
   	      depends="internal.classpath.libs">
     <echo message="creating db" />
-    <java classname="org.activiti.engine.impl.db.DbSchemaUpdate" classpathref="classpath.libs" />
+    <java classname="org.activiti.engine.impl.db.DbSchemaUpdate" 
+          classpathref="classpath.libs" failonerror="true" />
   </target>
 
   <target name="internal.db.drop"
           depends="internal.classpath.libs">
-    <java classname="org.activiti.engine.impl.db.DbSchemaDrop" classpathref="classpath.libs" />
+    <java classname="org.activiti.engine.impl.db.DbSchemaDrop" 
+          classpathref="classpath.libs" />
   </target>
 
   <target name="internal.db.demo.data" 
@@ -473,17 +476,22 @@ set JAVA_OPTS=%JAVA_OPTS% @tomcat.java.opts@
 
 	<target name="internal.cfg.create">
 	  <mkdir dir="${activiti.home}/setup/build/activiti-cfg" />
-	  <copy todir="${activiti.home}/setup/build/activiti-cfg" overwrite="true">
-	    <filterset filtersfile="build.db.properties" />
-	    <fileset dir="files/cfg.activiti/${tx}" />
-	  </copy>
+	  <copy file="${activiti.home}/setup/files/cfg.activiti/standalone/activiti-context.xml"
+            todir="${activiti.home}/setup/build/activiti-cfg" overwrite="true"
+      />
+      <propertyfile file="${activiti.home}/setup/build/activiti-cfg/db.properties">
+        <entry key="jdbc.driver" value="${jdbc.driver}" />
+        <entry key="jdbc.url" value="${jdbc.url}" />
+        <entry key="jdbc.username" value="${jdbc.username}" />
+        <entry key="jdbc.password" value="${jdbc.password}" />
+      </propertyfile>
 	  <zip destfile="${activiti.home}/setup/build/activiti-cfg.jar">
 	    <fileset dir="${activiti.home}/setup/build/activiti-cfg" />
 	  </zip>
 	  <echo message="copying configuration to ${activiti.home}/workspace/activiti-engine-examples/src/main/config" />
 	  <mkdir dir="${activiti.home}/workspace/activiti-engine-examples/src/main/config" />
 	  <unzip src="${activiti.home}/setup/build/activiti-cfg.jar" dest="${activiti.home}/workspace/activiti-engine-examples/src/main/config" />
-	  <replace file="${activiti.home}/workspace/activiti-engine-examples/src/main/config/activiti.cfg.xml">
+	  <replace file="${activiti.home}/workspace/activiti-engine-examples/src/main/config/activiti-context.xml">
 	    <replacetoken><![CDATA[<!-- Database configurations -->]]></replacetoken>
 	    <replacevalue><![CDATA[<!-- 
 	    This configuration file is used by the deploy target 
