@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import org.activiti.rest.api.engine.ProcessEngineResource;
 import org.activiti.rest.api.identity.GroupResource;
 import org.activiti.rest.api.identity.GroupUsersResource;
 import org.activiti.rest.api.identity.LoginResource;
+import org.activiti.rest.api.identity.UserCreateResource;
 import org.activiti.rest.api.identity.UserGroupsResource;
 import org.activiti.rest.api.identity.UserPictureResource;
 import org.activiti.rest.api.identity.UserResource;
@@ -40,6 +41,8 @@ import org.activiti.rest.api.process.ProcessInstanceResource;
 import org.activiti.rest.api.process.ProcessInstancesResource;
 import org.activiti.rest.api.process.ProcessInstanceTaskResource;
 import org.activiti.rest.api.process.StartProcessInstanceResource;
+import org.activiti.rest.api.repository.DeploymentArtifactResource;
+import org.activiti.rest.api.repository.DeploymentArtifactsResource;
 import org.activiti.rest.api.repository.DeploymentDeleteResource;
 import org.activiti.rest.api.repository.DeploymentUploadResource;
 import org.activiti.rest.api.repository.DeploymentsDeleteResource;
@@ -69,7 +72,7 @@ import org.activiti.rest.api.task.SubTasksResource;
  * @author Tijs Rademakers
  */
 public class ActivitiRestApplication extends Application {
-  
+
   private ChallengeAuthenticator authenticator;
 
   /**
@@ -87,7 +90,7 @@ public class ActivitiRestApplication extends Application {
     };
     authenticator = new ChallengeAuthenticator(null, true, ChallengeScheme.HTTP_BASIC,
           "Activiti Realm") {
-      
+
       @Override
       protected boolean authenticate(Request request, Response response) {
         if (request.getChallengeResponse() == null) {
@@ -98,24 +101,24 @@ public class ActivitiRestApplication extends Application {
       }
     };
     authenticator.setVerifier(verifier);
-    
+
     Router router = new Router(getContext());
 
     router.attachDefault(DefaultResource.class);
-    
+
     router.attach("/process-engine", ProcessEngineResource.class);
-    
+
     router.attach("/login", LoginResource.class);
-    
-    router.attach("/user", UserResource.class);
+
+    router.attach("/user", UserCreateResource.class);
     router.attach("/user/{userId}", UserResource.class);
     router.attach("/user/{userId}/groups", UserGroupsResource.class);
     router.attach("/user/{userId}/picture", UserPictureResource.class);
     router.attach("/users/{searchText}", UserSearchResource.class);
-    
+
     router.attach("/group/{groupId}", GroupResource.class);
     router.attach("/groups/{groupId}/users", GroupUsersResource.class);
-    
+
     router.attach("/process-definitions", ProcessDefinitionsResource.class);
     router.attach("/process-instances", ProcessInstancesResource.class);
     router.attach("/process-instance", StartProcessInstanceResource.class);
@@ -137,31 +140,33 @@ public class ActivitiRestApplication extends Application {
     router.attach("/task/{taskId}/attachment", TaskAttachmentAddResource.class);
     router.attach("/task/{taskId}/url", TaskUrlAddResource.class);
     router.attach("/task/{taskId}/{operation}", TaskOperationResource.class);
-    
+
     router.attach("/attachment/{attachmentId}", TaskAttachmentResource.class);
-    
+
     router.attach("/subTasks", SubTasksResource.class);
     router.attach("/form/{taskId}/properties", TaskPropertiesResource.class);
-    
+
     router.attach("/deployments", DeploymentsResource.class);
     router.attach("/deployment", DeploymentUploadResource.class);
     router.attach("/deployments/delete", DeploymentsDeleteResource.class);
     router.attach("/deployment/{deploymentId}", DeploymentDeleteResource.class);
-    
+    router.attach("/deployment/{deploymentId}/resources", DeploymentArtifactsResource.class);
+    router.attach("/deployment/{deploymentId}/resource/{resourceName}", DeploymentArtifactResource.class);
+
     router.attach("/management/jobs", JobsResource.class);
     router.attach("/management/job/{jobId}", JobResource.class);
     router.attach("/management/job/{jobId}/execute", JobExecuteResource.class);
     router.attach("/management/jobs/execute", JobsExecuteResource.class);
-    
+
     router.attach("/management/tables", TablesResource.class);
     router.attach("/management/table/{tableName}", TableResource.class);
     router.attach("/management/table/{tableName}/data", TableDataResource.class);
-    
+
     authenticator.setNext(router);
-    
+
     return authenticator;
   }
-  
+
   public String authenticate(Request request, Response response) {
     if (!request.getClientInfo().isAuthenticated()) {
       authenticator.challenge(response, false);

@@ -20,6 +20,7 @@ create table ACT_GE_BYTEARRAY (
     NAME_ varchar(255),
     DEPLOYMENT_ID_ varchar(64),
     BYTES_ BLOB,
+    GENERATED_ smallint check(GENERATED_ in (1,0)),
     primary key (ID_)
 );
 
@@ -42,7 +43,7 @@ create table ACT_RU_EXECUTION (
     IS_ACTIVE_ smallint check(IS_ACTIVE_ in (1,0)),
     IS_CONCURRENT_ smallint check(IS_CONCURRENT_ in (1,0)),
     IS_SCOPE_ smallint check(IS_SCOPE_ in (1,0)),
-    IS_EVENT_SCOPE_ smallint check(IS_SCOPE_ in (1,0)),
+    IS_EVENT_SCOPE_ smallint check(IS_EVENT_SCOPE_ in (1,0)),
 	UNI_BUSINESS_KEY varchar (255)  not null  generated always as (case when "BUSINESS_KEY_" is null then "ID_" else "BUSINESS_KEY_" end),
 	UNI_PROC_DEF_ID varchar (64)  not null  generated always as (case when "PROC_DEF_ID_" is null then "ID_" else "PROC_DEF_ID_" end),
 	SUSPENSION_STATE_ integer,
@@ -146,6 +147,7 @@ create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
+create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 

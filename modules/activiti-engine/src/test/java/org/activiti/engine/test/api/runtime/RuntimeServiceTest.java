@@ -19,9 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 
@@ -137,8 +140,21 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
     
-    runtimeService.deleteProcessInstance(processInstance.getId(), "testing instance deletion");
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    String deleteReason = "testing instance deletion";
+    runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());    
+    
+    // test that the delete reason of the process instance shows up as delete reason of the task in history
+    // ACT-848
+    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(processEngineConfiguration.getHistory())) {
+      
+      HistoricTaskInstance historicTaskInstance = historyService
+              .createHistoricTaskInstanceQuery()
+              .processInstanceId(processInstance.getId())
+              .singleResult();
+      
+      assertEquals(deleteReason, historicTaskInstance.getDeleteReason());
+    }    
   }
   
   @Deployment(resources={
@@ -215,6 +231,21 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
     } catch (ActivitiException ae) {
       assertTextPresent("executionId is null", ae.getMessage());
     }
+  }
+  
+  @Deployment
+  public void testSignalWithProcessVariables() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
+    Map<String, Object> processVariables = new HashMap<String, Object>();
+    processVariables.put("variable", "value");
+    
+    // signal the execution while passing in the variables
+    runtimeService.signal(processInstance.getId(), processVariables);
+    
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(variables, processVariables);
+       
   }
   
   public void testGetVariablesUnexistingExecutionId() {
@@ -324,4 +355,79 @@ public class RuntimeServiceTest extends PluggableActivitiTestCase {
       assertTextPresent("executionId is null", ae.getMessage());
     }
   }
+  
+  @Deployment(resources={
+          "org/activiti/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml",
+          "org/activiti/engine/test/api/runtime/RuntimeServiceTest.catchPanicSignal.bpmn20.xml"
+  })
+  public void testSignalEventReceived() {
+    
+    //////  test  signalEventReceived(String)
+    
+    startSignalCatchProcesses();    
+    // 12, because the signal catch is a scope
+    assertEquals(12, runtimeService.createExecutionQuery().count());    
+    runtimeService.signalEventReceived("alert");    
+    assertEquals(6, runtimeService.createExecutionQuery().count());
+    runtimeService.signalEventReceived("panic");
+    assertEquals(0, runtimeService.createExecutionQuery().count());
+    
+    //////  test  signalEventReceived(String, String)    
+    startSignalCatchProcesses();    
+  
+    // signal the executions one at a time:
+    for (int executions = 3; executions > 0; executions--) {
+      List<Execution> page = runtimeService.createExecutionQuery()
+        .signalEventSubscription("alert")
+        .listPage(0, 1);
+      runtimeService.signalEventReceived("alert", page.get(0).getId());       
+      
+      assertEquals(executions-1, runtimeService.createExecutionQuery().signalEventSubscription("alert").count());  
+    }
+    
+    for (int executions = 3; executions > 0; executions-- ) {
+      List<Execution> page = runtimeService.createExecutionQuery()
+        .signalEventSubscription("panic")
+        .listPage(0, 1);
+      runtimeService.signalEventReceived("panic", page.get(0).getId());       
+      
+      assertEquals(executions-1, runtimeService.createExecutionQuery().signalEventSubscription("panic").count());  
+    }
+    
+  }
+  
+ public void testSignalEventReceivedNonExistingExecution() {
+   try {
+     runtimeService.signalEventReceived("alert", "nonexistingExecution");
+     fail("exeception expected");
+   }catch (ActivitiException e) {
+     // this is good
+     assertTrue(e.getMessage().contains("Execution 'nonexistingExecution' has not subscribed to a signal event with name 'alert'"));
+   }
+  }
+ 
+ @Deployment(resources={
+         "org/activiti/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml"
+ })
+ public void testExecutionWaitingForDifferentSignal() {
+   runtimeService.startProcessInstanceByKey("catchAlertSignal");
+   Execution execution = runtimeService.createExecutionQuery()
+     .signalEventSubscription("alert")
+     .singleResult();
+   try {
+     runtimeService.signalEventReceived("bogusSignal", execution.getId());
+     fail("exeception expected");
+   }catch (ActivitiException e) {
+     // this is good
+     assertTrue(e.getMessage().contains("has not subscribed to a signal event with name 'bogusSignal'"));
+   }
+  }
+
+  private void startSignalCatchProcesses() {
+    for (int i = 0; i < 3; i++) {
+      runtimeService.startProcessInstanceByKey("catchAlertSignal");
+      runtimeService.startProcessInstanceByKey("catchPanicSignal");      
+    }
+  }
+   
 }

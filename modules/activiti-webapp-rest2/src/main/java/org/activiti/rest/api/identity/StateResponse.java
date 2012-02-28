@@ -1,7 +1,8 @@
 package org.activiti.rest.api.identity;
 
 public class StateResponse {
-  private boolean success;
+
+  boolean success;
 
   public boolean isSuccess() {
     return success;

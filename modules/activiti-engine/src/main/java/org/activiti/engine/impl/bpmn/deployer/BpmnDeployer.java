@@ -20,20 +20,25 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.bpmn.parser.BpmnParser;
+import org.activiti.engine.impl.bpmn.parser.MessageEventDefinition;
 import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cmd.DeleteJobsCmd;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.el.ExpressionManager;
+import org.activiti.engine.impl.event.MessageEventHandler;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.activiti.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
+import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.activiti.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
@@ -136,6 +141,9 @@ public class BpmnDeployer implements Deployer {
 
         removeObsoleteTimers(processDefinition);
         addTimerDeclarations(processDefinition);
+        
+        removeObsoleteMessageEventSubscriptions(processDefinition, latestProcessDefinition);
+        addMessageEventSubscriptions(processDefinition);
 
         dbSqlSession.insert(processDefinition);
         deploymentCache.addProcessDefinition(processDefinition);
@@ -179,6 +187,64 @@ public class BpmnDeployer implements Deployer {
     for (Job job :jobsToDelete) {
         new DeleteJobsCmd(job.getId()).execute(Context.getCommandContext());
     }
+  }
+  
+  protected void removeObsoleteMessageEventSubscriptions(ProcessDefinitionEntity processDefinition, ProcessDefinitionEntity latestProcessDefinition) {
+    // remove all subscriptions for the previous version    
+    if(latestProcessDefinition != null) {
+      CommandContext commandContext = Context.getCommandContext();
+      
+      List<EventSubscriptionEntity> subscriptionsToDelete = commandContext
+        .getEventSubscriptionManager()
+        .findEventSubscriptionsByConfiguration(MessageEventHandler.TYPE, latestProcessDefinition.getId());
+      
+      for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
+        eventSubscriptionEntity.delete();        
+      } 
+      
+    }
+  }
+  
+  @SuppressWarnings("unchecked")
+  protected void addMessageEventSubscriptions(ProcessDefinitionEntity processDefinition) {
+    CommandContext commandContext = Context.getCommandContext();
+    List<MessageEventDefinition> messageEventDefinitions = (List<MessageEventDefinition>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_MESSAGE_EVENT_DEFINITIONS);
+    if(messageEventDefinitions != null) {     
+      for (MessageEventDefinition messageEventDefinition : messageEventDefinitions) {
+        if(messageEventDefinition.isStartEvent()) {
+          // look for subscriptions for the same name in db:
+          List<EventSubscriptionEntity> subscriptionsForSameMessageName = commandContext
+            .getEventSubscriptionManager()
+            .findEventSubscriptionByName(MessageEventHandler.TYPE, messageEventDefinition.getName());
+          // also look for subscriptions created in the session:
+          List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
+            .getDbSqlSession()
+            .findInCache(MessageEventSubscriptionEntity.class);
+          for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
+            if(messageEventDefinition.getName().equals(cachedSubscription.getEventName())
+                    && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
+              subscriptionsForSameMessageName.add(cachedSubscription);
+            }
+          }      
+          // remove subscriptions deleted in the same command
+          subscriptionsForSameMessageName = commandContext
+                  .getDbSqlSession()
+                  .pruneDeletedEntities(subscriptionsForSameMessageName);
+                
+          if(!subscriptionsForSameMessageName.isEmpty()) {
+            throw new ActivitiException("Cannot deploy process definition '" + processDefinition.getResourceName()
+                    + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getName() + "'.");
+          }
+          
+          MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
+          newSubscription.setEventName(messageEventDefinition.getName());
+          newSubscription.setActivityId(messageEventDefinition.getActivityId());
+          newSubscription.setConfiguration(processDefinition.getId());
+          
+          newSubscription.insert();
+        }
+      }
+    }      
   }
 
 
@@ -231,6 +297,9 @@ public class BpmnDeployer implements Deployer {
     resource.setName(name);
     resource.setBytes(bytes);
     resource.setDeploymentId(deploymentEntity.getId());
+    
+    // Mark the resource as 'generated'
+    resource.setGenerated(true);
     
     Context
       .getCommandContext()

@@ -10,33 +10,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.activiti.engine.impl.bpmn.behavior;
 
-package org.activiti.engine.runtime;
-
-
-/**
- * @author Daniel Meyer
- */
-public interface EventSubscription {
-  
-  /**
-   * returns the type of the event subscription, such as 'message' or 'signal'
-   */
-  String getEventType();
-  
-  /**
-   * returns the execution id of the event subscription
-   */
-  String getExecutionId();
-  
-  /**
-   * returns the name of the event subscription as specified in the event definition
-   */
-  String getEventName();
-  
-  /**
-   * the id of the catching event activity 
-   */
-  String getActivityId();
+public class IntermediateThrowNoneEventActivityBehavior extends FlowNodeActivityBehavior{
 
 }

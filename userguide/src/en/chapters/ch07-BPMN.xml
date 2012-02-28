@@ -2,7 +2,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "../../../target/docbook-tool-1.0/docbook-xml/docbookx.dtd">
 
 <chapter id="bpmn20">
-	<title>BPMN</title>
+	<title>BPMN 20 Introduction</title>
 
 	<section id="whatIsBpmn">
 
@@ -633,12 +633,29 @@ public class TenMinuteTutorial {
     </section>
   	
 	</section>
+</chapter>
 
-	<section id="bpmnConstructs">
 
-		<title>BPMN 2.0 constructs</title>
-		
-			<section id="bpmnCustomExtensions">
+	  <!--	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  													BPMN 20 Constructs
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////	  
+	   -->
+
+
+
+
+<chapter id="bpmnConstructs">
+	<title>BPMN 20 Constructs</title>
+	
+	<para>This chapter covers the BPMN 20 constructs supported by 
+	activiti as well as custom extensions to the BPMN standard.</para>
+
+	<section id="bpmnCustomExtensions">
 	
 	    <title>Custom extensions</title>
 	
@@ -703,6 +720,16 @@ public class TenMinuteTutorial {
 	  
 	  </section>
 	  
+	  <!-- 
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  													Events
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	   -->
+	  
 	  <section id="bpmnEvents">
 	   
 	    <title>Events</title>
@@ -733,7 +760,21 @@ public class TenMinuteTutorial {
        </itemizedlist>
 	     
 	    </para>
+	    
+	<!-- //////////////////////////////////////// event definitions introductions -->
 	   
+	  <section id="eventDefinitions">
+	  	<title>Event definitions</title>
+	  	
+	  	<para>Event definitions define the semantics of an event. Without an event definition, an event "does nothing special". For instance a start event 
+	  	without and event definition does not specify what exactly starts the process. If we add an event definition to the start event (like for instance a 
+	  	timer event definition) we declare what &quot;type&quot; of event starts the process (in the case of a timer event definition the fact that a certain 
+	  	point in time is reached).  
+	  	</para>
+	  
+	  </section>
+	  
+	<!-- //////////////////////////////////////// timer event definitions -->
 
       <section id="timerEventDefinitions">
           <title>Timer events definitions</title>
@@ -812,7 +853,235 @@ public class TenMinuteTutorial {
         </para>
 
       </section>
+      
+	<!-- //////////////////////////////////////// error event definitions -->
+      
+      <section id="bpmnErrorEventDefinition">
+      <title>Error event definitions</title>
+      Error events are events which are triggered by a defined error. 
+      
+        <para>
+		      <emphasis role="bold">Important note:</emphasis> a BPMN error is NOT the same as a 
+		      Java exception. In fact, the two have nothing in common. BPMN error events are a way
+		      of modeling <emphasis>business exceptions</emphasis>. Java exceptions are handled 
+		      in <link linkend="serviceTaskExceptionHandling">their own specific way</link>.
+		</para>
+		
+		
+		An error event definition references an error element. The following is an example of an error end event,
+		referencing an error declaration:
+		
+		 <programlisting>
+&lt;endEvent id=&quot;myErrorEndEvent&quot;&gt;
+  &lt;errorEventDefinition errorRef=&quot;myError&quot; /&gt;
+&lt;/endEvent&gt;     
+         </programlisting>
+         
+         An error event handler references the same error element to declare that it catches the error.      	      
       </section>
+      
+<!-- //////////////////////////////////////// signal event definitions -->
+      
+      
+   <section id="bpmnSignalEventDefinition">
+      	<title>Signal event definitions</title>
+      	<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+      	<para>
+      		Signal events are events which reference a named signal. A signal is an event of global scope (broadcast semantics)
+      		and is delivered to all active handlers.	
+      	</para>
+        
+        <para>
+      		A signal event definition is declared using the <code>signalEventDefinition</code> element. 
+      		The attribute <code>signalRef</code> references a <code>signal</code> element declared as a child element 
+      		of the <code>definitions</code> root element. The following is an excerpt of a process where a signal event 
+      		is thrown and caught by intermediate events. 
+<programlisting>
+&lt;definitions... &gt;
+	&lt;!-- declaration of the signal --&gt;
+	&lt;signal id=&quot;alertSignal&quot; name=&quot;alert&quot; /&gt;
+	
+	&lt;process id=&quot;catchSignal&quot;&gt;
+		&lt;intermediateThrowEvent id=&quot;throwSignalEvent&quot; name=&quot;Alert&quot;&gt;
+			&lt;!-- signal event definition --&gt;
+			&lt;signalEventDefinition signalRef=&quot;alertSignal&quot; /&gt;
+		&lt;/intermediateThrowEvent&gt;
+		...
+		&lt;intermediateCatchEvent id=&quot;catchSignalEvent&quot; name=&quot;On Alert&quot;&gt;
+			&lt;!-- signal event definition --&gt;
+			&lt;signalEventDefinition signalRef=&quot;alertSignal&quot; /&gt;
+		&lt;/intermediateCatchEvent&gt;
+		...		
+	&lt;/process&gt;
+&lt;/definitions&gt;
+</programlisting>
+The <code>signalEventDefinition</code>s reference the same <code>signal</code> element.      		  
+        </para>
+        <section id="bpmnSignalEventDefinitionThrow">
+        	<title>Throwing a signal event</title>       
+	        <para>
+	        	A signal can either be thrown by a process instance using a bpmn construct
+	        	or programmatically using java API. The following methods on the 
+	        	<code>org.activiti.engine.RuntimeService</code> can be used to throw a signal programmatically:
+	        	<programlisting>
+RuntimeService.signalEventReceived(String signalName);
+RuntimeService.signalEventReceived(String signalName, String executionId);  
+	  			</programlisting>	  			 
+	  			The difference between <code>signalEventReceived(String signalName);</code> and 
+	  			<code>signalEventReceived(String signalName, String executionId);</code> is that the 
+	  			first method throws the signal globally to all subscribed handlers (broadcast semantics) 
+	  			and the second method delivers the signal to a specific execution only. 
+	        </para>
+	    </section>
+	    <section id="bpmnSignalEventDefinitionCatch">
+	    	<title>Catching a signal event</title>
+	    	<para>
+	    		A signal event can be caught by an intermediate catch signal event or a signal boundary event.
+	    	</para>
+	    </section>
+	    <section id="bpmnSignalEventDefinitionQuery">
+	    	<title>Querying for signal event subscriptions</title>
+	    	It is possible to query for all executions which have subscribed to a specific signal event:
+	    	<programlisting>
+ List&lt;Execution&gt; executions = runtimeService.createExecutionQuery()
+      .signalEventSubscription("alert")
+      .list();
+	    	</programlisting>
+	    	We could then use the <code>signalEventReceived(String signalName, String executionId)</code> method 
+	    	to deliver the signal to these executions.	    		    	
+	    </section> 
+	    
+	    <section id="bpmnSignalEventDefinitionExample">
+	    	<title>Signal event example(s)</title>
+	    	
+	    	<para>
+		    	The following is an example of two separate processes communicating using signals. The first process is started if an insurance policy is 
+		    	updated or changed. After the changes have been reviewed by a human participant, a signal event is thrown, signaling that a policy has changed:	    		    	 
+	    	</para>
+	    	
+	    	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.signal.event.throw.png"/></imageobject></mediaobject>
+	    	
+	    	<para>
+		    	This event can now be caught by all process instances which are interested. The following is an example of a process subscribing to the event.		    			    		    		    	 
+	    	</para>
+	    	
+	    	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.signal.event.catch.png"/></imageobject></mediaobject>
+	    	
+	    	<para>
+	    		<emphasis role="bold">Note:</emphasis> it is important to understand that a signal event is broadcast to <emphasis role="bold">all</emphasis> active handlers.
+	    		This means in the case of the example given above, that all instances of the process catching the signal would receive the event. 
+	    		In this case this is what we want. However, there are also situations where the broadcast behavior is unintended. Consider the following process: 
+	    	</para>
+	    	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.signal.event.warning.1.png"/></imageobject></mediaobject>
+	    	
+	    	<para>
+	    		The pattern described in the process above is not supported by activiti. The idea is that the error thrown while performing the "do something" task 
+	    		is caught by the boundary error event and would be propagated to the parallel path of execution using the signal throw event and then interrupt the 
+	    		"do something in parallel" task. So far activiti would perform as expected. The signal would be propagated to the catching boundary event and interrupt the 
+	    		task. <emphasis role="bold">However, due to the broadcast semantics of the signal, it would also be propagated to all other process instances which have subscribed 
+	    		to the signal event.</emphasis> In this case, this might not be what we want.
+	    	</para>
+	    	
+	    	<para>
+	    		<emphasis role="bold">Note:</emphasis> the signal event does not perform any kind of correlation to a specific process instance. On the contrary, it is broadcast to all 
+	    		process instances. If you need to deliver a signal to a specific process instance only, perform correlation manually and use  
+	    		<code>signalEventReceived(String signalName, String executionId)</code> and the appropriate <link linkend="bpmnSignalEventDefinitionQuery">query mechanisms</link>.
+	    	</para>
+	    </section>
+             
+      </section>
+      
+      <!-- //////////////////////////////////////// message event definitions -->
+      
+      
+   <section id="bpmnMessageEventDefinition">
+      	<title>Message event definitions</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+      	<para>
+      		Message events are events which reference a named message. A message has a name and a payload. Unlike a signal, a message event is always directed at a single receiver.      		 
+      	</para>
+        
+        <para>
+      		A message event definition is declared using the <code>messageEventDefinition</code> element. 
+      		The attribute <code>messaageRef</code> references a <code>message</code> element declared as a child element 
+      		of the <code>definitions</code> root element. The following is an excerpt of a process where a message event
+      		is declared and referenced by a start event. 
+<programlisting>
+&lt;definitions id=&quot;definitions&quot; 
+  xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+  xmlns:activiti=&quot;http://activiti.org/bpmn&quot;
+  targetNamespace=&quot;Examples&quot;
+  xmlns:tns=&quot;Examples&quot;&gt;
+  
+  &lt;message id=&quot;newInvoice&quot; name=&quot;newInvoiceMessage&quot; /&gt;
+  
+  &lt;process id=&quot;invoiceProcess&quot;&gt;  
+  
+    &lt;startEvent id=&quot;messageStart&quot; &gt;
+    	&lt;messageEventDefinition messageRef=&quot;tns:newInvoice&quot; /&gt;
+    &lt;/startEvent&gt;
+    ...    
+  &lt;/process&gt;
+
+&lt;/definitions&gt;</programlisting>		  
+        </para>
+        <section id="bpmnMessageEventDefinitionThrow">
+        	<title>Throwing a signal event</title>       
+	        <para>
+	        	At the moment, activiti supports message events only for starting process instances. To support this, the following methods exist on the <code>RuntimeService</code>:
+	        	<programlisting>
+ProcessInstance startProcessInstanceByMessage(String messageName);
+ProcessInstance startProcessInstanceByMessage(String messageName, Map&lt;String, Object&gt; processVariables);
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map&lt;String, Object&lt; processVariables); 		</programlisting>	        	
+	        </para>
+	        The methods allow starting a process instance using the referenced message. 
+	    </section>
+	    <section id="bpmnMessageEventDefinitionCatch">
+	    	<title>Catching a signal event</title>
+	    	<para>
+	    		At the moment activiti only supports <link linkend="bpmnMessageStartEvent">message start events</link>. A message start event catches a message with a given name and 
+	    		starts a process instance. The payload of the message is added as process variables to the process instance. Since a message must be directed at a single receiver, 
+	    		activiti only allows a single process definition to be deployed for a given message name.  
+	    	</para>
+	    </section>
+	    <section id="bpmnMessageEventDefinitionQuery">
+	    	<title>Querying for message event subscriptions</title>	    	
+	    	Since activiti only supports message start events, we can only query for message subscriptions using a <code>ProcessDefinitionQuery</code>:
+	    	<programlisting>
+ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+      .messageEventSubscription("newCallCenterBooking")
+      .singleResult();
+	    	</programlisting>
+	    	Since there can only be one process definition for a specific message subscription, the query always returns zero or one results. If a process definition is updated,
+	    	only the newest version of the process definition has a subscription to the message event.     		    	
+	    </section> 
+	    
+	    <section id="bpmnMessageEventDefinitionExample">
+	    	<title>Message event example(s)</title>
+	    	
+	    	<para>
+		    	The following is an example of a process which can be started using two different messages:		    		    		    	 
+	    	</para>
+	    	
+	    	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.start.message.event.example.1.png"/></imageobject></mediaobject>
+	    	
+	    	<para>
+		    	This is useful if the process needs alternative ways to react to different start events but eventually continues in a uniform way.     			    		    		    	 
+	    	</para>
+	    		    	
+	    </section>
+             
+      </section>
+      
+      
+            
+      
+      <!-- //////////////////////////////////////// start events -->
+      
 
 	  <section id="bpmnStartEvents">
 	  
@@ -834,15 +1103,7 @@ public class TenMinuteTutorial {
 	     In a start event, following activiti-specific properties can be specified:
 	   </para>
 	   
-	   <itemizedlist>
-       <listitem>
-         <para>
-           <emphasis role="bold">formKey</emphasis>: references to a form template that users have to fill in
-           when starting a new process instance.  More information can be found in 
-           <link linkend="forms">the forms section</link> Example:
-           <programlisting>&lt;startEvent id=&quot;request&quot; activiti:formKey=&quot;org/activiti/examples/taskforms/request.form&quot; /&gt;</programlisting>
-         </para>
-       </listitem>
+	   <itemizedlist> 
        <listitem>
          <para>
            <emphasis role="bold">initiator</emphasis>: identifies the variable name in which the authenticated 
@@ -862,9 +1123,10 @@ public class TenMinuteTutorial {
          </para>
        </listitem>
      </itemizedlist>
-	   
 	  
 	  </section>
+	  
+	  <!-- //////////////////////////////////////// none start events -->
 
 		<section id="bpmnNoneStartEvent">
 
@@ -913,8 +1175,19 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
         </para>
        
       </section>
+      	<section id="noneStartEventCustomExtension">
+      		<title>Custom extensions for the none start event</title>
+	       	 <para>
+	           <emphasis role="bold">formKey</emphasis>: references to a form template that users have to fill in
+	           when starting a new process instance.  More information can be found in 
+	           <link linkend="forms">the forms section</link> Example:
+	           <programlisting>&lt;startEvent id=&quot;request&quot; activiti:formKey=&quot;org/activiti/examples/taskforms/request.form&quot; /&gt;</programlisting>
+	         </para>
+	    </section>
 
 		</section>
+		
+		<!-- //////////////////////////////////////// timer start events -->
 
         <section id="bpmnTimerStartEvent">
 
@@ -982,7 +1255,210 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
       </section>
 
         </section>
+        
+        
+        <!-- //////////////////////////////////////// message start events -->
+        
+        <section id="bpmnMessageStartEvent">
 
+            <title>Message start event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+
+            <section id="messageStartEventDescription">
+
+	        <title>Description</title>
+	
+	        <para>
+	            A <link linkend="bpmnMessageEventDefinition">message</link> start event can be used to start a process instance using a named message. This effectively allows us 
+	            to <emphasis>select</emphasis> the right start event from a set of alternative start events using the message name.	            
+	        </para>
+	        
+	        <para>
+				When <emphasis role="bold">deploying</emphasis> a process instance with one or more message start events, the following considerations apply:	        	
+				<itemizedlist>
+					<listitem>
+						<para>
+							The name of the message start event must be unique across a given process instance. Activiti throws an exception upon deployment of a process definition such that two or more message 
+							start events reference the same message	of if two or more message start events reference messages with the same message name.  						
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The name of the message start event must be unique across all deployed process definitions. Activiti throws an exception upon deployment of a process definition such that one or more message start events reference a message with the same name 
+							as a message start event already deployed by a different process definition. 				
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Process versioning: Upon deployment of a new version of a process definition, the message subscriptions of the previous version are cancelled. This is also true for message events
+							that are not present in the new version.	
+						</para>
+					</listitem>
+				</itemizedlist>					
+			</para>
+	        
+			<para>
+				When <emphasis role="bold">starting</emphasis> a process instance, a message start event can be triggered using the following methods on the <code>RuntimeService</code>:
+	        	<programlisting>
+ProcessInstance startProcessInstanceByMessage(String messageName);
+ProcessInstance startProcessInstanceByMessage(String messageName, Map&lt;String, Object&gt; processVariables);
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map&lt;String, Object&lt; processVariables); 
+	  			</programlisting>
+	  			The <code>messageName</code> is the name given in the <code>name</code> attribute of the <code>message</code> element referenced by the <code>messageRef</code>
+	  			attribute of the <code>messageEventDefinition</code>.
+				The following considerations apply when <emphasis role="bold">starting</emphasis> a process instance: 
+				<itemizedlist>
+					<listitem>
+						<para>
+							Message start events are only supported on top-level processes. Message start events are not supported on embedded sub processes.							
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If a process definition has multiple message start events, <code>rutimeService.startProcessInstanceByMessage(...)</code> allows to select the appropriate 
+							start event.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If a process definition has multiple message start events and a single none start event, <code>rutimeService.startProcessInstanceByKey(...)</code> and 
+							<code>rutimeService.startProcessInstanceById(...)</code> starts a process instance using the none start event.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If a process definition has multiple message start events and no none start event, <code>rutimeService.startProcessInstanceByKey(...)</code> and 
+							<code>rutimeService.startProcessInstanceById(...)</code> throw an exception.
+						</para>
+					</listitem>
+					<listitem>						
+						<para>
+							If a process definition has a single message start event, <code>rutimeService.startProcessInstanceByKey(...)</code> and 
+							<code>rutimeService.startProcessInstanceById(...)</code> start a new process instance using the message start event.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If a process is started from a call activity, message start event(s) are only supported if
+							<itemizedlist>
+								<listitem>
+									<para>in addition to the message start event(s), the process has a single none start event</para>
+								</listitem>
+								<listitem>
+									<para>the process has a single message start event and no other start events.</para>
+								</listitem>
+							</itemizedlist>							
+						</para>
+					</listitem>			
+				</itemizedlist>
+			</para> 
+	
+	      </section>
+
+            <section id="messageStartEventGraphicalNotation">
+
+              <title>Graphical notation</title>
+
+              <para>
+                A message start event is visualized as a circle with a message event symbol. The symbol is unfilled, to visualize the catching (receiving) behavior. 
+                <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.start.message.event.png"/></imageobject></mediaobject>
+              </para>
+
+            </section>
+
+            <section id="messageStartEventXml">
+
+        <title>XML representation</title>
+
+        <para>
+          The XML representation of a message start event is the normal
+          start event declaration with a messageEventDefinition child-element:
+          
+          <programlisting>
+&lt;definitions id=&quot;definitions&quot; 
+  xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+  xmlns:activiti=&quot;http://activiti.org/bpmn&quot;
+  targetNamespace=&quot;Examples&quot;
+  xmlns:tns=&quot;Examples&quot;&gt;
+  
+  &lt;message id=&quot;newInvoice&quot; name=&quot;newInvoiceMessage&quot; /&gt;
+  
+  &lt;process id=&quot;invoiceProcess&quot;&gt;  
+  
+    &lt;startEvent id=&quot;messageStart&quot; &gt;
+    	&lt;messageEventDefinition messageRef=&quot;tns:newInvoice&quot; /&gt;
+    &lt;/startEvent&gt;
+    ...    
+  &lt;/process&gt;
+
+&lt;/definitions&gt;</programlisting>
+        
+        </para>
+         
+
+      </section>
+
+        </section>
+        
+        
+        
+         <!-- //////////////////////////////////////// error start events -->
+        
+        <section id="bpmnErrorStartEvent">
+
+            <title>Error start event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+            <section id="errorStartEventDescription">
+
+	        <title>Description</title>
+	
+	        <para>
+	            An <link linkend="bpmnErrorEventDefinition">error</link> start event can be used to trigger an event subprocess. 
+	            <emphasis role="bold">An error start event cannot be used for starting a process instance</emphasis>.
+	        </para>
+	        
+	        <para>
+	           An error start event is always interrupting.
+	        </para>
+	        
+	      </section>
+
+            <section id="errorStartEventGraphicalNotation">
+
+              <title>Graphical notation</title>
+
+              <para>
+                A error start event is visualized as a circle with an error event symbol. The symbol is unfilled, to visualize the catching (receiving) behavior. 
+                <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.start.error.event.png"/></imageobject></mediaobject>
+              </para>
+
+            </section>
+
+            <section id="errorStartEventXml">
+
+        <title>XML representation</title>
+
+        <para>
+          The XML representation of an error start event is the normal
+          start event declaration with an errorEventDefinition child-element:
+          
+          <programlisting>
+&lt;startEvent id=&quot;messageStart&quot; &gt;
+	&lt;errorEventDefinition errorRef=&quot;someError&quot; /&gt;
+&lt;/startEvent&gt;</programlisting>
+        
+        </para>
+         
+
+      </section>
+
+        </section>
+
+	<!-- ////////////////////////////////////// End Events -->
 
 		<section id="bpmnEndEvent">
 		
@@ -997,6 +1473,8 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
 		  </para>
 		
 		</section>
+
+	<!-- ////////////////////////////////////// None End Event -->
 
 		<section id="bpmnNoneEndEvent">
 		
@@ -1040,6 +1518,8 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
       </section>
 
 		</section>
+
+	<!-- ////////////////////////////////////// Error End Events -->
 		
 		<section id="bpmnErrorEndEvent">
 		  
@@ -1054,13 +1534,7 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
 		      In case no matching boundary error event is found, the execution semantics default to the 
 		      <link linkend="bpmnNoneEndEvent">none end event</link> semantics.
 		    </para>
-		    
-		    <para>
-		      <emphasis role="bold">Important note:</emphasis> a BPMN error is NOT the same as a 
-		      Java exception. In fact, the two have nothing in common. BPMN error events are a way
-		      of modeling <emphasis>business exceptions</emphasis>. Java exceptions are handled 
-		      in <link linkend="serviceTaskExceptionHandling">their own specific way</link>.
-		    </para>
+		  	  
 		  </section>
 		  
 		  <section id="bpmnErrorEndEventGraphicalNotation">
@@ -1117,6 +1591,966 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
       </section>
 		  
 		</section>
+
+	<!-- ////////////////////////////////////// Cancel End Event -->
+		
+		<section id="bpmnCancelEndEvent">
+		  
+		  <title>Cancel end event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnCancelEndEventDescription">
+		    <title>Description</title>
+		    <para>
+		     	The cancel end event can only be used in combination with a bpmn transaction subprocess.
+		     	When the cancel end event is reached, a cancel event is thrown which must be caught by a 
+		     	cancel boundary event. The cancel boundary event then cancels the transaction and triggers 
+		     	compensation. 
+		    </para>
+		  	  
+		  </section>
+		  
+		  <section id="bpmnCancelEndEventGraphicalNotation">
+        <title>Graphical notation</title>
+        <para>
+          A cancel end event visualized as a typical end event (circle with thick outline), with the
+          cancel icon inside. The cancel icon is completely black, to indicate the throwing semantics.
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.cancel.end.event.png"/></imageobject></mediaobject>
+        </para>
+      </section>
+      
+      <section id="bpmnCancelEndEventXml">
+        <title>XML representation</title>
+        <para>
+          A cancel end event is represented as an end event, with a <emphasis>cancelEventDefinition</emphasis>
+          child element.
+          <programlisting>
+&lt;endEvent id=&quot;myCancelEndEvent&quot;&gt;
+  &lt;cancelEventDefinition /&gt;
+&lt;/endEvent&gt;          
+          </programlisting>
+		</para>          
+      </section>
+		  
+		</section>		
+	
+	<!-- ////////////////////////////////////// Boundary Events -->	
+		
+		
+		<section id="bpmnBoundaryEvent">
+		  
+		  <title>Boundary events</title>
+		  
+		  <para>
+		    Boundary events are <emphasis>catching</emphasis> events that are attached to an activity
+		    (a boundary event can never be throwing). This means that while the activity is
+		    running, the event is <emphasis>listening</emphasis> for a certain type of trigger. 
+		    When the event is <emphasis>caught</emphasis>, the activity is interrupted and the 
+		    sequence flow going out of the event are followed.
+		  </para>
+		  
+		  <para>
+		    All boundary events are defined in the same way:
+<programlisting>
+&lt;boundaryEvent id=&quot;myBoundaryEvent&quot; attachedToRef=&quot;theActivity&quot;&gt;
+      &lt;XXXEventDefinition/&gt;
+&lt;/boundaryEvent&gt;</programlisting>
+		  </para>
+		  
+		  <para>
+		    A boundary event is defined with
+		    <itemizedlist>
+		      <listitem>
+		        <para>
+		          A unique identifier (process-wide)
+		        </para>
+		      </listitem>
+		      <listitem>
+		        <para>
+		          A reference to the activity to which the event is attached through the
+		          <emphasis role="bold">attachedToRef</emphasis> attribute.
+		          Note that a boundary event is defined on the same level as the activities
+		          to which they are attached
+		          (i.e. no inclusion of the boundary event inside the activity).
+		        </para>
+		      </listitem>
+		      <listitem>
+		        <para>
+		          An XML sub-element of the form <emphasis>XXXEventDefinition</emphasis> 
+		          (e.g. <emphasis>TimerEventDefinition</emphasis>, <emphasis>ErrorEventDefinition</emphasis>, etc.)
+		          defining the type of the boundary event. See the specific boundary event types
+		          for more details.
+		        </para>
+		      </listitem>
+		    </itemizedlist>
+		  </para>
+		  
+		</section>
+		  
+		<section id="bpmnTimerBoundaryEvent">
+      
+      <title>Timer Boundary Event</title>
+        
+      <section id="timerBoundaryEventDescription">
+        
+        <title>Description</title>
+          
+        <para>
+          A timer boundary event acts as a stopwatch and alarm clock. When an execution arrives
+          in the activity where the boundary event is attached to, a timer is started.
+          When the timer fires (e.g. after a specified interval), the activity is interrupted
+          and the sequence flow going out of the timer boundary event are followed.
+        </para>
+        
+      </section>
+        
+      <section id="bpmnTimerBoundaryEventGraphicalNotation">
+        
+        <title>Graphical Notation</title>
+          
+        <para>
+          A timer boundary event is visualized as a typical boundary event (i.e. circle
+          on the border), with the timer icon on the inside.
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.timer.event.png"/></imageobject></mediaobject>
+        </para>
+        
+      </section>
+      
+      <section id="bpmnTimerBoundaryEventXml">
+      
+        <title>XML Representation</title>
+        
+        <para>
+          A timer boundary event is defined as a <link linkend="bpmnBoundaryEvent">regular boundary event</link>.
+          The specific type sub-element is in this case a <emphasis role="bold">timerEventDefinition</emphasis>
+          element.
+<programlisting>
+&lt;boundaryEvent id=&quot;escalationTimer&quot; cancelActivity=&quot;true&quot; attachedToRef=&quot;firstLineSupport&quot;&gt;
+   <emphasis role="bold">&lt;timerEventDefinition&gt;
+    &lt;timeDuration&gt;PT4H&lt;/timeDuration&gt;
+  &lt;/timerEventDefinition&gt;</emphasis>
+&lt;/boundaryEvent&gt;          
+</programlisting>
+
+        Please refer to <link linkend="timerEventDefinitions">timer event definition</link> for details on timer configuration.
+        </para>
+
+        <para>
+          In the graphical representation, the line of the circle is dotted as you can see in this example above:
+          
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.non.interrupting.boundary.timer.event.png"/></imageobject></mediaobject>
+          
+          A typical use case is sending an escalation email additionally but not interrupt the normal process flow.
+        </para>        
+<!-- 
+        <para>
+          Since BPMn 2.0 there is the difference between the interrupting and non interrupting timer event. The 
+          interrupting is the default. The non-interrupting leads to the original activity is <emphasis role="bold">not</emphasis>
+          interrupted but the activity stays there. Instead an additional executions is created and send over the
+          outgoing transition of the event. In the XML representation, the <emphasis>cancelActivity</emphasis> attribute
+          is set to false:
+<programlisting>
+&lt;boundaryEvent id=&quot;escalationTimer&quot; cancelActivity=&quot;false&quot; attachedToRef=&quot;firstLineSupport&quot;/&gt;
+</programlisting>
+        </para>
+         -->
+        
+        <para>
+          <emphasis role="bold">Note:</emphasis> boundary timer events are only fired when 
+          the job executor is enabled (i.e. <emphasis>jobExecutorActivate</emphasis>
+          needs to be set to <literal>true</literal> in the <literal>activiti.cfg.xml</literal>, since the job
+          executor is disabled by default). 
+        </para>
+      
+      </section>
+      
+      <section id="bpmnKnownIssueBoundaryEvent">
+    
+      <title>Known issue with boundary events</title>
+      
+      <para>
+        There is a known issue regarding concurrency when using boundary events of any type.
+        Currently, it is not possible to have multiple outgoing sequence flow attached to 
+        a boundary event (see issue <ulink url="http://jira.codehaus.org/browse/ACT-47">ACT-47</ulink>).
+        A solution to this problem is to use one outgoing sequence flow that goes to a parallel gateway.
+        <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.known.issue.boundary.event.png"/></imageobject></mediaobject>
+      </para>
+    
+    </section>
+		
+		</section> 
+		
+		
+		<!-- ////////////////////// error boundary event -->
+		
+		<section id="bpmnBoundaryErrorEvent">
+		  <title>Error Boundary event</title>
+		  
+		  <section id="bpmnBoundaryErrorEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An intermediate <emphasis>catching</emphasis> error on the boundary of an activity,
+		      or <emphasis role="bold">boundary error event</emphasis> for short, catches errors that are thrown within the scope
+		      of the activity on which it is defined.
+		    </para>
+		    
+		    <para>
+		      Defining a boundary error event makes most sense on an <link linkend="bpmnSubProcess">embedded subprocess</link>,
+		      or a <link linkend="bpmnCallActivity">call activity</link>, as a subprocess creates a scope for all activities inside the subprocess. 
+		      Errors are thrown by <link linkend="bpmnErrorEndEvent">error end events</link>. Such an error will propagate its
+		      parent scopes upwards until a scope is found on which a boundary error event is defined
+		      that matches the error event definition.
+		    </para>
+		    
+		    <para>
+		      When an error event is caught, the activity on which the boundary event is defined
+		      is destroyed, also destroying all current executions within
+		      (e.g. concurrent activities, nested subprocesses, etc.). Process execution continues
+		      following the outgoing sequence flow of the boundary event. 
+		    </para>
+		    
+		  </section>
+		  
+		  <section id="bpmnBoundaryErrorEventgraphicalNotation">
+        <title>Graphical notation</title>
+        <para>
+          A boundary error event is visualized as a typical intermediate event (Circle with smaller circle inside)
+          on the boundary, with the error icon inside. The error icon is white, to indicate
+          the <emphasis>catch</emphasis> semantics.
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.error.event.png"/></imageobject></mediaobject>
+        </para>
+      </section>
+      
+      <section id="bpmnBoundaryErrorEventXml">
+        <title>Xml representation</title>
+        <para>
+          A boundary error event is defined as a typical <link linkend="bpmnBoundaryEvent">boundary event</link>:
+          <programlisting>
+&lt;boundaryEvent id=&quot;catchError&quot; attachedToRef=&quot;mySubProcess&quot;&gt;
+  &lt;errorEventDefinition errorRef=&quot;myError&quot;/&gt;
+&lt;/boundaryEvent&gt;
+          </programlisting>
+          As with the <link linkend="bpmnErrorEndEvent">error end event</link>, the <emphasis>errorRef</emphasis>
+          references an error defined outside the process element:
+          <programlisting>
+&lt;error id=&quot;myError&quot; errorCode=&quot;123&quot; /&gt;
+...
+&lt;process id=&quot;myProcess&quot;&gt;  
+...              
+          </programlisting>
+        </para>
+        
+        <para>
+          The <emphasis role="bold">errorCode</emphasis> is used to match the errors that are caught:
+          <itemizedlist>
+            <listitem>
+              <para>
+                If <emphasis>errorRef</emphasis> is omitted, the boundary error event will catch
+                <emphasis role="bold">any error event</emphasis>, regardless of the errorCode of the <emphasis>error</emphasis>.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                In case an <emphasis>errorRef</emphasis> is provided and it references an existing <emphasis>error</emphasis>,
+                the boundary event will <emphasis role="bold">only catch errors with the same error code</emphasis>.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                In case an <emphasis>errorRef</emphasis> is provided, but no <emphasis>error</emphasis>
+                is defined in the BPMN 2.0 file, then the <emphasis role="bold">errorRef is used
+                as errorCode</emphasis> (similar for with error end events).
+              </para>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </section>
+      
+      <section id="bpmnBoundaryErrorEventExample">
+        <title>Example</title>
+        <para>
+          Following example process shows how an error end event can be used. When the 
+          <emphasis>'Review profitability'</emphasis> user task is completed by stating that
+          not enough information is provided, an error is thrown. When this error is caught on
+          the boundary of the subprocess, all active activities within the <emphasis>'Review sales lead'</emphasis>
+          subprocess are destroyed (even if <emphasis>'Review customer rating'</emphasis> was not yet completed),
+          and the <emphasis>'Provide additional details'</emphasis> user task is created.
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.error.example.png"/></imageobject></mediaobject>
+        </para>
+        
+        <para>
+          This process is shipped as example in the demo setup. The process XML and unit test can
+          be found in the <emphasis>org.activiti.examples.bpmn.event.error</emphasis> package.
+        </para>
+      </section>
+		  
+		</section>
+		
+		<!-- ////////////////////// signal boundary event -->
+		
+		<section id="bpmnBoundarySignalEvent">
+		  <title>Signal Boundary event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnBoundarySignalEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An attached intermediate <emphasis>catching</emphasis> <link linkend="bpmnSignalEventDefinition">signal</link> on the boundary of an activity,
+		      or <emphasis role="bold">boundary signal event</emphasis> for short, catches signals with the same signal name
+		      as the referenced signal definition. 
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> contrary to other events like the boundary error event, a boundary signal event does not only catch
+		    	signal events thrown from the scope it is attached to. On the contrary, a signal event has global scope
+		    	(broadcast semantics) meaning that the signal can be thrown from any place, even from a different process instance. 
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> contrary to other events like an error event, a signal is not consumed if it is caught.
+		    	If you have two active signal boundary events catching the same signal event, both boundary events are triggered, event if they are part of 
+		    	different process instances.
+		    </para>		    		    
+		    
+		  </section>
+		  
+		  <section id="bpmnBoundarySignalEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          A boundary signal event is visualized as a typical intermediate event (Circle with smaller circle inside)
+	          on the boundary, with the signal icon inside. The signal icon is white (unfilled), to indicate
+	          the <emphasis>catch</emphasis> semantics.
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.signal.event.png"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnBoundarySignalEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	A boundary signal event is defined as a typical <link linkend="bpmnBoundaryEvent">boundary event</link>:
+          		<programlisting>
+&lt;boundaryEvent id=&quot;boundary&quot; attachedToRef=&quot;task&quot; cancelActivity=&quot;true&quot;&gt;       
+          &lt;signalEventDefinition signalRef=&quot;alertSignal&quot;/&gt;
+&lt;/boundaryEvent&gt;
+          		</programlisting>         
+        	</para>	    
+	      </section>
+      
+	      <section id="bpmnBoundarySignalEventExample">
+	        <title>Example</title>	        
+	        <para>
+	        	See section on <link linkend="bpmnSignalEventDefinition">signal event definitions</link>.
+	        </para>	       
+	      </section>
+      
+      </section>
+      
+      <!-- ////////////////////// cancel boundary event -->
+		
+		<section id="bpmnBoundaryCancelEvent">
+		  <title>Cancel Boundary event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnBoundaryCancelEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An attached intermediate <emphasis>catching</emphasis> cancel on the boundary of a transaction subprocess,
+		      or <emphasis role="bold">boundary cancel event</emphasis> for short, is triggered when a transaction
+		      is cancelled. When the cancel boundary event is triggered, it first interrupts all executions active in the 
+		      current scope. Next, it starts compensation of all active compensation boundary events in the scope of the 
+		      transaction. Compensation is performed synchronously, i.e. the boundary event waits before compensation is 
+		      completed before leaving the transaction. When compensation is completed, the transaction subprocess is left 
+		      using the sequence flow(s) running out of the cancel boundary event.  
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> Only a single cancel boundary event is allowed for a transaction subprocess.
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> If the transaction subprocess hosts nested subprocesses, compensation is only triggered for subprocesses
+		    	that have completed successfully.	
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> If a cancel boundary event is placed on a transaction subprocess with 
+		    	multi instance characteristics, if one instance triggers cancellation, the boundary event cancels all 
+		    	instances. 
+		    </para>
+		    
+		  </section>
+		  
+		  <section id="bpmnBoundaryCancelEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          A cancel boundary event is visualized as a typical intermediate event (Circle with smaller circle inside)
+	          on the boundary, with the cancel icon inside. The cancel icon is white (unfilled), to indicate
+	          the <emphasis>catching</emphasis> semantics.
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.cancel.event.png"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnBoundarySignalEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	A cancel boundary event is defined as a typical <link linkend="bpmnBoundaryEvent">boundary event</link>:
+          		<programlisting>
+&lt;boundaryEvent id=&quot;boundary&quot; attachedToRef=&quot;transaction&quot; &gt;       
+          &lt;cancelEventDefinition /&gt;
+&lt;/boundaryEvent&gt;
+          		</programlisting>      
+          		Since the cancel boundary event is always interrupting, the <code>cancelActivity</code> attribute 
+          		is not required.   
+        	</para>	    
+	      </section>
+	           
+      </section>
+      
+       <!-- ////////////////////// compensation boundary event -->
+		
+		<section id="bpmnBoundaryCompensationEvent">
+		  <title>Compensation Boundary event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnBoundaryCompensationEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An attached intermediate <emphasis>catching</emphasis> compensation on the boundary of an activity
+		      or <emphasis role="bold">compensation boundary event</emphasis> for short, can be used to attach a compensation 
+		      handler to an activity.		      
+		    </para>
+		    
+		    <para>
+		    	The compensation boundary event must reference a single compensation handler using a directed association.		    	 
+		    </para>
+		    
+		    <para>
+		    	A compensation boundary event has a different activation policy from other boundary events. Other boundary events 
+		    	like for instance the signal boundary event are activated when the activity they are attached to is started. 
+		    	When the activity is left, they are deactivated and the corresponding event subscription is cancelled. 
+		    	The compensation boundary event is different. The compensation boundary is activated when the activity is attached
+		    	to <emphasis role="bold">completes successfully</emphasis>. At this point, the corresponding subscription to 
+		    	compensation events is created. The subscription is removed either when a compensation event is triggered
+		    	or when the corresponding process instance ends. From this, it follows: 
+		    	<itemizedlist>
+		    		<listitem>
+		    			<para>
+		    				When compensation is triggered, the compensation handler associated with the compensation 
+		    				boundary event is invoked the same number of times the activity it is attached to completed 
+		    				successfully.		    				
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				If a compensation boundary event is attached to an activity with multiple instance characteristics, 
+		    				a compensation event subscription is created for each instance.
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				If a compensation boundary event is attached to an activity which is contained inside a loop, 
+		    				a compensation event subscription is created for each time the activity is executed.
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				If the process instance ends, the subscriptions to compensation events are cancelled. 
+		    			</para>
+		    		</listitem>
+		    	</itemizedlist>
+		    	 
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> the compensation boundary event is not supported on embedded subprocesses.
+		    </para>
+		    
+		  </section>
+		  
+		  <section id="bpmnBoundaryCompensationEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          A compensation boundary event is visualized as a typical intermediate event (Circle with smaller circle inside)
+	          on the boundary, with the compensation icon inside. The compensation icon is white (unfilled), to indicate
+	          the <emphasis>catching</emphasis> semantics. In addition to a compensation boundary event, the following 
+	          figure shows a compensation handler associated with the boundary event using a unidirectional association:
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.compensation.event.png"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnBoundaryCompensationEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	A compensation boundary event is defined as a typical <link linkend="bpmnBoundaryEvent">boundary event</link>:
+          		<programlisting>
+&lt;boundaryEvent id=&quot;compensateBookHotelEvt&quot; attachedToRef=&quot;bookHotel&quot; &gt;       
+          &lt;compensateEventDefinition /&gt;
+&lt;/boundaryEvent&gt;
+
+&lt;association associationDirection=&quot;One&quot; id=&quot;a1&quot;  sourceRef=&quot;compensateBookHotelEvt&quot; targetRef=&quot;undoBookHotel&quot; /&gt;
+
+&lt;serviceTask id=&quot;undoBookHotel&quot; isForCompensation=&quot;true&quot; activiti:class=&quot;...&quot; /&gt;</programlisting>      
+          		Since the compensation boundary event is activated after the activity has completed successfully, 
+          		the <code>cancelActivity</code> attribute is not supported.   
+        	</para>	    
+	      </section>
+	           
+      </section>
+      
+      <!-- ////////////////////// intermediate catching events -->
+	
+      <section id="bpmnIntermediateCatchingEvent">
+
+          <title>Intermediate catching events</title>
+
+		  <para>
+		    All intermediate catching events events are defined in the same way:
+<programlisting>
+&lt;intermediateCatchEvent id=&quot;myIntermediateCatchEvent&quot; &gt;
+      &lt;XXXEventDefinition/&gt;
+&lt;/intermediateCatchEvent&gt;</programlisting>
+		  </para>
+
+		  <para>
+		    An intermediate catching event is defined with
+		    <itemizedlist>
+		      <listitem>
+		        <para>
+		          A unique identifier (process-wide)
+		        </para>
+		      </listitem>
+		      <listitem>
+		        <para>
+		          An XML sub-element of the form <emphasis>XXXEventDefinition</emphasis>
+		          (e.g. <emphasis>TimerEventDefinition</emphasis>, etc.)
+		          defining the type of the intermediate catching event. See the specific catching event types
+		          for more details.
+		        </para>
+		      </listitem>
+		    </itemizedlist>
+		  </para>
+
+        </section>
+        
+        <!-- //////////////////////////////////////// intermediate timer catch  -->
+
+        <section id="bpmnTimerIntermediateEvent">
+
+            <title>Timer intermediate catching event</title>
+
+            <section id="bpmnTimerIntermediateEventDescription">
+                <title>Description</title>
+
+        <para>
+          A timer intermediate event acts as a stopwatch. When an execution arrives
+          in catching event activity, a timer is started.
+          When the timer fires (e.g. after a specified interval), the sequence flow going out of the timer intermediate event is followed.
+        </para>
+
+            </section>
+
+            <section id="bpmnTimerIntermediateEventGraphicalNotation">
+
+              <title>Graphical Notation</title>
+
+              <para>
+                A timer intermediate event is visualized as a intermediate catching event, with the timer icon on the inside.
+                <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.timer.event.png"/></imageobject></mediaobject>
+              </para>
+
+            </section>
+
+            <section id="bpmnTimerIntermediateEventXml">
+
+              <title>XML Representation</title>
+
+              <para>
+
+          A timer intermediate event is defined as a <link linkend="bpmnIntermediateCatchingEvent">intermediate catching event</link>.
+          The specific type sub-element is in this case a <emphasis role="bold">timerEventDefinition</emphasis>
+          element.
+                 <programlisting>
+        &lt;intermediateCatchEvent id=&quot;timer&quot;&gt;
+            <emphasis role="bold">&lt;timerEventDefinition&gt;
+                &lt;timeDuration&gt;PT5M&lt;/timeDuration&gt;
+            &lt;/timerEventDefinition&gt;</emphasis>
+        &lt;/intermediateCatchEvent&gt;
+                 </programlisting>
+              See <link linkend="timerEventDefinitions">timer event definitions</link> for configuration details.
+
+              </para>
+            </section>
+
+        </section>
+        
+        <!-- //////////////////////////////////////// intermediate signal catch  -->
+        
+        <section id="bpmnIntermediateSignalEvent">
+		  <title>Signal Intermediate catching event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  <section id="bpmnIntermediateSignalEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An intermediate <emphasis>catching</emphasis> <link linkend="bpmnSignalEventDefinition">signal</link> event catches signals with the same signal name
+		      as the referenced signal definition. 
+		    </para>
+		   		    
+		    <para>
+		    	<emphasis role="bold">Note:</emphasis> contrary to other events like an error event, a signal is not consumed if it is caught.
+		    	If you have two active signal boundary events catching the same signal event, both boundary events are triggered, event if they are part of 
+		    	different process instances.
+		    </para>		    		    
+		    
+		  </section>
+		  
+		  <section id="bpmnIntermediateSignalEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          An intermediate signal catch event is visualized as a typical intermediate event (Circle with smaller circle inside), 
+	          with the signal icon inside. The signal icon is white (unfilled), to indicate
+	          the <emphasis>catch</emphasis> semantics.
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.signal.catch.event.PNG"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnIntermediateSignalEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	 A signal intermediate event is defined as a <link linkend="bpmnIntermediateCatchingEvent">intermediate catching event</link>.
+		          The specific type sub-element is in this case a <emphasis role="bold">signalEventDefinition</emphasis>
+		          element.
+                 <programlisting>
+&lt;intermediateCatchEvent id=&quot;signal&quot;&gt;
+	<emphasis role="bold">&lt;signalEventDefinition signalRef="newCustomerSignal" /&gt;</emphasis>
+&lt;/intermediateCatchEvent&gt;
+                 </programlisting>    
+        	</para>	    
+	      </section>
+      
+	      <section id="bpmnIntermediateSignalEventExample">
+	        <title>Example</title>	        
+	        <para>
+	        	See section on <link linkend="bpmnSignalEventDefinition">signal event definitions</link>.
+	        </para>	       
+	      </section>
+      
+      </section>
+      
+      
+    <!-- //////////////////////////////////////// intermediate throwing events introduction -->
+    
+    <section id="bpmnIntermediateThrowEvent">
+        <title>Intermediate throwing event</title>
+        <para>
+		    All intermediate throwing events events are defined in the same way:
+<programlisting>
+&lt;intermediateThrowEvent id=&quot;myIntermediateThrowEvent&quot; &gt;
+      &lt;XXXEventDefinition/&gt;
+&lt;/intermediateThrowEvent&gt;</programlisting>
+		  </para>
+
+		  <para>
+		    An intermediate throwing event is defined with
+		    <itemizedlist>
+		      <listitem>
+		        <para>
+		          A unique identifier (process-wide)
+		        </para>
+		      </listitem>
+		      <listitem>
+		        <para>
+		          An XML sub-element of the form <emphasis>XXXEventDefinition</emphasis>
+		          (e.g. <emphasis>signalEventDefinition</emphasis>, etc.)
+		          defining the type of the intermediate throwing event. See the specific throwing event types
+		          for more details.
+		        </para>
+		      </listitem>
+		    </itemizedlist>
+		  </para>
+    </section>
+    
+    <!-- //////////////////////////////////////// intermediate throwing none events  -->
+
+    <section id="bpmnIntermediateThrowNoneEvent">
+        <title>Intermediate throwing none event</title>
+        <para>
+          The following process diagram shows a simple example of an intermediate none event, which is often used to 
+          indicate some state achieved in the process. 
+
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.none.event.png"/></imageobject></mediaobject>
+          
+          This can be a good hook to monitor some KPI's, basically by adding an <link linkend="#executionListeners">execution listener</link>
+          
+<programlisting>
+&lt;intermediateThrowEvent id="noneEvent"&gt;
+  &lt;extensionElements&gt;
+    &lt;activiti:executionListener class="org.activiti.engine.test.bpmn.event.IntermediateNoneEventTest$MyExecutionListener" event="start" /&gt;
+  &lt;/extensionElements&gt;
+&lt;/intermediateThrowEvent&gt;
+</programlisting>          
+          
+          There you can add some own code to maybe send some event to your BAM tool or DWH. The engine itself doesn't do anything in that event, it just
+          passes through.
+        </para>
+    </section>
+    
+    <!-- //////////////////////////////////////// intermediate throwing signal events  -->
+    
+     <section id="bpmnIntermediateThrowSignalEvent">
+		  <title>Signal intermediate throwing event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  <section id="bpmnIntermediateThrowSignalEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An intermediate <emphasis>throwing</emphasis> <link linkend="bpmnSignalEventDefinition">signal</link> event throws a signal event for a defined signal.		      
+		    </para>
+		   		    
+		    <para>
+		    	In activiti, the signal is broadcast to all active handlers (i.e. all catching signal events). Signals can be published synchronous or asynchronous.
+		    	<itemizedlist>
+		    		<listitem>
+		    			<para>
+		    				In the default configuration, the signal is delivered <emphasis role="bold">synchronously</emphasis>. This means that the throwing process instance waits until 
+		    				the signal is delivered to all catching process instances. The catching process instances are also notified in the same transaction as the throwing process 
+		    				instance, which means that if one of the notified instances produces a technical error (throws an exception), all involved instances fail.
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				A signal can also be delivered <emphasis role="bold">asynchronously</emphasis>. In that case it is determined which handlers are active at the time 
+		    				the throwing signal event is reached. For each active handler, an asynchronous notification message (Job) is stored and delivered by the JobExecutor. 			
+		    			</para>
+		    		</listitem>
+		    	</itemizedlist>
+		    	  
+		    </para>		    		    
+		    
+		  </section>
+		  
+		  <section id="bpmnIntermediateThrowSignalEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          An intermediate signal throw event is visualized as a typical intermediate event (Circle with smaller circle inside), 
+	          with the signal icon inside. The signal icon is black (filled), to indicate
+	          the <emphasis>throw</emphasis> semantics.
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.signal.throw.event.png"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnIntermediateThrowSignalEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	 A signal intermediate event is defined as a <link linkend="bpmnIntermediateThrowingEvent">intermediate throwing event</link>.
+		          The specific type sub-element is in this case a <emphasis role="bold">signalEventDefinition</emphasis>
+		          element.
+                 <programlisting>
+&lt;intermediateThrowEvent id=&quot;signal&quot;&gt;
+	<emphasis role="bold">&lt;signalEventDefinition signalRef="newCustomerSignal" /&gt;</emphasis>
+&lt;/intermediateThrowEvent&gt;
+                 </programlisting>    
+        	</para>
+        	<para>
+        		An asynchronous signal event would look like this:        		
+        		<programlisting>
+&lt;intermediateThrowEvent id=&quot;signal&quot;&gt;
+	<emphasis role="bold">&lt;signalEventDefinition signalRef="newCustomerSignal" activiti:async=&quot;true&quot; /&gt;</emphasis>
+&lt;/intermediateThrowEvent&gt;
+                 </programlisting>
+        	</para>	    
+	      </section>
+      
+	      <section id="bpmnIntermediateSignalEventExample">
+	        <title>Example</title>	        
+	        <para>
+	        	See section on <link linkend="bpmnSignalEventDefinition">signal event definitions</link>.
+	        </para>	       
+	      </section>
+      
+      </section>
+      
+      <!-- //////////////////////////////////////// intermediate throwing compensation events  -->
+    
+     <section id="bpmnIntermediateThrowCompensationEvent">
+		  <title>Compensation intermediate throwing event</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnIntermediateThrowCompensationEventDescription">
+		    <title>Description</title>
+		    <para>
+		      An intermediate <emphasis>throwing</emphasis> <link linkend="bpmnCompensationEventDefinition">compensation</link> 
+		      event can be used to trigger compensation.       
+		    </para>
+		   	<para>
+		   		<emphasis role="bold">Triggering compensation:</emphasis>
+		   		Compensation can either be triggered for a designated activity or for the scope which hosts the compensation 
+		   		event. Compensation is performed through execution of the compensation handler associated with an activity.
+		   		<itemizedlist>
+		   			<listitem>
+		   				<para>
+					   		When compensation is thrown for an activity, the associated compensation handler is executed the same
+					   		number of times the activity competed successfully. 
+					   	</para>	
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+					   		If compensation is thrown for the current scope, all activities withing the current scope are compensated, 
+					   		which includes activities on concurrent branches.  
+					   	</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+							Compensation is triggered hierarchically: if an activity to be compensated is a subprocess, compensation is 
+							triggered for all activities contained in the subprocess. If the subprocess has nested activities, compensation 
+							is thrown recursively. However, compensation is not propagated to the "upper levels" of the process: if compensation 
+							is triggered within a subprocess, it is not propagated to activities outside of the subprocess scope. 
+							The bpmn specification states that compensation is triggered for activities at "the same level of subprocess". 
+						</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+							In activiti compensation is performed in reverse order of execution. This means that whichever activity 
+							completed last is compensated first, etc.  
+						</para>
+					</listitem>
+		   			<listitem>						
+						<para>
+							The intermediate throwing compensation event can be used to compensate transaction subprocesses which 
+							competed successfully.
+						</para>
+		   			</listitem>
+		   		</itemizedlist>  
+		   	</para>
+		   	  
+			<para>
+				<emphasis role="bold">Note:</emphasis>
+				If compensation is thrown within a scope which contains a subprocess and the subprocess contains activities 
+				with compensation handlers, compensation is only propagated to the subprocess if it has completed successfully 
+				when compensation is thrown. If some of the activities nested inside the subprocess have completed and have attached 
+				compensation handlers, the compensation handlers are not executed if the subprocess containing these activities 
+				is not completed yet. Consider the following example: 
+				<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.throw.compensation.example1.PNG"/></imageobject></mediaobject>
+				In this process we have two concurrent executions, one executing the embedded subprocess and one executing the 
+				"charge credit card" activity. Lets assume both executions are started and the first concurrent execution is waiting 
+				for a user to complete the "review bookings" task. The second execution performs the "charge credit card" activity 
+				and an error is thrown, which causes the "cancel reservations" event to trigger compensation.
+				At this point the parallel subprocess is not yet completed which means that the compensation event is not propagated 
+				to the subprocess and thus the "cancel hotel reservation"  compensation handler is not executed.
+				If the user task (and thus the embedded subprocess) completes before the "cancel reservations" is performed, 
+				compensation is propagated to the embedded subprocess.	
+			</para>   
+			<para>
+				<emphasis role="bold">Process variables:</emphasis>
+				When compensating an embedded subprocess, the execution used for executing the compensation handlers has access
+				to the local process variables of the subprocess in the state they were in when the subprocess completed execution.
+				To achieve this, a snapshot of the process variables associated with the scope execution (execution created for executing the 
+				subprocess) is taken. Form this, a couple of implications follow:
+				<itemizedlist>
+					<listitem>
+						<para>
+							The compensation handler does not have access to variables added to concurrent executions created 
+							inside the subprocess scope.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Process variables associated with executions higher up in the hierarchy, (for instance process variables
+							associated with the process instance execution are not contained in the snapshot: the compensation handler
+							has access to these process variables in the state they are in when compensation is thrown.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							A variable snapshot is only taken for embedded subprocesses, not for other activities.
+						</para>
+					</listitem>
+				</itemizedlist>								  
+			</para> 
+			
+			<para>
+				<emphasis role="bold">Current limitations:</emphasis>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<code>waitForCompletion="false"</code> is currently unsupported. When compensation is triggered
+							using the intermediate throwing compensation event, the event is only left, after compensation completed 
+							successfully. 
+						 </para>
+					</listitem>
+					<listitem>
+						<para>
+							Compensation itself is currently performed by concurrent executions. The concurrent executions are started 
+							in reverse order in which the compensated activities completed. Future versions of activity might include 
+							an option to perform compensation sequentially. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Compensation is not propagated to sub process instances spawned by call activities.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		  </section>
+		  
+		  <section id="bpmnIntermediateThrowCompensationEventGraphicalNotation">
+	        <title>Graphical notation</title>
+	        <para>
+	          An intermediate compensation throw event is visualized as a typical intermediate event (Circle with smaller circle inside), 
+	          with the compensation icon inside. The compensation icon is black (filled), to indicate
+	          the <emphasis>throw</emphasis> semantics.
+	          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.compensation.throw.event.png"/></imageobject></mediaobject>
+	        </para>
+	      </section>
+      
+	      <section id="bpmnIntermediateThrowSignalEventXml">
+	        <title>Xml representation</title>	               
+	         <para>
+     	     	 A compensation intermediate event is defined as a <link linkend="bpmnIntermediateThrowingEvent">intermediate throwing event</link>.
+		          The specific type sub-element is in this case a <emphasis role="bold">compensateEventDefinition</emphasis>
+		          element.
+                 <programlisting>
+&lt;intermediateThrowEvent id=&quot;throwCompensation&quot;&gt;
+	&lt;compensateEventDefinition /&gt;
+&lt;/intermediateThrowEvent&gt;</programlisting>    
+                 In addition, the optional argument <code>activityRef</code> can be used to trigger compensation of 
+                 a specific scope / activity:
+                  <programlisting>
+&lt;intermediateThrowEvent id=&quot;throwCompensation&quot;&gt;
+	&lt;compensateEventDefinition activityRef=&quot;bookHotel&quot; /&gt;
+&lt;/intermediateThrowEvent&gt;</programlisting>    
+        	</para>
+        	
+	      </section>
+            
+      </section>
+    
+</section>
+
+		
+	  <!-- 
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  												Sequence flows
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	   -->
+		
 		
 	  <section id="bpmnSequenceFlow">
     
@@ -1160,9 +2594,7 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
         </para>
       
       </section>
-    
-    </section>
-    
+            
     <section id="bpmnConditionalSequenceFlow">
     
       <title>Conditional sequence flow</title>
@@ -1302,6 +2734,19 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
       
     </section>
     
+  </section>
+    
+	  <!-- 
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  												Gateways
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	   -->
+    
+    
     <section id="bpmnGateways">
     
       <title>Gateways</title>
@@ -1317,9 +2762,9 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
         The icon shows the type of gateway.
         <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.gateway.png"/></imageobject></mediaobject>
       </para>
-    
-    </section>
-    
+      
+     <!-- ///////////////////////////////////////  Exclusive Gateway -->
+            
     <section id="bpmnExclusiveGateway">
     
       <title>Exclusive gateway</title>
@@ -1399,6 +2844,8 @@ ProcessInstance processInstance = runtimeService.startProcessInstanceByXXX();</p
       </section>
     
     </section>
+    
+    <!-- ///////////////////////////////////////  Parallel Gateway -->
     
     <section id="bpmnParallelGateway">
       
@@ -1531,6 +2978,8 @@ assertEquals("Ship Order", task2.getName());</programlisting>
       </section>
    
     </section>
+    
+    <!-- ///////////////////////////////////////  Inclusive Gateway -->
     
     <section id="bpmnInclusiveGateway">
       
@@ -1665,6 +3114,148 @@ assertEquals("Ship Order", task.getName());</programlisting>
       </section>
    
     </section> 
+    
+    <!-- ///////////////////////////////////////  Event based Gateway -->
+    
+    <section id="bpmnEventbasedGateway">
+    
+      <title>Event based gateway</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+      
+      <section id="eventBasedGatewayDescription">
+      
+        <title>Description</title>
+        
+        <para>
+        	The event based gateway allows to take a decision based on events. Each outgoing sequenceflow of the gateway needs to be connected to an 
+        	intermediate catching event. When process execution reaches the event based gateway, the gateway acts like a wait state: execution is suspended. 
+        	In addition, for each outgoing sequence flow, an event subscription is created.   
+        </para>
+        
+        <para>
+        	Note the sequence flows running out of an event based gateway are different from ordinary sequence flows. These sequence flows are never actually 
+        	&quot;executed&quot;. On the contrary, they allow the process engine to determine which events an execution arriving at an event based gateway needs to 
+        	subscribe to. The following restrictions apply:        	
+        	<itemizedlist>
+        		<listitem>
+        			<para>
+        				An event based gateway must have two or more outgoing sequence flows.
+        			</para>
+        		</listitem>
+        		<listitem>
+        			<para>
+        				An event based gateway must only be to elements of type <code>intermediateCatchEvent</code> only. 
+        				(Receive tasks after an event based gateway are not supported by activiti.)
+        			</para>
+        		</listitem>
+        		<listitem>
+        			<para>
+        				An <code>intermediateCatchEvent</code> connected to an event based gateway must have a single incoming sequenceflow.  
+        			</para>
+        		</listitem>        		
+        	</itemizedlist>
+        	
+        </para>
+        
+        
+      </section>
+      
+      <section id="eventBasedGatewayGraphNotation">
+      
+        <title>Graphical notation</title>
+        
+        <para>
+          An event based gateway gateway is visualized as a typical gateway (i.e. a diamond shape)
+          with a special icon inside.          
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.event.based.gateway.notation.png"/></imageobject></mediaobject>
+        </para>
+      
+      </section>
+      
+      <section id="eventBasedGatewayXML">
+      
+        <title>XML representation</title>
+        
+        <para>
+          The xml element used to define an event based gateway is <code>eventBasedGateway</code>.
+        </para>
+        
+      </section>
+      
+      <section id="eventBasedGatewayExample">      
+      	<title>Example(s)</title>
+      	
+      	<para>
+	      	The following process is an example of a process with an event based gateway. When the execution arrives at the event based gateway,
+	      	process execution is suspended. In addition, the process instance subscribes to the alert signal event and created a timer which fires after 10 minutes.
+	      	This effectively causes the process engine to wait for ten minutes for a signal event. If the signal occurs within 10 minutes, the timer is cancelled and 
+	      	execution continues after the signal. If the signal is not fired, execution continues after the timer and the signal subscription is cancelled. 
+	      	
+	      	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.event.based.gateway.example.png"/></imageobject></mediaobject>
+<programlisting>      	
+&lt;definitions id=&quot;definitions&quot;
+	xmlns=&quot;http://www.omg.org/spec/BPMN/20100524/MODEL&quot;
+	xmlns:activiti=&quot;http://activiti.org/bpmn&quot; 
+	targetNamespace=&quot;Examples&quot;&gt;
+
+	&lt;signal id=&quot;alertSignal&quot; name=&quot;alert&quot; /&gt;
+
+	&lt;process id=&quot;catchSignal&quot;&gt;
+
+		&lt;startEvent id=&quot;start&quot; /&gt;
+
+		&lt;sequenceFlow sourceRef=&quot;start&quot; targetRef=&quot;gw1&quot; /&gt;
+
+		&lt;eventBasedGateway id=&quot;gw1&quot; /&gt;
+		
+		&lt;sequenceFlow sourceRef=&quot;gw1&quot; targetRef=&quot;signalEvent&quot; /&gt;		
+		&lt;sequenceFlow sourceRef=&quot;gw1&quot; targetRef=&quot;timerEvent&quot; /&gt;
+
+		&lt;intermediateCatchEvent id=&quot;signalEvent&quot; name=&quot;Alert&quot;&gt;
+			&lt;signalEventDefinition signalRef=&quot;alertSignal&quot; /&gt;
+		&lt;/intermediateCatchEvent&gt;
+		
+		&lt;intermediateCatchEvent id=&quot;timerEvent&quot; name=&quot;Alert&quot;&gt;
+			&lt;timerEventDefinition&gt;
+				&lt;timeDuration&gt;PT10M&lt;/timeDuration&gt;
+			&lt;/timerEventDefinition&gt;		
+		&lt;/intermediateCatchEvent&gt;
+		
+		&lt;sequenceFlow sourceRef=&quot;timerEvent&quot; targetRef=&quot;exGw1&quot; /&gt;
+		&lt;sequenceFlow sourceRef=&quot;signalEvent&quot; targetRef=&quot;task&quot; /&gt;
+			
+		&lt;userTask id=&quot;task&quot; name=&quot;Handle alert&quot;/&gt;
+		
+		&lt;exclusiveGateway id=&quot;exGw1&quot; /&gt;
+		
+		&lt;sequenceFlow sourceRef=&quot;task&quot; targetRef=&quot;exGw1&quot; /&gt;
+		&lt;sequenceFlow sourceRef=&quot;exGw1&quot; targetRef=&quot;end&quot; /&gt;
+
+		&lt;endEvent id=&quot;end&quot; /&gt;
+&lt;/process&gt;
+&lt;/definitions&gt;</programlisting>
+      	</para>
+      </section>
+    
+    </section>
+    
+    
+</section>
+    
+   	 <!-- 
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  												Tasks
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	   -->
+    
+    <section id="bpmnTask">
+    	<title>Tasks</title>    
 
 		<section id="bpmnUserTask">
 
@@ -3658,334 +5249,68 @@ public class MyTaskCreateListener implements TaskListener {
       </section>
     
     </section>    
-		
-		<section id="bpmnBoundaryEvent">
-		  
-		  <title>Boundary events</title>
-		  
-		  <para>
-		    Boundary events are <emphasis>catching</emphasis> events that are attached to an activity
-		    (a boundary event can never be throwing). This means that while the activity is
-		    running, the event is <emphasis>listening</emphasis> for a certain type of trigger. 
-		    When the event is <emphasis>caught</emphasis>, the activity is interrupted and the 
-		    sequence flow going out of the event are followed.
-		  </para>
-		  
-		  <para>
-		    All boundary events are defined in the same way:
-<programlisting>
-&lt;boundaryEvent id=&quot;myBoundaryEvent&quot; attachedToRef=&quot;theActivity&quot;&gt;
-      &lt;XXXEventDefinition/&gt;
-&lt;/boundaryEvent&gt;</programlisting>
-		  </para>
-		  
-		  <para>
-		    A boundary event is defined with
-		    <itemizedlist>
-		      <listitem>
-		        <para>
-		          A unique identifier (process-wide)
-		        </para>
-		      </listitem>
-		      <listitem>
-		        <para>
-		          A reference to the activity to which the event is attached through the
-		          <emphasis role="bold">attachedToRef</emphasis> attribute.
-		          Note that a boundary event is defined on the same level as the activities
-		          to which they are attached
-		          (i.e. no inclusion of the boundary event inside the activity).
-		        </para>
-		      </listitem>
-		      <listitem>
-		        <para>
-		          An XML sub-element of the form <emphasis>XXXEventDefinition</emphasis> 
-		          (e.g. <emphasis>TimerEventDefinition</emphasis>, <emphasis>ErrorEventDefinition</emphasis>, etc.)
-		          defining the type of the boundary event. See the specific boundary event types
-		          for more details.
-		        </para>
-		      </listitem>
-		    </itemizedlist>
-		  </para>
-		  
-		</section>
-		  
-		<section id="bpmnTimerBoundaryEvent">
+
+<section id="bpmnCompensationHandlers">
+	<title>Compensation Handlers</title>
+	
+	
+	 <section id="bpmnCompensationHandlerDescription">
       
-      <title>Timer Boundary Event</title>
-        
-      <section id="timerBoundaryEventDescription">
-        
         <title>Description</title>
-          
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
         <para>
-          A timer boundary event acts as a stopwatch and alarm clock. When an execution arrives
-          in the activity where the boundary event is attached to, a timer is started.
-          When the timer fires (e.g. after a specified interval), the activity is interrupted
-          and the sequence flow going out of the timer boundary event are followed.
+         If an activity is used for compensating the effects of another activity, it can be declared to be a compensation handler.
+         Compensation handlers are not contained in normal flow and are only executed when a compensation event is thrown. 
         </para>
         
-      </section>
-        
-      <section id="bpmnTimerBoundaryEventGraphicalNotation">
-        
-        <title>Graphical Notation</title>
-          
         <para>
-          A timer boundary event is visualized as a typical boundary event (i.e. circle
-          on the border), with the timer icon on the inside.
-          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.timer.event.png"/></imageobject></mediaobject>
+        	Compensation handlers must not have incoming or outgoing sequence flows.
         </para>
         
+        <para>
+        	A compensation handler must be associated with a compensation boundary event using a directed association.
+        </para>
+                             
       </section>
       
-      <section id="bpmnTimerBoundaryEventXml">
+      <section id="bpmnCompensationHandlerGraphicalNotation">
       
-        <title>XML Representation</title>
-        
-        <para>
-          A timer boundary event is defined as a <link linkend="bpmnBoundaryEvent">regular boundary event</link>.
-          The specific type sub-element is in this case a <emphasis role="bold">timerEventDefinition</emphasis>
-          element.
-<programlisting>
-&lt;boundaryEvent id=&quot;escalationTimer&quot; cancelActivity=&quot;true&quot; attachedToRef=&quot;firstLineSupport&quot;&gt;
-   <emphasis role="bold">&lt;timerEventDefinition&gt;
-    &lt;timeDuration&gt;PT4H&lt;/timeDuration&gt;
-  &lt;/timerEventDefinition&gt;</emphasis>
-&lt;/boundaryEvent&gt;          
-</programlisting>
-
-        Please refer to <link linkend="timerEventDefinitions">timer event definition</link> for details on timer configuration.
-        </para>
-
-        <para>
-          In the graphical representation, the line of the circle is dotted as you can see in this example above:
-          
-          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.non.interrupting.boundary.timer.event.png"/></imageobject></mediaobject>
-          
-          A typical use case is sending an escalation email additionally but not interrupt the normal process flow.
-        </para>        
-<!-- 
-        <para>
-          Since BPMn 2.0 there is the difference between the interrupting and non interrupting timer event. The 
-          interrupting is the default. The non-interrupting leads to the original activity is <emphasis role="bold">not</emphasis>
-          interrupted but the activity stays there. Instead an additional executions is created and send over the
-          outgoing transition of the event. In the XML representation, the <emphasis>cancelActivity</emphasis> attribute
-          is set to false:
-<programlisting>
-&lt;boundaryEvent id=&quot;escalationTimer&quot; cancelActivity=&quot;false&quot; attachedToRef=&quot;firstLineSupport&quot;/&gt;
-</programlisting>
-        </para>
-         -->
-        
-        <para>
-          <emphasis role="bold">Note:</emphasis> boundary timer events are only fired when 
-          the job executor is enabled (i.e. <emphasis>jobExecutorActivate</emphasis>
-          needs to be set to <literal>true</literal> in the <literal>activiti.cfg.xml</literal>, since the job
-          executor is disabled by default). 
-        </para>
-      
-      </section>
-      
-      <section id="bpmnKnownIssueBoundaryEvent">
-    
-      <title>Known issue with boundary events</title>
-      
-      <para>
-        There is a known issue regarding concurrency when using boundary events of any type.
-        Currently, it is not possible to have multiple outgoing sequence flow attached to 
-        a boundary event (see issue <ulink url="http://jira.codehaus.org/browse/ACT-47">ACT-47</ulink>).
-        A solution to this problem is to use one outgoing sequence flow that goes to a parallel gateway.
-        <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.known.issue.boundary.event.png"/></imageobject></mediaobject>
-      </para>
-    
-    </section>
-		
-		</section> 
-		
-		<section id="bpmnBoundaryErrorEvent">
-		  <title>Error Boundary event</title>
-		  
-		  <section id="bpmnBoundaryErrorEventDescription">
-		    <title>Description</title>
-		    <para>
-		      An intermediate <emphasis>catching</emphasis> error on the boundary of an activity,
-		      or <emphasis role="bold">boundary error event</emphasis> for short, catches errors that are thrown within the scope
-		      of the activity on which it is defined.
-		    </para>
-		    
-		    <para>
-		      Defining a boundary error event makes most sense on an <link linkend="bpmnSubProcess">embedded subprocess</link>,
-		      or a <link linkend="bpmnCallActivity">call activity</link>, as a subprocess creates a scope for all activities inside the subprocess. 
-		      Errors are thrown by <link linkend="bpmnErrorEndEvent">error end events</link>. Such an error will propagate its
-		      parent scopes upwards until a scope is found on which a boundary error event is defined
-		      that matches the error event definition.
-		    </para>
-		    
-		    <para>
-		      When an error event is caught, the activity on which the boundary event is defined
-		      is destroyed, also destroying all current executions within
-		      (e.g. concurrent activities, nested subprocesses, etc.). Process execution continues
-		      following the outgoing sequence flow of the boundary event. 
-		    </para>
-		    
-		  </section>
-		  
-		  <section id="bpmnBoundaryErrorEventgraphicalNotation">
         <title>Graphical notation</title>
+        
         <para>
-          A boundary error event is visualized as a typical intermediate event (Circle with smaller circle inside)
-          on the boundary, with the error icon inside. The error icon is white, to indicate
-          the <emphasis>catch</emphasis> semantics.
-          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.error.event.png"/></imageobject></mediaobject>
+          If an activity is a compensation handler, the compensation event icon is displayed in the center bottom area. The following
+          excerpt from a process diagram shows a service task with an attached compensation boundary event which is associated to a 
+          compensation handler. Notice the compensation handler icon in the bottom canter area of the "cancel hotel reservation" service task
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.compensation.event.png"/></imageobject></mediaobject>
         </para>
+      
       </section>
       
-      <section id="bpmnBoundaryErrorEventXml">
+      <section id="bpmnCompensationHandlerXml">
+      
         <title>Xml representation</title>
-        <para>
-          A boundary error event is defined as a typical <link linkend="bpmnBoundaryEvent">boundary event</link>:
-          <programlisting>
-&lt;boundaryEvent id=&quot;catchError&quot; attachedToRef=&quot;mySubProcess&quot;&gt;
-  &lt;errorEventDefinition errorRef=&quot;myError&quot;/&gt;
-&lt;/boundaryEvent&gt;
-          </programlisting>
-          As with the <link linkend="bpmnErrorEndEvent">error end event</link>, the <emphasis>errorRef</emphasis>
-          references an error defined outside the process element:
-          <programlisting>
-&lt;error id=&quot;myError&quot; errorCode=&quot;123&quot; /&gt;
-...
-&lt;process id=&quot;myProcess&quot;&gt;  
-...              
-          </programlisting>
-        </para>
-        
-        <para>
-          The <emphasis role="bold">errorCode</emphasis> is used to match the errors that are caught:
-          <itemizedlist>
-            <listitem>
-              <para>
-                If <emphasis>errorRef</emphasis> is omitted, the boundary error event will catch
-                <emphasis role="bold">any error event</emphasis>, regardless of the errorCode of the <emphasis>error</emphasis>.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                In case an <emphasis>errorRef</emphasis> is provided and it references an existing <emphasis>error</emphasis>,
-                the boundary event will <emphasis role="bold">only catch errors with the same error code</emphasis>.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                In case an <emphasis>errorRef</emphasis> is provided, but no <emphasis>error</emphasis>
-                is defined in the BPMN 2.0 file, then the <emphasis role="bold">errorRef is used
-                as errorCode</emphasis> (similar for with error end events).
-              </para>
-            </listitem>
-          </itemizedlist>
-        </para>
+      	In order to declare an activity to be a compensation handler, we need to set the attribute <code>isForCompensation</code>
+      	to <code>true</code>:
+      	<programlisting>
+&lt;serviceTask id=&quot;undoBookHotel&quot; isForCompensation=&quot;true&quot; activiti:class=&quot;...&quot;&gt;
+&lt;/serviceTask&gt;</programlisting> 
       </section>
-      
-      <section id="bpmnBoundaryErrorEventExample">
-        <title>Example</title>
-        <para>
-          Following example process shows how an error end event can be used. When the 
-          <emphasis>'Review profitability'</emphasis> user task is completed by stating that
-          not enough information is provided, an error is thrown. When this error is caught on
-          the boundary of the subprocess, all active activities within the <emphasis>'Review sales lead'</emphasis>
-          subprocess are destroyed (even if <emphasis>'Review customer rating'</emphasis> was not yet completed),
-          and the <emphasis>'Provide additional details'</emphasis> user task is created.
-          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.boundary.error.example.png"/></imageobject></mediaobject>
-        </para>
-        
-        <para>
-          This process is shipped as example in the demo setup. The process XML and unit test can
-          be found in the <emphasis>org.activiti.examples.bpmn.event.error</emphasis> package.
-        </para>
-      </section>
-		  
-		</section>
+	</section>
+</section>    
+       	 <!-- 
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	  												Subprocesses
+	  
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+	   -->
+<section id="bpmnSubprocessAndCallActivity">
 
-        <section id="bpmnIntermediateCatchingEvent">
-
-          <title>Intermediate catching events</title>
-
-		  <para>
-		    All intermediate catching events events are defined in the same way:
-<programlisting>
-&lt;intermediateCatchEvent id=&quot;myIntermediateCatchEvent&quot; &gt;
-      &lt;XXXEventDefinition/&gt;
-&lt;/intermediateCatchEvent&gt;</programlisting>
-		  </para>
-
-		  <para>
-		    An intermediate catching event is defined with
-		    <itemizedlist>
-		      <listitem>
-		        <para>
-		          A unique identifier (process-wide)
-		        </para>
-		      </listitem>
-		      <listitem>
-		        <para>
-		          An XML sub-element of the form <emphasis>XXXEventDefinition</emphasis>
-		          (e.g. <emphasis>TimerEventDefinition</emphasis>, etc.)
-		          defining the type of the intermediate catching event. See the specific catching event types
-		          for more details.
-		        </para>
-		      </listitem>
-		    </itemizedlist>
-		  </para>
-
-        </section>
-
-        <section id="bpmnTimerIntermediateEvent">
-
-            <title>Timer intermediate catching event</title>
-
-            <section id="bpmnTimerIntermediateEventDescription">
-                <title>Description</title>
-
-        <para>
-          A timer intermediate event acts as a stopwatch. When an execution arrives
-          in catching event activity, a timer is started.
-          When the timer fires (e.g. after a specified interval), the sequence flow going out of the timer intermediate event is followed.
-        </para>
-
-            </section>
-
-            <section id="bpmnTimerIntermediateEventGraphicalNotation">
-
-              <title>Graphical Notation</title>
-
-              <para>
-                A timer intermediate event is visualized as a intermediate catching event, with the timer icon on the inside.
-                <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.intermediate.timer.event.png"/></imageobject></mediaobject>
-              </para>
-
-            </section>
-
-            <section id="bpmnTimerIntermediateEventXml">
-
-              <title>XML Representation</title>
-
-              <para>
-
-          A timer intermediate event is defined as a <link linkend="bpmnIntermediateCatchingEvent">intermediate catching event</link>.
-          The specific type sub-element is in this case a <emphasis role="bold">timerEventDefinition</emphasis>
-          element.
-                 <programlisting>
-        &lt;intermediateCatchEvent id=&quot;timer&quot;&gt;
-            <emphasis role="bold">&lt;timerEventDefinition&gt;
-                &lt;timeDuration&gt;PT5M&lt;/timeDuration&gt;
-            &lt;/timerEventDefinition&gt;</emphasis>
-        &lt;/intermediateCatchEvent&gt;
-                 </programlisting>
-              See <link linkend="timerEventDefinitions">timer event definitions</link> for configuration details.
-
-              </para>
-            </section>
-
-        </section>
+	<title>Subprocesses and Callactivities</title>    
 
 		<section id="bpmnSubProcess">
 		
@@ -4098,6 +5423,339 @@ public class MyTaskCreateListener implements TaskListener {
       </section>
 		
 		</section>
+		
+		<!-- ///////////////////////////////////////// event subprocess -->
+		
+		<section id="bpmnEventSubprocess">
+		
+		  <title>Event subprocess</title>
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		  
+		  <section id="bpmnEventSubprocessDescription">
+		  
+		    <title>Description</title>
+		    
+		    <para>
+		      The event subprocess is new in BPMN 2.0. An event subprocess is a subprocess that is triggered by an event. 
+		      An event subprocess can be added at the process level or at any subprocess level. The event used to trigger an event 
+		      subprocess is configured using a start event. From this, it follows that none start events are not supported for 
+		      event subprocesses. An event subprocess might be triggered using events lit message events, error events, signal events, 
+		      timer events, or compensation events.
+		      The subscription to the start event is created when the scope (process instance or subprocess) 
+		      hosting the event subprocess is created. The subscription is removed when the scope is destroyed. 	      
+		    </para>
+			
+			<para>
+				An event subprocess may be interrupting or non interrupting. An interrupting subprocess cancels any executions 
+				in the current scope. A non interrupting event subprocess spawns a new concurrent execution. While an interrupting 
+				event subprocess can only be triggered once for each activation of the scope hosting it, a non interrupting event subprocess
+				can be triggered multiple times. The fact whether the subprocess is interrupting is configured using the start event triggering the 
+				event subprocess.
+		   	</para>
+		   		   
+		   	<para>
+		   		An event subprocess must not have any incoming or outgoing sequence flows. Since an event subprocess is triggered
+		   		by an event, an incoming sequence flow makes no sense. When an event subprocess is ended, either the current scope is ended 
+		   		(in case of an interrupting event subprocess), or the concurrent execution spawned for the non-interrupting subprocess is ended.
+		   	</para>
+		   		   	
+		   	<para>
+		   		<emphasis role="bold">Current limitations:</emphasis>
+		   		<itemizedlist>
+		   			<listitem>
+		   				<para>
+		   					Activiti only supports interrupting event subprocesses.
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					Activiti only supports event subprocess triggered using an error start event.
+		   				</para>
+		   			</listitem>
+		   		</itemizedlist>
+		   	</para>
+		   	
+		  </section>
+		  
+		  <section id="bpmnEventSubprocessGraphicalNotation">
+      
+        <title>Graphical Notation</title>
+        
+        <para>
+          An event subprocess might be visualized as a an <link linkend="bpmnSubProcessGraphicalNotation">embedded subprocess</link> with a dotted outline.          
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.subprocess.eventSubprocess.png"/></imageobject></mediaobject>
+        </para>
+        
+      </section>
+      
+      <section id="bpmnEventSubprocessXMLRepresentation">
+      
+        <title>XML representation</title>
+        
+        <para>
+      		An event subprocess is represented using xml in the same way as a an <link linkend="bpmnSubProcessXMLRepresentation">embedded subprocess</link>.
+      		In addition the attribute <code>triggeredByEvent</code> must have the value <code>true</code>:
+<programlisting>
+&lt;subProcess id=&quot;eventSubProcess&quot; triggeredByEvent=&quot;true&quot;&gt;
+	...
+&lt;/subProcess&gt;
+</programlisting>      		 
+        </para>
+        
+      </section>
+
+      <section id="bpmnEventSubprocessExample">
+      
+        <title>Example</title>
+        
+        <para>
+  			The following is an example of an event subprocess triggered using an error start event. The event subprocess is located "at process level", i.e. is scoped to the process
+  			instance:
+  			<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.subprocess.eventSubprocess.example.1.PNG"/></imageobject></mediaobject>
+  			This is how the event subprocess would look like in XML:  			
+<programlisting>
+&lt;subProcess id=&quot;eventSubProcess&quot; triggeredByEvent=&quot;true&quot;&gt;
+	&lt;startEvent id=&quot;catchError&quot;&gt;
+		&lt;errorEventDefinition errorRef=&quot;error&quot; /&gt; 
+	&lt;/startEvent&gt;
+	&lt;sequenceFlow id=&quot;flow2&quot; sourceRef=&quot;catchError&quot; targetRef=&quot;taskAfterErrorCatch&quot; /&gt;
+	&lt;userTask id=&quot;taskAfterErrorCatch&quot; name=&quot;Provide additional data&quot; /&gt;
+&lt;/subProcess&gt;
+</programlisting> 
+        </para>
+        
+        <para>
+        	As already stated, an event subprocess can also be added to an embedded subprocess. If it is added to an embedded subprocess, it becomes an alternative to a
+        	boundary event. Consider the two following process diagrams. In both cases the embedded subprocess throws an error event. Both times the error is caught and 
+        	handled using a user task.          
+        	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.subprocess.eventSubprocess.example.2a.PNG"/></imageobject></mediaobject>
+        	<para>as opposed to:</para>
+        	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.subprocess.eventSubprocess.example.2b.PNG"/></imageobject></mediaobject>	
+        	 In both cases the same tasks are executed. However, there are differences between both modelling alternatives:
+        	<itemizedlist>
+        		<listitem>
+        			<para>
+        				The embedded subprocess is executed using the same execution which executed the scope it is hosted in. This means that an embedded subprocess has
+        				access to the variables local to it's scope. When using a boundary event, the execution created for executing the embedded subprocess is deleted
+        				by the sequence flow leaving the boundary event. This means that the variables created by the embedded subprocess are not available anymore.				
+        			</para>
+        		</listitem>
+        		<listitem>
+        			<para>
+        				When using an event subprocess, the event is completely handled by the subprocess it is added to. 
+        				When using a boundary event, the event is handled by the parent process.				
+        			</para>
+        		</listitem>
+        	</itemizedlist>
+        	These two differences can help you decide whether a boundary event or an embedded subprocess is better suited for solving a particular process modeling 
+        	/ implementation problem.
+        </para>              
+      </section>      
+    </section>
+    
+    
+    	<!-- ///////////////////////////////////////// transaction subprocess -->
+		
+		<section id="bpmnTransactionSubprocess">
+		
+		  <title>Transaction subprocess</title>
+		  
+		<link linkend="experimental">
+			<emphasis role="bold">[EXPERIMENTAL]</emphasis>
+		</link>
+		
+		  <section id="bpmnTransactionSubprocessDescription">
+		  
+		    <title>Description</title>
+		    
+		    <para>
+		      A transaction subprocess is an embedded subprocess, which can be used to group multiple activities to a transaction. 
+		      A transaction is a logical unit of work which allows to group a set of individual activities, 
+		      such that they either succeed or fail collectively.		      		      		      
+		    </para>
+		    
+		    <para>
+		    	<emphasis role="bold">Possible outcomes of a transaction:</emphasis>
+		    	A transaction can have three different outcomes:
+		    	<itemizedlist>
+		    		<listitem>
+		    			<para>
+		    				A transaction is <emphasis>successful</emphasis>, if it is neither cancelled not terminated by a hazard. If a transaction subprocess
+		    				is successful, it is left using the outgoing sequenceflow(s). A successful transaction might be compensated if a compensation
+		    				event is thrown later in the process.		    				
+							   	<para>
+							   		<emphasis role="bols">Note:</emphasis> just as "ordinary" embedded subprocesses, a transaction may be compensated 
+							   		after successful completion using an intermediary throwing compensation event. 
+							   	</para> 
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				A transaction is <emphasis>cancelled</emphasis>, if an execution reaches the cancel end event. In that case, all executions are 
+		    				terminated and removed. A single remaining execution is then set to the cancel boundary event, which triggers compensation.
+		    				After compensation is completed, the transaction subprocess is left using the outgoing sequence flow(s) of the cancel boundary event.		    				  
+		    			</para>
+		    		</listitem>
+		    		<listitem>
+		    			<para>
+		    				A transaction is ended by a <emphasis>hazard</emphasis>, if an error event is thrown, that is not caught within the scope of the 
+		    				transaction subprocess. (This also applies if the error is caught on the boundary of the transaction subprocess.)
+		    				In this case, compensation is not performed.
+		    			</para>
+		    		</listitem>
+		    	</itemizedlist>
+		    	The following diagram illustrates the three different outcomes:
+		    	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.transaction.subprocess.example.1.png"/></imageobject></mediaobject>		    	
+		    </para>
+		 			
+			<para>
+				<emphasis role="bold">Relation to ACID transactions:</emphasis> it is important not to confuse the bpmn transaction subprocess with 
+				technical (ACID) transactions. The bpmn transaction subprocess is not a way to scope technical transactions.
+				In order to understand transaction management in activiti, read the section on 
+				<link linkend="bpmnConcurrencyAndTransactions">concurrency and transactions</link>.
+		   		A bpmn transaction is different from a technical transaction in the following ways:
+		   		<itemizedlist>
+		   			<listitem>
+		   				<para>
+		   					While an ACID transaction is typically short lived, a bpmn transaction may take hours, days or even months 
+		   					to complete. (Consider the case where one of the activities grouped by a transaction is a usertask, 
+		   					typically people have longer response times than applications. Or, in another situation, a bpmn transaction might wait 
+		   					for some business event to occur, like the fact that a particular order has been fulfilled.) Such operations
+		   					usually take considerably longer to complete than updating a record in a database, or storing a message using 
+		   					a transactional queue.  
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					Because it is impossible to scope a technical transaction to the duration of a business activity, a bpmn transaction typically 
+		   					spans multiple ACID transactions.
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					Since a bpmn transaction spans multiple ACID transactions, we loose ACID properties. For example, consider the example given above.
+		   					Let's assume the "book hotel" and the "charge credit card" operations are performed in separate ACID transactions. Let's also assume that 
+		   					the "book hotel" activity is successful. Now we have an intermediary inconsistent state, because we have performed an hotel booking but have 
+		   					not yet charged the credit card. Now, in an ACID transaction, we would also perform different operations sequentially and thus also have an 
+		   					intermediary inconsistent state. What is different here, is that the inconsistent state is visible outside of the scope of the transaction. 
+		   					For example, if the reservations are made using an external booking service, other parties using the same booking service might already see that 
+		   					the hotel is booked. This means, that when implementing business transactions, we completely loose the isolation property (Granted: we usually also 
+		   					relax isolation when working with ACID transactions to allow for higher levels of concurrency, but there we have fine grained control and intermediary 
+		   					inconsistencies are only present for very short periods of times). 		   					  		   				   
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					A bpmn business transaction can also not be rolled back in the traditional sense. Since it spans multiple ACID transactions, some of these ACID 
+		   					transactions might already be committed at the time the bpmn transaction is cancelled. At this point, they cannot be rolled back anymore. 
+		   				</para>
+		   			</listitem>		   			
+		   		</itemizedlist>
+		   	</para>
+		   	
+		   	<para>
+		   		Since bpmn transactions are long-running in nature, the lack of isolation and a rollback mechanism need to be dealt with differently. In practice, there is usually 
+		   		no better solution than to deal with these problems in a domain specific way:
+		   		<itemizedlist>
+		   			<listitem>
+		   				<para>
+		   					The rollback is performed using compensation. If a cancel event is thrown in the scope of a transaction, the effects of all activities that executed 
+		   					successfully and have a compensation handler are compensated. 		   				
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					The lack of isolation is also often dealt with using domain specific solutions. For instance, in the example above, an hotel room might appear to be
+		   					booked to a second customer, before we have actually made sure that the first customer can pay for it. Since this might be undesirable from a business 
+		   					perspective, a booking service might choose to allow for a certain amount of overbooking.
+		   				</para>
+		   			</listitem>
+		   			<listitem>
+		   				<para>
+		   					In addition, since the transaction can be aborted in case of a hazard, the booking service has to deal with the situation where a hotel room is booked 
+		   					but payment is never attempted (since the transaction was aborted). In that case the booking service might choose a strategy where a hotel room is
+		   					reserved for a maximum period of time and if payment is not received until then, the booking is cancelled. 
+		   				</para>
+		   			</listitem>
+		   		</itemizedlist>
+		   		To sum it up: while ACID transactions offer a generic solution to such problems (rollback, isolation levels and heuristic outcomes), 
+		   		we need to find domain specific solutions to these problems when implementing business transactions. 
+		   	</para>
+		   			   		   		   		   	
+		   	<para>
+		   		<emphasis role="bold">Current limitations:</emphasis>
+		   		<itemizedlist>
+		   			<listitem>
+		   				<para>
+		   					The bpmn specification requires that the process engine reacts to events issued by the underlying transaction protocol 
+		   					and for instance that a transaction is cancelled, if a cancel event occurs in the underlying protocol.
+		   					As an embeddable engine, activiti does currently not support this. (For some ramifications of this, see paragraph on consistency below.)		   					
+		   				</para>
+		   			</listitem>		   			
+		   		</itemizedlist>
+		   	</para>
+		   	
+		   	<para>
+		   		<emphasis role="bold">Consistency on top of ACID transactions and optimistic concurrency:</emphasis>
+		   		A bpmn transaction guarantees consistency in the sense that either all activities compete successfully, or if some activity 
+		   		cannot be performed, the effects of all other successful activities are compensated. So either way we end up in a consistent 
+		   		state. However, it is important to recognize that in activiti, the consistency model for bpmn transactions is superposed 
+		   		on top of the consistency model for process execution. 
+		   		Activiti executes processes in a transactional way. Concurrency is addressed using optimistic
+		   		locking. In activiti, bpmn error, cancel and compensation events 
+		   		are built on top of the same acid transactions and optimistic locking. For example, a cancel end event can only trigger compensation 
+		   		if it is actually reached. It is not reached if some undeclared exception is thrown by a service task before. Or, the 
+		   		effects of a compensation handler can not be committed if some other participant in the underlying ACID transaction 
+		   		sets the transaction to the state rollback-only. Or, when two concurrent executions reach a cancel end event, compensation 
+		   		might be triggered twice and fail with an optimistic locking exception. All of this is to say that when implementing 
+		   		bpmn transactions in activiti, the same set of rules apply as when implementing "ordinary" processes and subprocesses.
+		   		So to effectively guarantee consistency, it is important to implement processes in a way that does take the optimistic, transactional 
+		   		execution model into consideration.		   		 
+		   	</para>
+		   	
+		  </section>
+		  
+		  <section id="bpmnEventSubprocessGraphicalNotation">
+      
+        <title>Graphical Notation</title>
+        
+        <para>
+          An transaction subprocess might be visualized as a an <link linkend="bpmnSubProcessGraphicalNotation">embedded subprocess</link> with a double outline.          
+          <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.transaction.subprocess.png"/></imageobject></mediaobject>
+        </para>
+        
+      </section>
+      
+      <section id="bpmnEventSubprocessXMLRepresentation">
+      
+        <title>XML representation</title>
+        
+        <para>
+      		A transaction subprocess is represented using xml using the  <code>transaction</code> tag:
+<programlisting>
+&lt;transaction id=&quot;myTransaction&quot; &gt;
+	...
+&lt;/transaction&gt;
+</programlisting>      		 
+        </para>
+        
+      </section>
+
+      <section id="bpmnEventSubprocessExample">
+      
+        <title>Example</title>
+        
+        <para>
+        	The following is an example of a transaction subprocess:
+        	<mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.transaction.subprocess.example.2.png"/></imageobject></mediaobject>
+        </para>
+      
+      </section>      
+    </section>
+		
+		<!-- ///////////////////////////////////////// call activity -->
 		
 		<section id="bpmnCallActivity">
 		
@@ -4234,10 +5892,22 @@ public class MyTaskCreateListener implements TaskListener {
         </para>
       
       </section>
-		
-		</section>
+      
+    </section>
+    
+</section>
+    
+    
+    
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////    
+     -->
+    
+<section id="bpmnConcurrencyAndTransactions">
 
-	</section>
+	<title>Transactions and Concurrency</title>    
+	
 	<section id="asyncContinuations">
       
         <title>Asynchronous Continuations</title>
@@ -4287,6 +5957,113 @@ public class MyTaskCreateListener implements TaskListener {
     <para>
         On a userTask, receiveTask or other wait states, the async continuation allows us to execute the start execution listeners in a separate thread/transaction.
     </para>
-        
+    
 	</section>
+	<section id="exclusiveJobs">
+      
+        <title>Exclusive Jobs</title>
+        
+        Since activiti 5.9, the JobExecutor makes sure that jobs from a single process instance are never executed concurrently. Why is this?
+        
+        <section>
+        	<title>Why exclusive Jobs?</title>
+        
+                
+	        <para> Consider the following process definition:</para>
+	        
+	        <mediaobject><imageobject><imagedata align="center" fileref="images/bpmn.why.exclusive.jobs.png"/></imageobject></mediaobject>
+	                
+	        <para>We have a parallel gateway followed by three service tasks which all perform an asynchronous continuation. As a result of this, three jobs are added to the database.
+	        Once such a job is present in the database it can be processes by the JobExecutor. The JobExecutor acquires the jobs and delegates them to a thread pool of worker threads 
+	        which actually process the jobs. This means that using an asynchronous continuation, you can distribute the work to this thread pool (and in a clustered scenario even 
+	        across multiple thread pools in the cluster). This is usually a good thing. However it also bears an inherent problem: consistency. Consider the parallel join after the service
+	        tasks. When execution of a service tasks is completed, we arrive at the parallel join and need to decide whether to wait for the other executions or whether we can move forward. 
+	        That means, for each branch 
+	        arriving at the parallel join, we need to take a decision whether we can continue or whether we need to wait for one or more other executions on the other branches.</para> 
+	        
+	        <para>
+	        Why is this a problem? Since the service tasks are configured using an asynchronous continuation, it is possible that the corresponding jobs are all acquired at the same time and 
+	        delegated to different worker threads by the JobExecutor. The consequence is that the transactions in which the services are executed and in which the 3 individual executions arrive
+	        at the parallel join can overlap. And if they do so, each individual transaction will not "see", that another transaction is arriving at the same parallel join concurrently and 
+	        thus assume that it has to wait for the others. However, if each transaction assumes that it has to wait for the other ones, none will continue the process after the parallel 
+	        join and the process instance will remain in that state forever.    
+	         </para>
+	         
+	         <para>
+	         How does activiti address this problem? Activiti performs optimistic locking. Whenever we take a decision based on data that might not be current (because another 
+	         transaction might modify it before we commit, we make sure to increment the version of the same database row in both transactions). This way, whichever transaction commits first wins 
+	         and the other ones fail with an optimistic locking exception. This solves the problem in the case of the process discussed above: if multiple executions arrive at the parallel join 
+	         concurrently, they all assume that they have to wait, increment the version of their parent execution (the process instance) and then try to commit. Whichever execution is first will 
+	         be able to commit and the other ones will fail with an optimistic locking exception. Since the executions are triggered by a job, activiti will retry to perform the same job after waiting
+	         for a certain amount of time and hopefully this time pass the synchronizing gateway.            
+	         </para>
+	         
+	         <para>
+	         Is this a good solution? As we have seen, optimistic locking allows activiti to prevent inconsistencies. It makes sure that we do not "keep stuck at the joining gateway", meaning: either 
+	         all executions have passed the gateway or, there are jobs in the database making sure that we retry passing it. However, while this is a perfectly fine solution from the point of view 
+	         of persistence and consistency, this might not always be desirable behavior at an higher level: 
+	         
+	          <itemizedlist>
+			      <listitem>
+			        <para>
+			          Activiti will retry the same job for a fixed maximum number of times only ('3' in the default configuration). After that, the job will still be present in the database but not be retried 
+			          actively anymore. That means that an operator would need to trigger the job manually.
+			        </para>
+			      </listitem>
+			      <listitem>
+			        <para>
+			          If a job has non-transactional side effects, those will not be rolled back by the failing transaction. For instance, if the "book concert tickets" service does not 
+			          share the same transaction as activiti, we might book multiple tickets if we retry the job. 
+			        </para>
+			      </listitem>
+			    </itemizedlist>         
+	           
+	         </para>
+	         In activiti 5.9 we thus introduced a concept which was already present in jbpm4 we call 'exclusive jobs'.
+	         
+         </section>
+         <section>
+        	<title>What are exclusive Jobs?</title>
+        	<para>
+        		An exclusive job cannot be performed at the same time as another exclusive job from the same process instance. Consider the process shown above: if we declare the service tasks to be exclusive,
+        	 	the JobExecutor will make sure that the corresponding jobs are not executed concurrently. Instead, it will make sure that whenever it acquires an exclusive job from a certain process instance, 
+        	 	it acquires all other exclusive jobs from the same process instance and delegates them to the same worker thread. This ensures sequential execution execution of the jobs.           	 	
+        	</para>
+        		
+        	<para>
+        		How can I enable this feature? Since activiti 5.9, exclusive jobs are the default configuration. All asynchronous continuations and timer events are thus exclusive by default. In addition, if you want a 
+        		job to be non-exclusive, you can configure it as such using <code>activiti:exclusive="false"</code>. For example, the following servicetask would be asynchronous but non-exclusive.
+        		
+        		<programlisting>
+&lt;serviceTask id=&quot;service&quot; activiti:expression=&quot;${myService.performBooking(hotel, dates)}&quot; activiti:async=&quot;true&quot; activiti:exclusive=&quot;false&quot; /&gt;        		
+        		</programlisting>
+        	</para>
+        	
+        	<para>
+        		Is this a good solution?
+        		We had some people asking whether this was a good solution. Their concern was that this would to prevent you from "doing things" in parallel and would thus be a performance problem.
+        		Again, two things have to be taken into consideration: 
+        		  <itemizedlist>
+			      <listitem>
+			        <para>
+			          It can be turned off if you are an expert and know what you are doing (and have understood the section named "Why exclusive Jobs?"). Other than that, it is more intuitive 
+			          for most users if things like asynchronous continuations and timers just work.
+			        </para>
+			      </listitem>
+			      <listitem>
+			        <para>
+			          It is actually not a performance issue. Performance is an issue under heavy load. Heavy load means that all worker threads of the job executor are busy all the time.
+			          With exclusive jobs, activiti will simply distribute the load differently. Exclusive jobs means that jobs from a single process instance are performed by the same
+			          thread sequentially. But consider: you have more than one single process instance.
+			          And jobs from other process instances are delegated to other threads and executed concurrently. 
+			          This means that with exclusive jobs activiti will not execute jobs from the same process instance concurrently but it will still execute multiple instances concurrently. 
+			          From an overall throughput perspective this is desirable in most scenarios as it usually leads to individual instances being done more quickly.    
+			        </para>
+			      </listitem>
+			    </itemizedlist>
+			             
+        	</para>
+        </section>
+      </section>
+	</section>	
 </chapter>

@@ -28,9 +28,10 @@ import org.activiti.engine.impl.cmd.GetExecutionVariablesCmd;
 import org.activiti.engine.impl.cmd.GetStartFormCmd;
 import org.activiti.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.activiti.engine.impl.cmd.SignalCmd;
+import org.activiti.engine.impl.cmd.SignalEventReceivedCmd;
+import org.activiti.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.activiti.engine.impl.cmd.StartProcessInstanceCmd;
 import org.activiti.engine.impl.cmd.SuspendProcessInstanceCmd;
-import org.activiti.engine.runtime.EventSubscriptionQuery;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
@@ -81,10 +82,6 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new ExecutionQueryImpl(commandExecutor);
   }
   
-  public EventSubscriptionQuery createEventSubscriptionQuery() {
-    return new EventSubscriptionQueryImpl(commandExecutor);
-  }
-
   public Map<String, Object> getVariables(String executionId) {
     return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
   }
@@ -135,8 +132,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
   }
 
-  public void signal(String activityInstanceId) {
-    commandExecutor.execute(new SignalCmd(activityInstanceId, null, null));
+  public void signal(String executionId) {
+    commandExecutor.execute(new SignalCmd(executionId, null, null, null));
+  }
+  
+  public void signal(String executionId, Map<String, Object> processVariables) {
+    commandExecutor.execute(new SignalCmd(executionId, null, null, processVariables));
   }
 
   public ProcessInstanceQuery createProcessInstanceQuery() {
@@ -158,5 +159,35 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public void activateProcessInstanceById(String processInstanceId) {
     commandExecutor.execute(new ActivateProcessInstanceCmd(processInstanceId));
   }
+  
+  public ProcessInstance startProcessInstanceByMessage(String messageName) {
+    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName,null, null));
+  }
+  
+  public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables) {
+    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, null, processVariables));
+  }
+  
+  public ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
+    return commandExecutor.execute(new StartProcessInstanceByMessageCmd(messageName, businessKey, processVariables));
+  }
+
+  public void signalEventReceived(String signalName) {
+    commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, null));
+  }
+
+  public void signalEventReceived(String signalName, Map<String, Object> processVariables) {
+    commandExecutor.execute(new SignalEventReceivedCmd(signalName, null, processVariables));
+  }
+
+  public void signalEventReceived(String signalName, String executionId) {
+    commandExecutor.execute(new SignalEventReceivedCmd(signalName, executionId, null));
+  }
+
+  public void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables) {
+    commandExecutor.execute(new SignalEventReceivedCmd(signalName, executionId, processVariables));
+  }
+  
+  
    
 }

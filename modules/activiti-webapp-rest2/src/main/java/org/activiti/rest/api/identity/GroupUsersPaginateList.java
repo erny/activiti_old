@@ -27,9 +27,9 @@ public class GroupUsersPaginateList extends AbstractPaginateList {
   @SuppressWarnings("rawtypes")
   @Override
   protected List processList(List list) {
-    List<UserResponse> responseList = new ArrayList<UserResponse>();
+    List<UserInfo> responseList = new ArrayList<UserInfo>();
     for (Object definition : list) {
-      UserResponse response = new UserResponse((User) definition);
+      UserInfo response = new UserInfo((User) definition);
       responseList.add(response);
     }
     return responseList;

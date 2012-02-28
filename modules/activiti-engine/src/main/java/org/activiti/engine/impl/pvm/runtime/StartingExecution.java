@@ -11,28 +11,24 @@
  * limitations under the License.
  */
 
-package org.activiti.engine.runtime;
+package org.activiti.engine.impl.pvm.runtime;
 
-import org.activiti.engine.query.Query;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 
 
 /**
  * @author Daniel Meyer
  */
-public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, EventSubscription> {
+public class StartingExecution {
   
-  EventSubscriptionQuery eventSubscriptionId(String id);
-  
-  EventSubscriptionQuery eventName(String eventName);
-  
-  EventSubscriptionQuery executionId(String executionId);
-  
-  EventSubscriptionQuery processInstanceId(String processInstanceId);
-  
-  EventSubscriptionQuery activityId(String activityId);
-  
-  EventSubscriptionQuery eventType(String eventType);
-    
-  EventSubscriptionQuery orderByCreated();
+  protected final ActivityImpl selectedInitial;
+
+  public StartingExecution(ActivityImpl selectedInitial) {
+    this.selectedInitial = selectedInitial;
+  }
+
+  public ActivityImpl getInitial() {
+    return selectedInitial;
+  }
   
 }

@@ -44,6 +44,7 @@ public class SecuredResource extends ServerResource {
       return false;
     
     } else if(group == null) {
+      ActivitiUtil.getIdentityService().setAuthenticatedUserId(loggedInUser);
       return true;
     
     } else {
@@ -53,6 +54,7 @@ public class SecuredResource extends ServerResource {
         for (Group groupObject : groupList) {
           if(groupObject.getId().equals(group)) {
             allowed = true;
+            ActivitiUtil.getIdentityService().setAuthenticatedUserId(loggedInUser);
             break;
           }
         }

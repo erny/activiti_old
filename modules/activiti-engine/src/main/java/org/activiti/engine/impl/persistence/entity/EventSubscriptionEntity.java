@@ -26,12 +26,11 @@ import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.util.ClockUtil;
-import org.activiti.engine.runtime.EventSubscription;
 
 /**
  * @author Daniel Meyer
  */
-public abstract class EventSubscriptionEntity implements PersistentObject, EventSubscription {
+public abstract class EventSubscriptionEntity implements PersistentObject {
 
   // persistent state ///////////////////////////
   protected String id;
@@ -50,13 +49,15 @@ public abstract class EventSubscriptionEntity implements PersistentObject, Event
   
   /////////////////////////////////////////////
   
-  public EventSubscriptionEntity() { }
+  public EventSubscriptionEntity() { 
+    this.created = ClockUtil.getCurrentTime();
+  }
 
   public EventSubscriptionEntity(ExecutionEntity executionEntity) {
+    this();
     setExecution(executionEntity);
     setActivity(execution.getActivity());
-    this.processInstanceId = executionEntity.getProcessDefinitionId();
-    this.created = ClockUtil.getCurrentTime();
+    this.processInstanceId = executionEntity.getProcessInstanceId();
   }
   
   // processing /////////////////////////////

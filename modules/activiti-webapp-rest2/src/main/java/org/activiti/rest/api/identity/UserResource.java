@@ -31,7 +31,7 @@ public class UserResource extends SecuredResource {
   }
 
   @Get
-  public UserResponse getUser() {
+  public UserInfo getUser() {
     if(authenticate() == false) return null;
     
     String userId = (String) getRequest().getAttributes().get("userId");
@@ -39,32 +39,8 @@ public class UserResource extends SecuredResource {
       throw new ActivitiException("No userId provided");
     }
     User user = ActivitiUtil.getIdentityService().createUserQuery().userId(userId).singleResult();
-    UserResponse response = new UserResponse(user);
+    UserInfo response = new UserInfo(user);
     return response;
   }
 
-  @Put()
-  public StateResponse createUser(UserInfo userInfo){
-    if(authenticate() == false) return null;
-
-    IdentityService identityService = ActivitiUtil.getIdentityService();
-
-    String userId = userInfo.getUserId();
-
-    if( userId == null) {
-      throw new ActivitiException("No user id supplied");
-    }
-
-    if (identityService.createUserQuery().userId(userId).count() == 0) {
-      User user = identityService.newUser(userId);
-      user.setFirstName(userInfo.getFirstName());
-      user.setLastName(userInfo.getLastName());
-      user.setPassword(userInfo.getPassword());
-      user.setEmail(userInfo.getEmail());
-      identityService.saveUser(user);
-    }else{
-      throw new ActivitiException("user id must be unique");
-    }
-    return new StateResponse().setSuccess(true);
-  }
 }

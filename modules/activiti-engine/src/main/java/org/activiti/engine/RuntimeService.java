@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.EventSubscriptionQuery;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
@@ -29,6 +28,7 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Daniel Meyer
  */
 public interface RuntimeService {
   
@@ -149,6 +149,75 @@ public interface RuntimeService {
    * @throws ActivitiException when no process definition is deployed with the given key. 
    */
   ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new 
+   * {@link ProcessInstance}.</p>
+   * 
+   * <p>Calling this method can have two different outcomes:
+   * <ul>
+   * <li>If the message name is associated with a message start event, a new
+   * process instance is started.</li>
+   * <li>If no subscription to a message with the given name exists, {@link ActivitiException}
+   * is thrown</li>
+   * </ul>
+   * </p>
+   *  
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element.
+
+   * @return the {@link ProcessInstance} object representing the started process instance
+   * 
+   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * 
+   * @since 5.9
+   */
+  ProcessInstance startProcessInstanceByMessage(String messageName);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new 
+   * {@link ProcessInstance}.</p>
+   * 
+   * See {@link #startProcessInstanceByMessage(String)}. In addition, this method allows 
+   * specifying a the payload of the message as a map of process variables.
+   *  
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element.
+   * @param processVariables
+   *          the 'payload' of the message. The variables are added as processes
+   *          variables to the started process instance.
+   * @return the {@link ProcessInstance} object representing the started process instance
+   * 
+   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * 
+   * @since 5.9
+   */
+  ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
+  
+  /**
+   * <p>Signals the process engine that a message is received and starts a new 
+   * {@link ProcessInstance}.</p>
+   * 
+   * See {@link #startProcessInstanceByMessage(String, Map)}. In addition, this method allows 
+   * specifying a business key.
+   *  
+   * @param messageName
+   *          the 'name' of the message as specified as an attribute on the
+   *          bpmn20 {@code <message name="messageName" />} element.
+   * @param businessKey
+   *          the business key which is added to the started process instance 
+   * @param processVariables
+   *          the 'payload' of the message. The variables are added as processes
+   *          variables to the started process instance.
+   * @return the {@link ProcessInstance} object representing the started process instance
+   * 
+   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * 
+   * @since 5.9
+   */
+  ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
 
   /** Delete an existing runtime process instance.
    * @param processInstanceId id of process instance to delete, cannot be null.
@@ -169,6 +238,15 @@ public interface RuntimeService {
    * @throws ActivitiException when no execution is found for the given executionId. 
    */
   void signal(String executionId);
+  
+  /** Sends an external trigger to an activity instance that is waiting inside the given execution.
+   * @param executionId id of execution to signal, cannot be null.
+   * @param processVariables a map of process variables
+   * @throws ActivitiException when no execution is found for the given executionId. 
+   */
+  void signal(String executionId, Map<String, Object> processVariables);
+  
+  // Variables ////////////////////////////////////////////////////////////////////
   
   /** All variables visible from the given execution scope (including parent scopes).
    * @param executionId id of execution, cannot be null.
@@ -242,9 +320,7 @@ public interface RuntimeService {
    * @throws ActivitiException when no execution is found for the given executionId. */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
 
-
-  
-  
+  // Queries ////////////////////////////////////////////////////////
   
   /** Creates a new {@link ExecutionQuery} instance, 
    * that can be used to query the executions and process instances. */
@@ -256,12 +332,8 @@ public interface RuntimeService {
    */
   ProcessInstanceQuery createProcessInstanceQuery();
   
-  /**
-   * Creates a new {@link EventSubscriptionQuery} instance, that can be used
-   * to query event subscriptions.
-   */
-  EventSubscriptionQuery createEventSubscriptionQuery();
-  
+  // Process instance state //////////////////////////////////////////
+    
   /**
    * Suspends the process instance with the given id. 
    * 
@@ -287,5 +359,64 @@ public interface RuntimeService {
    */
   void activateProcessInstanceById(String processInstanceId);
   
+  // Events ////////////////////////////////////////////////////////////////////////
   
+  /**
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. This method delivers the signal to all executions waiting on
+   * the signal.<p/> 
+   * 
+   * <strong>NOTE:</strong> The waiting executions are notified synchronously. 
+   * 
+   * @param signalName
+   *          the name of the signal event
+   */
+  void signalEventReceived(String signalName);
+  
+  /**
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. This method delivers the signal to all executions waiting on
+   * the signal.<p/>
+   * 
+   * <strong>NOTE:</strong> The waiting executions are notified synchronously.
+   * 
+   * @param signalName
+   *          the name of the signal event
+   * @param processVariables
+   *          a map of variables added to the execution(s)
+   */
+  void signalEventReceived(String signalName, Map<String, Object> processVariables);
+  
+  /**
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. This method delivers the signal to a single execution, being the 
+   * execution referenced by 'executionId'. 
+   * The waiting execution is notified synchronously.
+   * 
+   * @param signalName
+   *          the name of the signal event
+   * @param executionId
+   *          the id of the execution to deliver the signal to
+   * @throws ActivitiException if no such execution exists or if the execution 
+   *          has not subscribed to the signal
+   */
+  void signalEventReceived(String signalName, String executionId);  
+  
+  /**
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. This method delivers the signal to a single execution, being the 
+   * execution referenced by 'executionId'. 
+   * The waiting execution is notified synchronously.
+   * 
+   * @param signalName
+   *          the name of the signal event
+   * @param executionId
+   *          the id of the execution to deliver the signal to
+   * @param processVariables
+   *          a map of variables added to the execution(s)
+   * @throws ActivitiException if no such execution exists or if the execution 
+   *          has not subscribed to the signal
+   */
+  void signalEventReceived(String signalName, String executionId, Map<String, Object> processVariables);
+   
 }

@@ -88,8 +88,6 @@ public class SubProcessTest extends PluggableActivitiTestCase {
   @Deployment
   public void IGNORE_testSimpleSubProcessWithConcurrentTimer() {
     
-    Date startTime = new Date();
-    
     // After staring the process, the task in the subprocess should be active
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessWithConcurrentTimer");
     TaskQuery taskQuery = taskService
@@ -300,7 +298,7 @@ public class SubProcessTest extends PluggableActivitiTestCase {
   @Deployment
   public void testTwoNestedSubProcessesInParallelWithTimer() {
     
-    Date startTime = new Date();
+//    Date startTime = new Date();
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedParallelSubProcessesWithTimer");
     TaskQuery taskQuery = taskService
@@ -336,6 +334,24 @@ public class SubProcessTest extends PluggableActivitiTestCase {
   @Deployment
   public void testNestedSimpleSubProcessWithoutEndEvent() {
     testNestedSimpleSubProcess();
+  }
+
+  /**
+   * @see http://jira.codehaus.org/browse/ACT-1072
+   */
+  @Deployment
+  public void testSimpleSubProcessWithoutEndEvent() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSimpleSubProcessWithoutEndEvent");
+    assertProcessEnded(pi.getId());
+  }
+
+  /**
+   * @see http://jira.codehaus.org/browse/ACT-1072
+   */
+  @Deployment
+  public void testNestedSubProcessesWithoutEndEvents() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testNestedSubProcessesWithoutEndEvents");
+    assertProcessEnded(pi.getId());
   }
 
 }

@@ -23,6 +23,11 @@ import org.activiti.engine.impl.util.xml.Element;
 import org.activiti.engine.impl.variable.VariableDeclaration;
 
 /**
+ * Listener which can be registered within the engine to receive events during parsing (and
+ * maybe influence ist). Instead of implmenting this interface you migh consider to extend 
+ * the {@link AbstractBpmnParseListener}, which contains an empty implementation for all methods
+ * and makes your implementation easier and more robust to future changes.
+ * 
  * @author Tom Baeyens
  * @author Falko Menge
  * @author Joram Barrez
@@ -57,5 +62,6 @@ public interface BpmnParseListener {
   void parseEventBasedGateway(Element eventBasedGwElement, ScopeImpl scope, ActivityImpl activity);
   void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity);
   void parseCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl compensationActivity);
+  void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity);
 
 }
