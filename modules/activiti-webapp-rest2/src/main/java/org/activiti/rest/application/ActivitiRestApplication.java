@@ -40,6 +40,7 @@ import org.activiti.rest.api.process.ProcessInstanceDiagramResource;
 import org.activiti.rest.api.process.ProcessInstanceResource;
 import org.activiti.rest.api.process.ProcessInstancesResource;
 import org.activiti.rest.api.process.ProcessInstanceTaskResource;
+import org.activiti.rest.api.process.ProcessInstanceVariablesResource;
 import org.activiti.rest.api.process.StartProcessInstanceResource;
 import org.activiti.rest.api.repository.DeploymentArtifactResource;
 import org.activiti.rest.api.repository.DeploymentArtifactsResource;
@@ -122,7 +123,7 @@ public class ActivitiRestApplication extends Application {
     router.attach("/process-definitions", ProcessDefinitionsResource.class);
     router.attach("/process-instances", ProcessInstancesResource.class);
     router.attach("/process-instance", StartProcessInstanceResource.class);
-    router.attach("/process-instance/{processInstanceId}/variables", ProcessInstanceResource.class);
+    router.attach("/process-instance/{processInstanceId}/variables", ProcessInstanceVariablesResource.class);
     router.attach("/processInstance/{processInstanceId}", ProcessInstanceResource.class);
     router.attach("/processInstance/{processInstanceId}/diagram", ProcessInstanceDiagramResource.class);
     router.attach("/processInstance/{processInstanceId}/tasks", ProcessInstanceTaskResource.class);
