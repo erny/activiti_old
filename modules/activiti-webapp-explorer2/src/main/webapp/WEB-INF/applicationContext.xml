@@ -43,6 +43,7 @@
   	<property name="databaseSchemaUpdate" value="true" />
   	<property name="jobExecutorActivate" value="true" />
     <property name="customFormTypes">
+    <property name="history" value="full" />
       <list>
         <ref bean="userFormType"/>
       </list>

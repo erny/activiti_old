@@ -35,6 +35,7 @@
     <property name="mailServerPort" value="5025" />
     <property name="jobExecutorActivate" value="true" />
     <property name="dbCycleUsed" value="true" />
+    <property name="history" value="full" />
   </bean>
 
   <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">

@@ -30,6 +30,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <property name="mailServerHost" value="localhost" />
     <property name="mailServerPort" value="5025" />
     <property name="jobExecutorActivate" value="true" />
+    <property name="history" value="full" />
   </bean>
 
   <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
