@@ -43,6 +43,9 @@
 
     <properties>
         <activiti.osgi.import.pkg>*</activiti.osgi.import.pkg>
+        <activiti.osgi.import.additional>
+          org.apache.camel;resolution:=optional,
+      	</activiti.osgi.import.additional>
         <activiti.artifact>
             org.activiti.camel
         </activiti.artifact>
