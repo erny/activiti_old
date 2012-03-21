@@ -69,6 +69,11 @@
         <version>1.4</version>
       </dependency>
       <dependency>
+        <groupId>commons-httpclient</groupId>
+        <artifactId>commons-httpclient</artifactId>
+        <version>3.1</version>
+      </dependency>
+      <dependency>
         <!-- required by Apache commons httpclient, required by restlet -->
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
@@ -168,6 +173,12 @@
       <dependency>
         <groupId>org.activiti</groupId>
         <artifactId>activiti-cxf</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <!-- Tangram -->
+      <dependency>
+        <groupId>es.tangrambpm.activiti</groupId>
+        <artifactId>tangram-addons</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

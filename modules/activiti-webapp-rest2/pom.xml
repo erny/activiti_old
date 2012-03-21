@@ -54,6 +54,11 @@
       <groupId>org.activiti</groupId>
       <artifactId>activiti-spring</artifactId>
     </dependency>
+    <!-- Tangram -->
+    <dependency>
+      <groupId>es.tangrambpm.activiti</groupId>
+      <artifactId>tangram-addons</artifactId>
+    </dependency>
     <!-- Database -->
     <dependency>
       <groupId>com.h2database</groupId>
