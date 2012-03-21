@@ -66,13 +66,13 @@ public class WebClient implements JavaDelegate
             client.executeMethod(method);
             result = method.getResponseBodyAsString();
             status = "" + method.getStatusCode();
-            exe.setVariable("http_result", result);
-            exe.setVariable("http_status", status);
         } catch (Exception e) {
             status = "ERROR";
             result = e.getMessage();
         } finally {
             method.releaseConnection();
+            exe.setVariable("http_result", result);
+            exe.setVariable("http_status", status);
         }
     }
     
