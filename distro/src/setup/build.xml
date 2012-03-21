@@ -388,13 +388,6 @@ set JAVA_OPTS=%JAVA_OPTS% @tomcat.java.opts@
   	</propertyfile>
   	
   	<!-- Activiti Rest -->
-    <propertyfile file="${activiti.home}/setup/build/webapps/activiti-rest.war/WEB-INF/classes/db.properties">
-      <entry key="db" value="${db}" />
-        <entry key="jdbc.driver" value="${jdbc.driver}" />
-      <entry key="jdbc.url" value="${jdbc.url}" />
-        <entry key="jdbc.username" value="${jdbc.username}" />
-      <entry key="jdbc.password" value="${jdbc.password}" />
-    </propertyfile>
     <copy todir="${activiti.home}/setup/build/webapps/activiti-rest.war/WEB-INF/lib">
       <fileset dir="${activiti.home}/setup/files/dependencies/libs" 
                includesfile="${activiti.home}/setup/files/dependencies/libs.webapp.rest.txt" />
