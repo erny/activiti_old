@@ -166,6 +166,12 @@
       <version>5.9-YACO</version>
     </dependency>
     
+    <!-- Tangram -->
+    <dependency>
+      <groupId>es.tangrambpm.activiti</groupId>
+      <artifactId>tangram-addons</artifactId>
+    </dependency>
+       
     <!-- Vaadin -->
     <dependency>
       <groupId>javax.servlet</groupId>
