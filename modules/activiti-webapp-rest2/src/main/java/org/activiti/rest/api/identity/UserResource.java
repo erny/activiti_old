@@ -14,12 +14,10 @@
 package org.activiti.rest.api.identity;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.User;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
 import org.restlet.resource.Get;
-import org.restlet.resource.Put;
 
 /**
  * @author Tijs Rademakers

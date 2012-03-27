@@ -13,18 +13,14 @@
 
 package org.activiti.rest.api.process;
 
-import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.rest.api.ActivitiUtil;
-import org.activiti.rest.api.RequestUtil;
 import org.activiti.rest.api.SecuredResource;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
-import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 
 /**

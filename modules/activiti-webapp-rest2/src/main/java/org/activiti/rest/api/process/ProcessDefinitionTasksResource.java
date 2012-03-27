@@ -16,7 +16,6 @@ package org.activiti.rest.api.process;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -44,7 +43,6 @@ public class ProcessDefinitionTasksResource extends SecuredResource {
     }
     ObjectNode responseJSON = new ObjectMapper().createObjectNode();
     ArrayNode tasksJSON = new ObjectMapper().createArrayNode();
-    RepositoryService repository = ActivitiUtil.getRepositoryService();
     ProcessDefinitionEntity pde = (ProcessDefinitionEntity) ((RepositoryServiceImpl) ActivitiUtil.getRepositoryService())
             .getDeployedProcessDefinition(processDefinitionId);
     Map<String, TaskDefinition> taskDefinitionMap = pde.getTaskDefinitions();

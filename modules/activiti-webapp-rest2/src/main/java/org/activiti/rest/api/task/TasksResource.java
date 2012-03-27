@@ -106,6 +106,7 @@ public class TasksResource extends SecuredResource {
     
     DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
     // add processDefinition name to every task
+    @SuppressWarnings("unchecked")
     List<TaskResponse> tasks = (List<TaskResponse>) dataResponse.getData();
     RepositoryService repositoryService = ActivitiUtil.getRepositoryService();
     Map <String , ProcessDefinition> processDefinitions = new HashMap<String, ProcessDefinition>();
