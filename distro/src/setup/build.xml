@@ -257,7 +257,7 @@
   <property name="tomcat.home" value="${activiti.home}/apps/apache-tomcat-${tomcat.version}" /> 
   <property name="tomcat.filename" value="apache-tomcat-${tomcat.version}.zip" /> 
   <property name="tomcat.download.url" value="${tomcat.url}${tomcat.filename}" />    
-  <property name="tomcat.java.opts" value="-server -Xms128m -Xmx512m -XX:NewSize=64m -XX:MaxNewSize=64m -XX:PermSize=256m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8" /> 
+  <property name="tomcat.java.opts" value="-server -Xms256m -Xmx1024m -XX:NewSize=64m -XX:MaxNewSize=64m -XX:PermSize=256m -XX:MaxPermSize=512m -Dfile.encoding=UTF-8 -Djava.awt.headless=true" /> 
   <property name="tomcat.distro" value="${downloads.dir}/${tomcat.filename}" />
   <available property="is.tomcat.installed" file="${tomcat.home}/bin" />
   <available property="is.tomcat.available" file="${tomcat.distro}" />
