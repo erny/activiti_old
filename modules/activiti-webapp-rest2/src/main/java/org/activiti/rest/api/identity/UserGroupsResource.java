@@ -13,10 +13,12 @@
 
 package org.activiti.rest.api.identity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.impl.GroupQueryProperty;
 import org.activiti.engine.query.QueryProperty;
 import org.activiti.rest.api.ActivitiUtil;
@@ -24,6 +26,7 @@ import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.api.DefaultPaginateList;
 import org.activiti.rest.api.SecuredResource;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 
 /**
  * @author Tijs Rademakers
@@ -51,5 +54,36 @@ public class UserGroupsResource extends SecuredResource {
         ActivitiUtil.getIdentityService().createGroupQuery().groupMember(userId), "id", properties);
     return dataResponse;
   }
+
+  @Post
+  public StateResponse setGroups(ArrayList<String> groupIds){
+      if(authenticate() == false) return null;
+      String userId = (String) getRequest().getAttributes().get("userId");
+      if(userId == null) {
+          throw new ActivitiException("No userId provided");
+      }
+      if(groupIds == null) {
+        throw new ActivitiException("No groupIds provided");
+      }
+
+      IdentityService identityService=ActivitiUtil.getIdentityService();
+      // Check if user exists
+      if (identityService.createUserQuery().userId(userId).singleResult() == null)
+          throw new ActivitiException("The user '" + userId + " does not exist.");
+          
+      // Check first if all groups exist
+      for (String groupId: groupIds)
+      {
+          if (identityService.createGroupQuery().groupId(groupId).singleResult() == null)
+              throw new ActivitiException("Group '" + groupId + "' does not exist.");
+      }
+      for (String groupId: groupIds)
+      {
+          // Add only if not already member
+          if (identityService.createUserQuery().userId(userId).memberOfGroup(groupId).singleResult() == null)
+              identityService.createMembership(userId, groupId);
+      }
+      return new StateResponse().setSuccess(true);
+    }
 
 }

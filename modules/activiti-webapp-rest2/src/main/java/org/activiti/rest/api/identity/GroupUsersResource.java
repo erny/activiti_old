@@ -13,16 +13,19 @@
 
 package org.activiti.rest.api.identity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.impl.UserQueryProperty;
 import org.activiti.engine.query.QueryProperty;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.DataResponse;
 import org.activiti.rest.api.SecuredResource;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 
 /**
  * @author Tijs Rademakers
@@ -52,4 +55,34 @@ public class GroupUsersResource extends SecuredResource {
     return dataResponse;
   }
 
+  @Post
+  public StateResponse setUsers(ArrayList<String> userIds){
+      if(authenticate() == false) return null;
+      String groupId = (String) getRequest().getAttributes().get("groupId");
+      if(groupId == null) {
+          throw new ActivitiException("No groupId provided");
+      }
+      if(userIds == null) {
+        throw new ActivitiException("No userIds provided");
+      }
+
+      IdentityService identityService = ActivitiUtil.getIdentityService();
+      // Check if user exists
+      if (identityService.createGroupQuery().groupId(groupId).singleResult() == null)
+          throw new ActivitiException("The user '" + groupId + "' does not exist.");
+          
+      // Check first if all users exist
+      for (String userId: userIds)
+      {
+          if (identityService.createUserQuery().userId(userId).singleResult() == null)
+              throw new ActivitiException("User '" + userId + " does not exist.");
+      }
+      for (String userId: userIds)
+      {
+          // Add only if not already member
+          if (identityService.createUserQuery().userId(userId).memberOfGroup(groupId).singleResult() == null)
+              identityService.createMembership(userId, groupId);
+      }
+      return new StateResponse().setSuccess(true);
+    }
 }

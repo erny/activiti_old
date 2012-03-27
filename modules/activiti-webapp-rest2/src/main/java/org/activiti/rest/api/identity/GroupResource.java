@@ -17,6 +17,8 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.identity.Group;
 import org.activiti.rest.api.ActivitiUtil;
 import org.activiti.rest.api.SecuredResource;
+import org.restlet.data.Status;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 
 /**
@@ -34,6 +36,23 @@ public class GroupResource extends SecuredResource {
     }
     Group group = ActivitiUtil.getIdentityService().createGroupQuery().groupId(groupId).singleResult();
     return group;
+  }
+
+  @Delete
+  public StateResponse deleteGroup() {
+    if(authenticate() == false) return null;
+    
+    String groupId = (String) getRequest().getAttributes().get("groupId");
+    if(groupId == null) {
+        setStatus(Status.CLIENT_ERROR_NOT_FOUND, "The group '" + groupId + "' does not exist.");
+        return new StateResponse().setSuccess(false);
+    }
+    Group group = ActivitiUtil.getIdentityService().createGroupQuery().groupId(groupId).singleResult();
+    if (group != null) {
+        ActivitiUtil.getIdentityService().deleteGroup(groupId);
+        return new StateResponse().setSuccess(true);
+    }
+    return new StateResponse().setSuccess(false);
   }
 
 }
