@@ -313,7 +313,8 @@
       <replacetoken><![CDATA[#!/bin/sh]]></replacetoken>
       <replacevalue><![CDATA[#!/bin/sh
 
-JAVA_OPTS=$JAVA_OPTS" @tomcat.java.opts@"
+JAVA_OPTS="$JAVA_OPTS @tomcat.java.opts@"
+unset DISPLAY
 ]]></replacevalue>
     </replace>
     <replace file="${tomcat.home}/conf/server.xml">
