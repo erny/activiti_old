@@ -1,4 +1,4 @@
-package es.tangrambpm.activi.servicetasks;
+package es.tangrambpm.activiti.servicetasks;
 
 import org.activiti.engine.delegate.Expression;
 
@@ -17,7 +17,7 @@ public class WebClient implements JavaDelegate
     protected Expression http_password;
     protected Expression http_content_type;
     protected Expression http_charset;
-    
+
     protected String val(Expression expr, DelegateExecution exe){
         try {
             return (String) expr.getValue(exe);
@@ -25,7 +25,7 @@ public class WebClient implements JavaDelegate
             return "";
         }
     }
-       
+
     @Override
     public void execute(DelegateExecution exe) throws Exception {
     	HttpMethodBase method=null;
@@ -75,7 +75,7 @@ public class WebClient implements JavaDelegate
             exe.setVariable("http_status", status);
         }
     }
-    
+
     protected String expr2str(Expression expression, DelegateExecution execution) {
         try {
             return expression.getValue(execution).toString();
