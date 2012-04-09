@@ -17,6 +17,8 @@ public class WebClient implements JavaDelegate
     protected Expression http_password;
     protected Expression http_content_type;
     protected Expression http_charset;
+    protected Expression http_result_status;
+    protected Expression http_result_body;
 
     protected String val(Expression expr, DelegateExecution exe){
         try {
@@ -36,6 +38,8 @@ public class WebClient implements JavaDelegate
         String password  = expr2str(http_password, exe);
         String content_type = expr2str(http_content_type, exe);
         String charset = expr2str(http_charset, exe);
+        String result_status = expr2str(http_result_status, "http_status", exe);
+        String result_body = expr2str(http_result_body, "http_result", exe);
         String result = "";
         String status = "";
         if (m.equals("")) {
@@ -71,8 +75,8 @@ public class WebClient implements JavaDelegate
             result = e.getMessage();
         } finally {
             method.releaseConnection();
-            exe.setVariable("http_result", result);
-            exe.setVariable("http_status", status);
+            exe.setVariable(result_body, result);
+            exe.setVariable(result_status, status);
         }
     }
 
@@ -82,5 +86,11 @@ public class WebClient implements JavaDelegate
         } catch (Exception e) {
             return "";
         }
+    }
+    protected String expr2str(Expression expression, String defaultValue, DelegateExecution execution) {
+        String res = expr2str(expression, execution);
+        if (res.equals(""))
+            return defaultValue;
+        return res;
     }
 }
