@@ -159,7 +159,11 @@ public class ProcessInstanceResource extends SecuredResource {
         HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) historicDetail;
         ObjectNode variableJSON = new ObjectMapper().createObjectNode();
         variableJSON.put("variableName", variableUpdate.getVariableName());
-        variableJSON.put("variableValue", variableUpdate.getValue().toString());
+        if (variableUpdate.getValue() == null) {
+            variableJSON.putNull("variableValue");
+        } else {
+            variableJSON.put("variableValue", variableUpdate.getValue().toString());
+        }
         variableJSON.put("variableType", variableUpdate.getVariableTypeName());
         variableJSON.put("revision", variableUpdate.getRevision());
         variableJSON.put("time", RequestUtil.dateToString(variableUpdate.getTime()));
