@@ -543,7 +543,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         // update the jdbc parameters to the configured ones...
         Environment environment = new Environment("default", transactionFactory, dataSource);
         Reader reader = new InputStreamReader(inputStream);
-        XMLConfigBuilder parser = new XMLConfigBuilder(reader);
+        Properties properties = new Properties();
+        properties.put("prefix", databaseTablePrefix);
+        XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
         configuration.setEnvironment(environment);
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
@@ -571,6 +573,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
       dbSqlSessionFactory.setDbIdentityUsed(isDbIdentityUsed);
       dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
+      dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
       addSessionFactory(dbSqlSessionFactory);
       
       addSessionFactory(new GenericManagerFactory(AttachmentManager.class));

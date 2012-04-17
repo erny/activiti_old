@@ -116,6 +116,7 @@ public abstract class ProcessEngineConfiguration {
 
   protected String databaseType;
   protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
+  protected String databaseTablePrefix = "";
   protected String jdbcDriver = "org.h2.Driver";
   protected String jdbcUrl = "jdbc:h2:tcp://localhost/activiti";
   protected String jdbcUsername = "sa";
@@ -501,5 +502,14 @@ public abstract class ProcessEngineConfiguration {
 
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
+  }
+    
+  public ProcessEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
+    this.databaseTablePrefix = databaseTablePrefix;
+    return this;
+  }
+    
+  public String getDatabaseTablePrefix() {
+    return databaseTablePrefix;
   }
 }
