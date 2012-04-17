@@ -683,6 +683,7 @@ public class DbSqlSession implements Session {
   }
 
   public boolean isTablePresent(String tableName) {
+    tableName = prependDatabaseTablePrefix(tableName);
     Connection connection = null;
     try {
       connection = sqlSession.getConnection();
@@ -714,6 +715,10 @@ public class DbSqlSession implements Session {
     } catch (Exception e) {
       throw new ActivitiException("couldn't check if tables are already present using metadata: "+e.getMessage(), e); 
     }
+  }
+
+  protected String prependDatabaseTablePrefix(String tableName) {
+    return dbSqlSessionFactory.getDatabaseTablePrefix() + tableName;    
   }
 
   protected void dbSchemaUpgrade(String component, String dbVersion) {
@@ -772,6 +777,7 @@ public class DbSqlSession implements Session {
       BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
       String line = readNextTrimmedLine(reader);
       while (line != null) {
+        line = replaceDatabaseSchemaPrefix(line);
         if (line.startsWith("# ")) {
           log.fine(line.substring(2));
           
@@ -827,6 +833,10 @@ public class DbSqlSession implements Session {
     } catch (Exception e) {
       throw new ActivitiException("couldn't "+operation+" db schema: "+exceptionSqlStatement, e);
     }
+  }
+
+  protected String replaceDatabaseSchemaPrefix(String line) {    
+    return line.replace("${prefix}", dbSqlSessionFactory.getDatabaseTablePrefix());
   }
 
   protected String addSqlStatementPiece(String sqlStatement, String line) {
