@@ -1,4 +1,4 @@
-create table ${prefix}ACT_HI_PROCINST (
+create table ACT_HI_PROCINST (
     ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64) not null,
     BUSINESS_KEY_ nvarchar(255),
@@ -15,7 +15,7 @@ create table ${prefix}ACT_HI_PROCINST (
     unique (PROC_INST_ID_)
 );
 
-create table ${prefix}ACT_HI_ACTINST (
+create table ACT_HI_ACTINST (
     ID_ nvarchar(64) not null,
     PROC_DEF_ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64) not null,
@@ -30,7 +30,7 @@ create table ${prefix}ACT_HI_ACTINST (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_HI_TASKINST (
+create table ACT_HI_TASKINST (
     ID_ nvarchar(64) not null,
     PROC_DEF_ID_ nvarchar(64),
     TASK_DEF_KEY_ nvarchar(255),
@@ -50,7 +50,7 @@ create table ${prefix}ACT_HI_TASKINST (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_HI_DETAIL (
+create table ACT_HI_DETAIL (
     ID_ nvarchar(64) not null,
     TYPE_ nvarchar(255) not null,
     PROC_INST_ID_ nvarchar(64) not null,
@@ -69,7 +69,7 @@ create table ${prefix}ACT_HI_DETAIL (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_HI_COMMENT (
+create table ACT_HI_COMMENT (
     ID_ nvarchar(64) not null,
     TYPE_ nvarchar(255),
     TIME_ datetime not null,
@@ -82,7 +82,7 @@ create table ${prefix}ACT_HI_COMMENT (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_HI_ATTACHMENT (
+create table ACT_HI_ATTACHMENT (
     ID_ nvarchar(64) not null,
     REV_ integer,
     USER_ID_ nvarchar(255),
@@ -96,13 +96,13 @@ create table ${prefix}ACT_HI_ATTACHMENT (
     primary key (ID_)
 );
 
-create index ${prefix}ACT_IDX_HI_PRO_INST_END on ${prefix}ACT_HI_PROCINST(END_TIME_);
-create index ${prefix}ACT_IDX_HI_PRO_I_BUSKEY on ${prefix}ACT_HI_PROCINST(BUSINESS_KEY_);
-create index ${prefix}ACT_IDX_HI_ACT_INST_START on ${prefix}ACT_HI_ACTINST(START_TIME_);
-create index ${prefix}ACT_IDX_HI_ACT_INST_END on ${prefix}ACT_HI_ACTINST(END_TIME_);
-create index ${prefix}ACT_IDX_HI_DETAIL_PROC_INST on ${prefix}ACT_HI_DETAIL(PROC_INST_ID_);
-create index ${prefix}ACT_IDX_HI_DETAIL_ACT_INST on ${prefix}ACT_HI_DETAIL(ACT_INST_ID_);
-create index ${prefix}ACT_IDX_HI_DETAIL_TIME on ${prefix}ACT_HI_DETAIL(TIME_);
-create index ${prefix}ACT_IDX_HI_DETAIL_NAME on ${prefix}ACT_HI_DETAIL(NAME_);
-create index ${prefix}ACT_IDX_HI_DETAIL_TASK_ID on ${prefix}ACT_HI_DETAIL(TASK_ID_);
-create unique index ${prefix}ACT_UNIQ_HI_BUS_KEY on ${prefix}ACT_HI_PROCINST (PROC_DEF_ID_, BUSINESS_KEY_) where BUSINESS_KEY_ is not null;
+create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
+create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
+create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
+create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
+create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
+create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
+create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
+create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
+create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
+create unique index ACT_UNIQ_HI_BUS_KEY on ACT_HI_PROCINST (PROC_DEF_ID_, BUSINESS_KEY_) where BUSINESS_KEY_ is not null;

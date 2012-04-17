@@ -1,4 +1,4 @@
-create table ${prefix}ACT_ID_GROUP (
+create table ACT_ID_GROUP (
     ID_ varchar(64),
     REV_ integer,
     NAME_ varchar(255),
@@ -6,13 +6,13 @@ create table ${prefix}ACT_ID_GROUP (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_ID_MEMBERSHIP (
+create table ACT_ID_MEMBERSHIP (
     USER_ID_ varchar(64),
     GROUP_ID_ varchar(64),
     primary key (USER_ID_, GROUP_ID_)
 );
 
-create table ${prefix}ACT_ID_USER (
+create table ACT_ID_USER (
     ID_ varchar(64),
     REV_ integer,
     FIRST_ varchar(255),
@@ -23,7 +23,7 @@ create table ${prefix}ACT_ID_USER (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_ID_INFO (
+create table ACT_ID_INFO (
     ID_ varchar(64),
     REV_ integer,
     USER_ID_ varchar(64),
@@ -35,14 +35,14 @@ create table ${prefix}ACT_ID_INFO (
     primary key (ID_)
 );
 
-create index ${prefix}ACT_IDX_MEMB_GROUP on ${prefix}ACT_ID_MEMBERSHIP(GROUP_ID_);
-alter table ${prefix}ACT_ID_MEMBERSHIP 
-    add constraint ${prefix}ACT_FK_MEMB_GROUP
+create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
+alter table ACT_ID_MEMBERSHIP 
+    add constraint ACT_FK_MEMB_GROUP
     foreign key (GROUP_ID_) 
-    references ${prefix}ACT_ID_GROUP (ID_);
+    references ACT_ID_GROUP (ID_);
 
-create index ${prefix}ACT_IDX_MEMB_USER on ${prefix}ACT_ID_MEMBERSHIP(USER_ID_);
-alter table ${prefix}ACT_ID_MEMBERSHIP 
-    add constraint ${prefix}ACT_FK_MEMB_USER
+create index ACT_IDX_MEMB_USER on ACT_ID_MEMBERSHIP(USER_ID_);
+alter table ACT_ID_MEMBERSHIP 
+    add constraint ACT_FK_MEMB_USER
     foreign key (USER_ID_) 
-    references ${prefix}ACT_ID_USER (ID_);
+    references ACT_ID_USER (ID_);

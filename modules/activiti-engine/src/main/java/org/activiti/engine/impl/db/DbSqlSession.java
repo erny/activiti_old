@@ -777,7 +777,6 @@ public class DbSqlSession implements Session {
       BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
       String line = readNextTrimmedLine(reader);
       while (line != null) {
-        line = replaceDatabaseSchemaPrefix(line);
         if (line.startsWith("# ")) {
           log.fine(line.substring(2));
           
@@ -833,10 +832,6 @@ public class DbSqlSession implements Session {
     } catch (Exception e) {
       throw new ActivitiException("couldn't "+operation+" db schema: "+exceptionSqlStatement, e);
     }
-  }
-
-  protected String replaceDatabaseSchemaPrefix(String line) {    
-    return line.replace("${prefix}", dbSqlSessionFactory.getDatabaseTablePrefix());
   }
 
   protected String addSqlStatementPiece(String sqlStatement, String line) {

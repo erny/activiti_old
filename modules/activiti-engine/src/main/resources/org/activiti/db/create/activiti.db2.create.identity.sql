@@ -1,4 +1,4 @@
-create table ${prefix}ACT_ID_GROUP (
+create table ACT_ID_GROUP (
     ID_ varchar(64) not null,
     REV_ integer,
     NAME_ varchar(255),
@@ -6,13 +6,13 @@ create table ${prefix}ACT_ID_GROUP (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_ID_MEMBERSHIP (
+create table ACT_ID_MEMBERSHIP (
     USER_ID_ varchar(64) not null,
     GROUP_ID_ varchar(64) not null,
     primary key (USER_ID_, GROUP_ID_)
 );
 
-create table ${prefix}ACT_ID_USER (
+create table ACT_ID_USER (
     ID_ varchar(64) not null,
     REV_ integer,
     FIRST_ varchar(255),
@@ -23,7 +23,7 @@ create table ${prefix}ACT_ID_USER (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_ID_INFO (
+create table ACT_ID_INFO (
     ID_ varchar(64) not null,
     REV_ integer,
     USER_ID_ varchar(64),
@@ -35,12 +35,12 @@ create table ${prefix}ACT_ID_INFO (
     primary key (ID_)
 );
 
-alter table ${prefix}ACT_ID_MEMBERSHIP 
-    add constraint ${prefix}ACT_FK_MEMB_GROUP 
+alter table ACT_ID_MEMBERSHIP 
+    add constraint ACT_FK_MEMB_GROUP 
     foreign key (GROUP_ID_) 
-    references ${prefix}ACT_ID_GROUP (ID_);
+    references ACT_ID_GROUP (ID_);
 
-alter table ${prefix}ACT_ID_MEMBERSHIP 
-    add constraint ${prefix}ACT_FK_MEMB_USER 
+alter table ACT_ID_MEMBERSHIP 
+    add constraint ACT_FK_MEMB_USER 
     foreign key (USER_ID_) 
-    references ${prefix}ACT_ID_USER (ID_);
+    references ACT_ID_USER (ID_);

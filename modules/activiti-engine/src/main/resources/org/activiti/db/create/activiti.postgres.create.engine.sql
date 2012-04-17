@@ -1,20 +1,20 @@
-create table ${prefix}ACT_GE_PROPERTY (
+create table ACT_GE_PROPERTY (
     NAME_ varchar(64),
     VALUE_ varchar(300),
     REV_ integer,
     primary key (NAME_)
 );
 
-insert into ${prefix}ACT_GE_PROPERTY
+insert into ACT_GE_PROPERTY
 values ('schema.version', '5.9-SNAPSHOT', 1);
 
-insert into ${prefix}ACT_GE_PROPERTY
+insert into ACT_GE_PROPERTY
 values ('schema.history', 'create(5.9-SNAPSHOT)', 1);
 
-insert into ${prefix}ACT_GE_PROPERTY
+insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
 
-create table ${prefix}ACT_GE_BYTEARRAY (
+create table ACT_GE_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
     NAME_ varchar(255),
@@ -24,14 +24,14 @@ create table ${prefix}ACT_GE_BYTEARRAY (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RE_DEPLOYMENT (
+create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
     DEPLOY_TIME_ timestamp,
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RU_EXECUTION (
+create table ACT_RU_EXECUTION (
     ID_ varchar(64),
     REV_ integer,
     PROC_INST_ID_ varchar(64),
@@ -49,7 +49,7 @@ create table ${prefix}ACT_RU_EXECUTION (
     unique (PROC_DEF_ID_, BUSINESS_KEY_)
 );
 
-create table ${prefix}ACT_RU_JOB (
+create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
 	  REV_ integer,
     TYPE_ varchar(255) NOT NULL,
@@ -68,7 +68,7 @@ create table ${prefix}ACT_RU_JOB (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RE_PROCDEF (
+create table ACT_RE_PROCDEF (
     ID_ varchar(64),
     REV_ integer,
     CATEGORY_ varchar(255),
@@ -83,7 +83,7 @@ create table ${prefix}ACT_RE_PROCDEF (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RU_TASK (
+create table ACT_RU_TASK (
     ID_ varchar(64),
     REV_ integer,
     EXECUTION_ID_ varchar(64),
@@ -102,7 +102,7 @@ create table ${prefix}ACT_RU_TASK (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RU_IDENTITYLINK (
+create table ACT_RU_IDENTITYLINK (
     ID_ varchar(64),
     REV_ integer,
     GROUP_ID_ varchar(64),
@@ -112,7 +112,7 @@ create table ${prefix}ACT_RU_IDENTITYLINK (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RU_VARIABLE (
+create table ACT_RU_VARIABLE (
     ID_ varchar(64) not null,
     REV_ integer,
     TYPE_ varchar(255) not null,
@@ -128,7 +128,7 @@ create table ${prefix}ACT_RU_VARIABLE (
     primary key (ID_)
 );
 
-create table ${prefix}ACT_RU_EVENT_SUBSCR (
+create table ACT_RU_EVENT_SUBSCR (
     ID_ varchar(64) not null,
     REV_ integer,
     EVENT_TYPE_ varchar(255) not null,
@@ -141,87 +141,87 @@ create table ${prefix}ACT_RU_EVENT_SUBSCR (
     primary key (ID_)
 );
 
-create index ${prefix}ACT_IDX_EXEC_BUSKEY on ${prefix}ACT_RU_EXECUTION(BUSINESS_KEY_);
-create index ${prefix}ACT_IDX_TASK_CREATE on ${prefix}ACT_RU_TASK(CREATE_TIME_);
-create index ${prefix}ACT_IDX_IDENT_LNK_USER on ${prefix}ACT_RU_IDENTITYLINK(USER_ID_);
-create index ${prefix}ACT_IDX_IDENT_LNK_GROUP on ${prefix}ACT_RU_IDENTITYLINK(GROUP_ID_);
-create index ${prefix}ACT_IDX_EVENT_SUBSCR_CONFIG_ on ${prefix}ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
-create index ${prefix}ACT_IDX_VARIABLE_TASK_ID on ${prefix}ACT_RU_VARIABLE(TASK_ID_);
+create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
+create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
+create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
+create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
+create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
+create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 
-create index ${prefix}ACT_IDX_BYTEAR_DEPL on ${prefix}ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
-alter table ${prefix}ACT_GE_BYTEARRAY
-    add constraint ${prefix}ACT_FK_BYTEARR_DEPL
+create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
+alter table ACT_GE_BYTEARRAY
+    add constraint ACT_FK_BYTEARR_DEPL
     foreign key (DEPLOYMENT_ID_) 
-    references ${prefix}ACT_RE_DEPLOYMENT (ID_);
+    references ACT_RE_DEPLOYMENT (ID_);
 
-create index ${prefix}ACT_IDX_EXE_PROCINST on ${prefix}ACT_RU_EXECUTION(PROC_INST_ID_);
-alter table ${prefix}ACT_RU_EXECUTION
-    add constraint ${prefix}ACT_FK_EXE_PROCINST 
+create index ACT_IDX_EXE_PROCINST on ACT_RU_EXECUTION(PROC_INST_ID_);
+alter table ACT_RU_EXECUTION
+    add constraint ACT_FK_EXE_PROCINST 
     foreign key (PROC_INST_ID_) 
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
 
-create index ${prefix}ACT_IDX_EXE_PARENT on ${prefix}ACT_RU_EXECUTION(PARENT_ID_);
-alter table ${prefix}ACT_RU_EXECUTION
-    add constraint ${prefix}ACT_FK_EXE_PARENT
+create index ACT_IDX_EXE_PARENT on ACT_RU_EXECUTION(PARENT_ID_);
+alter table ACT_RU_EXECUTION
+    add constraint ACT_FK_EXE_PARENT
     foreign key (PARENT_ID_) 
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
     
-create index ${prefix}ACT_IDX_EXE_SUPER on ${prefix}ACT_RU_EXECUTION(SUPER_EXEC_);
-alter table ${prefix}ACT_RU_EXECUTION
-    add constraint ${prefix}ACT_FK_EXE_SUPER
+create index ACT_IDX_EXE_SUPER on ACT_RU_EXECUTION(SUPER_EXEC_);
+alter table ACT_RU_EXECUTION
+    add constraint ACT_FK_EXE_SUPER
     foreign key (SUPER_EXEC_) 
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
 
-create index ${prefix}ACT_IDX_TSKASS_TASK on ${prefix}ACT_RU_IDENTITYLINK(TASK_ID_);
-alter table ${prefix}ACT_RU_IDENTITYLINK
-    add constraint ${prefix}ACT_FK_TSKASS_TASK
+create index ACT_IDX_TSKASS_TASK on ACT_RU_IDENTITYLINK(TASK_ID_);
+alter table ACT_RU_IDENTITYLINK
+    add constraint ACT_FK_TSKASS_TASK
     foreign key (TASK_ID_) 
-    references ${prefix}ACT_RU_TASK (ID_);
+    references ACT_RU_TASK (ID_);
     
-create index ${prefix}ACT_IDX_TASK_EXEC on ${prefix}ACT_RU_TASK(EXECUTION_ID_);
-alter table ${prefix}ACT_RU_TASK
-    add constraint ${prefix}ACT_FK_TASK_EXE
+create index ACT_IDX_TASK_EXEC on ACT_RU_TASK(EXECUTION_ID_);
+alter table ACT_RU_TASK
+    add constraint ACT_FK_TASK_EXE
     foreign key (EXECUTION_ID_)
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
     
-create index ${prefix}ACT_IDX_TASK_PROCINST on ${prefix}ACT_RU_TASK(PROC_INST_ID_);
-alter table ${prefix}ACT_RU_TASK
-    add constraint ${prefix}ACT_FK_TASK_PROCINST
+create index ACT_IDX_TASK_PROCINST on ACT_RU_TASK(PROC_INST_ID_);
+alter table ACT_RU_TASK
+    add constraint ACT_FK_TASK_PROCINST
     foreign key (PROC_INST_ID_)
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
     
-create index ${prefix}ACT_IDX_TASK_PROCDEF on ${prefix}ACT_RU_TASK(PROC_DEF_ID_);
-alter table ${prefix}ACT_RU_TASK
-  add constraint ${prefix}ACT_FK_TASK_PROCDEF
+create index ACT_IDX_TASK_PROCDEF on ACT_RU_TASK(PROC_DEF_ID_);
+alter table ACT_RU_TASK
+  add constraint ACT_FK_TASK_PROCDEF
   foreign key (PROC_DEF_ID_)
-  references ${prefix}ACT_RE_PROCDEF (ID_);
+  references ACT_RE_PROCDEF (ID_);
   
-create index ${prefix}ACT_IDX_VAR_EXE on ${prefix}ACT_RU_VARIABLE(EXECUTION_ID_);
-alter table ${prefix}ACT_RU_VARIABLE 
-    add constraint ${prefix}ACT_FK_VAR_EXE
+create index ACT_IDX_VAR_EXE on ACT_RU_VARIABLE(EXECUTION_ID_);
+alter table ACT_RU_VARIABLE 
+    add constraint ACT_FK_VAR_EXE
     foreign key (EXECUTION_ID_) 
-    references ${prefix}ACT_RU_EXECUTION (ID_);
+    references ACT_RU_EXECUTION (ID_);
 
-create index ${prefix}ACT_IDX_VAR_PROCINST on ${prefix}ACT_RU_VARIABLE(PROC_INST_ID_);
-alter table ${prefix}ACT_RU_VARIABLE
-    add constraint ${prefix}ACT_FK_VAR_PROCINST
+create index ACT_IDX_VAR_PROCINST on ACT_RU_VARIABLE(PROC_INST_ID_);
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_PROCINST
     foreign key (PROC_INST_ID_)
-    references ${prefix}ACT_RU_EXECUTION(ID_);
+    references ACT_RU_EXECUTION(ID_);
 
-create index ${prefix}ACT_IDX_VAR_BYTEARRAY on ${prefix}ACT_RU_VARIABLE(BYTEARRAY_ID_);
-alter table ${prefix}ACT_RU_VARIABLE 
-    add constraint ${prefix}ACT_FK_VAR_BYTEARRAY 
+create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
+alter table ACT_RU_VARIABLE 
+    add constraint ACT_FK_VAR_BYTEARRAY 
     foreign key (BYTEARRAY_ID_) 
-    references ${prefix}ACT_GE_BYTEARRAY (ID_);
+    references ACT_GE_BYTEARRAY (ID_);
 
-create index ${prefix}ACT_IDX_JOB_EXCEPTION on ${prefix}ACT_RU_JOB(EXCEPTION_STACK_ID_);
-alter table ${prefix}ACT_RU_JOB 
-    add constraint ${prefix}ACT_FK_JOB_EXCEPTION
+create index ACT_IDX_JOB_EXCEPTION on ACT_RU_JOB(EXCEPTION_STACK_ID_);
+alter table ACT_RU_JOB 
+    add constraint ACT_FK_JOB_EXCEPTION
     foreign key (EXCEPTION_STACK_ID_) 
-    references ${prefix}ACT_GE_BYTEARRAY (ID_);
+    references ACT_GE_BYTEARRAY (ID_);
 
-create index ${prefix}ACT_IDX_EVENT_SUBSCR on ${prefix}ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
-alter table ${prefix}ACT_RU_EVENT_SUBSCR
-    add constraint ${prefix}ACT_FK_EVENT_EXEC
+create index ACT_IDX_EVENT_SUBSCR on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
+alter table ACT_RU_EVENT_SUBSCR
+    add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
-    references ${prefix}ACT_RU_EXECUTION(ID_);
+    references ACT_RU_EXECUTION(ID_);
