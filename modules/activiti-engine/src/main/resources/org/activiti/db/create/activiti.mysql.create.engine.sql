@@ -39,7 +39,7 @@ create table ${prefix}ACT_RU_EXECUTION (
     PARENT_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
     SUPER_EXEC_ varchar(64),
-    ${prefix}ACT_ID_ varchar(255),
+    ACT_ID_ varchar(255),
     IS_ACTIVE_ TINYINT,
     IS_CONCURRENT_ TINYINT,
     IS_SCOPE_ TINYINT,
