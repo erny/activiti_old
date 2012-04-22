@@ -35,8 +35,8 @@ import org.activiti.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
-import org.activiti.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateCatchEventActivitiBehaviour;
@@ -2133,7 +2133,7 @@ public class BpmnParse extends Parse {
       boolean interrupting = cancelActivity.equals("true") ? true : false;
 
       // Catch event behavior is the same for most types
-      ActivityBehavior behavior = new BoundaryEventActivityBehavior(interrupting);
+      ActivityBehavior behavior = new BoundaryEventActivityBehavior(interrupting, nestedActivity.getId());
 
       // Depending on the sub-element definition, the correct activityBehavior
       // parsing is selected
