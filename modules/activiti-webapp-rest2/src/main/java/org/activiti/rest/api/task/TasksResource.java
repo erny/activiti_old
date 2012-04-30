@@ -72,6 +72,8 @@ public class TasksResource extends SecuredResource {
     String strDueDate = getQuery().getValues("dueDate");
     String strMinDueDate = getQuery().getValues("minDueDate");
     String strMaxDueDate = getQuery().getValues("maxDueDate");
+
+    String processInstanceId = getQuery().getValues("processInstanceId");
     
     TaskQuery taskQuery = ActivitiUtil.getTaskService().createTaskQuery();
     if (personalTaskUserId != null) {
@@ -104,6 +106,10 @@ public class TasksResource extends SecuredResource {
       taskQuery.dueBefore(RequestUtil.parseToDate(strMaxDueDate));
     }
     
+    if (processInstanceId != null) {
+        taskQuery.processInstanceId(processInstanceId);
+    }
+
     DataResponse dataResponse = new TasksPaginateList().paginateList(getQuery(), taskQuery, "id", properties);
     // add processDefinition name to every task
     @SuppressWarnings("unchecked")
