@@ -53,6 +53,7 @@ public class TasksResource extends SecuredResource {
     properties.put("assignee", TaskQueryProperty.ASSIGNEE);
     properties.put("executionId", TaskQueryProperty.EXECUTION_ID);
     properties.put("processInstanceId", TaskQueryProperty.PROCESS_INSTANCE_ID);
+    properties.put("createTime", TaskQueryProperty.CREATE_TIME);
   }
   
   @Get
