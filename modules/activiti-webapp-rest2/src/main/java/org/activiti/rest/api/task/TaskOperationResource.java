@@ -36,12 +36,6 @@ public class TaskOperationResource extends SecuredResource {
   public ObjectNode executeTaskOperation(Representation entity) {
     if(authenticate() == false) return null;
     
-      String effectiveUser = (String) getRequest().getAttributes().get("effectiveUser");
-      if(authenticate(SecuredResource.ADMIN) == true && effectiveUser != null){
-        Authentication.setAuthenticatedUserId(effectiveUser);
-        super.loggedInUser = effectiveUser;
-      }
-
     String taskId = (String) getRequest().getAttributes().get("taskId");
     String operation = (String) getRequest().getAttributes().get("operation");
     try {
