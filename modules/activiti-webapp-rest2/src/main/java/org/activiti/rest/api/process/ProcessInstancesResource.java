@@ -45,8 +45,10 @@ public class ProcessInstancesResource extends SecuredResource {
     HistoricProcessInstanceQuery query = ActivitiUtil.getHistoryService().createHistoricProcessInstanceQuery();
     query = query.unfinished();
     String processDefinitionId = getQuery().getValues("processDefinitionId");
+    String processDefinitionKey = getQuery().getValues("processDefinitionKey");
     String processInstanceKey = getQuery().getValues("businessKey");
     query = processDefinitionId == null ? query : query.processDefinitionId(processDefinitionId);
+    query = processDefinitionKey == null ? query : query.processDefinitionKey(processDefinitionKey);
     query = processInstanceKey == null ? query : query.processInstanceBusinessKey(processInstanceKey);
     
     DataResponse response = new ProcessInstancesPaginateList().paginateList(getQuery(), query, "id", properties);
